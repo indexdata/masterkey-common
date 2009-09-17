@@ -18,11 +18,13 @@ class ConfigFileLocation {
     public static final String MASTERKEY_ROOT_CONFIG_DIR_PARAM = "MASTERKEY_ROOT_CONFIG_DIR";
     public static final String MASTERKEY_COMPONENT_CONFIG_DIR_PARAM = "MASTERKEY_COMPONENT_CONFIG_DIR";
     public static final String MASTERKEY_CONFIG_FILE_NAME_PARAM = "MASTERKEY_CONFIG_FILE_NAME";
-    public static final String DOMAIN_CONFIG_DIR_MAPPING_FILE = "domain-config-map.properties";
+    public static final String DOMAIN_CONFIG_DIR_PROPERTY_NAME = "CONFIG_DIR";
+    public static final String DOMAIN_CONFIG_FILE_POSTFIX = "_confd";
     private String componentDir = null;
     String fileName = null;
     String serverName = null;
     String configDirForServerName = null;
+    String domainMappingFileName = null;
     Properties domainConfigMappingProperties = null;
     private static Logger logger = Logger.getLogger("com.indexdata.masterkey.config");
 
@@ -40,7 +42,8 @@ class ConfigFileLocation {
         this.fileName = context.getInitParameter(MASTERKEY_CONFIG_FILE_NAME_PARAM);
         checkMandatoryParameter(MASTERKEY_CONFIG_FILE_NAME_PARAM, fileName);
         this.serverName = serverName;
-        this.configDirForServerName = getConfigDirForServerName(componentDir, serverName);
+        this.domainMappingFileName = serverName + DOMAIN_CONFIG_FILE_POSTFIX;
+        this.configDirForServerName = getConfigDirForServerName(componentDir, domainMappingFileName);
     }
 
     /**
@@ -98,7 +101,7 @@ class ConfigFileLocation {
             }
             File confdDirFile = new File(getComponentConfDDir());
             if (!confdDirFile.exists()) {
-                logger.error("The component directory '" + getComponentDir() + "' must contain a directory name 'conf.d'");
+                logger.error("The component directory '" + getComponentDir() + "' must contain a directory named 'conf.d'");
                 throw new IOException("Directory 'conf.d' was not found in masterkey component config directory '" + getComponentDir() + "'");
             } else {
                 logger.info("Masterkey component 'conf.d' directory was found: '" + getComponentConfDDir() + "'");
@@ -106,7 +109,7 @@ class ConfigFileLocation {
             File configDirFile = new File(getConfigDir());
             if (!configDirFile.exists()) {
                 if (configDirForServerName != null || configDirForServerName.length() > 0) {
-                    logger.error("The directory '" + configDirForServerName + "' was not found in '" + getComponentConfDDir() + " '" + configDirForServerName + "' is configured for '" + serverName + "' in '" + getComponentDir() + "/" + DOMAIN_CONFIG_DIR_MAPPING_FILE + "'" + " Please check " + DOMAIN_CONFIG_DIR_MAPPING_FILE + " and compare with the file system.");
+                    logger.error("The directory '" + configDirForServerName + "' was not found in '" + getComponentConfDDir() + " '" + configDirForServerName + "' is configured for '" + serverName + "' in '" + getComponentDir() + "/" + serverName + "'" + " Please check the file '" + serverName + "' and compare with the file system.");
                     throw new IOException("Directory '" + configDirForServerName + "' was not found in '" + getComponentConfDDir());
                 } else {
                     logger.warn("Configuration directory not resolved for host name " + serverName);
@@ -125,21 +128,24 @@ class ConfigFileLocation {
      * the component was invoked.
      * @param rootConfigDirectory
      * @param componentConfigDirectory
-     * @param serverName
+     * @param domainMappingFileName
      * @return
      */
-    private String getConfigDirForServerName(String componentConfigDirectory, String serverName) {
+    private String getConfigDirForServerName(String componentConfigDirectory, String domainMappingFileName) {
         String configDir = "";
-        Properties prop = getDomainConfigMappingProperties(componentConfigDirectory);
+        Properties prop = getDomainConfigMappingProperties(componentConfigDirectory, domainMappingFileName);
         if (prop != null) {
-            configDir = (String) prop.get(serverName);
+            configDir = (String) prop.get(DOMAIN_CONFIG_DIR_PROPERTY_NAME);
             if (configDir == null || configDir.length() == 0) {
                 configDir = "";
-                logger.warn("Could not find directory name for host name \'" + serverName + "\' - will assume configuration file is in 'conf.d'.");
+                logger.warn("Property " + DOMAIN_CONFIG_DIR_PROPERTY_NAME + " not found in " + domainMappingFileName);
+                logger.warn("Could not find a config directory for host name \'" + serverName + "\' - will assume configuration file is in 'conf.d'.");
             } else {
                 configDir = "/" + configDir;
-                logger.info("Found config directory for host name \'" + serverName + "\': \'" + configDir + "\'");
+                logger.info("Found config directory name for host name \'" + serverName + "\': \'" + configDir + "\' under: " + componentConfigDirectory);
             }
+        } else {
+            logger.warn("Could not find a config directory name for host name \'" + serverName + "\' - will assume configuration file is in 'conf.d'.");
         }
         return configDir;
     }
@@ -152,13 +158,14 @@ class ConfigFileLocation {
      * @param componentConfigDirectory
      * @return
      */
-    private Properties getDomainConfigMappingProperties(String componentConfigDirectory) {
+    private Properties getDomainConfigMappingProperties(String componentConfigDirectory, String domainMappingFileName) {
         if (domainConfigMappingProperties == null) {
             domainConfigMappingProperties = new Properties();
             try {
-                domainConfigMappingProperties.load(new FileInputStream(MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + DOMAIN_CONFIG_DIR_MAPPING_FILE));
+                domainConfigMappingProperties.load(new FileInputStream(MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + domainMappingFileName));
             } catch (IOException ioe) {
-                logger.warn(ioe + "Could not load domain-to-config mapping file " + MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + DOMAIN_CONFIG_DIR_MAPPING_FILE + ".");
+            	domainConfigMappingProperties = null;
+                logger.warn(ioe + "Could not load domain-to-config mapping file " + MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + domainMappingFileName + ".");
             }
         }
         return domainConfigMappingProperties;
