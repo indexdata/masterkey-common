@@ -11,14 +11,19 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import org.apache.log4j.Logger;
 
 /**
- * Obtains configuration based on domain (host name) and component (J2EE module).
- * Caches the configuration per component@domain.
- * Retrieves parameters per servlet.
- *
+ * Represents the configuration context for modules within this J2EE component.
+ * 
+ * An instance of this class basically has a one-to-one relationship with the properties file for the component/vhost
+ * 
+ * From this context it is possible to obtain configurations for sub-modules within the component. The configuration
+ * of a sub-module would be those properties in the components properties file that are prefixed with a given module name.
+ * 
+ * 'Component': Basically a .war file
+ * 'Module': Sub-functions within the component, i.e. a Servlet, a REST service, a plug-in, etc.
+ * 
  * Throws ServletException 
  *    If the configuration file (property file) is not found
  *
@@ -29,45 +34,37 @@ public class MasterkeyConfiguration {
     public static final String MASTERKEY_CONFIG_LIFE_TIME_PARAM = "MASTERKEY_CONFIG_LIFE_TIME";
 
     private Logger logger = Logger.getLogger("com.indexdata.masterkey.config.");
-    private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap();
-    private boolean cacheConfigParams = true;
-    private String serviceName = null;
+    private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap();    
+    private boolean cacheConfigParams = true;           
+    private String contextKey = null;
 
     private ConcurrentHashMap<String,Properties> configParametersCache = new ConcurrentHashMap();
-    ConfigFileLocation configFileLocation = null;
+    private ConfigFileLocation configFileLocation = null;
 
-    private MasterkeyConfiguration(String serviceName, ServletContext servletContext, String hostName) throws IOException {
+    private MasterkeyConfiguration(ServletContext servletContext, String hostName) throws IOException {
+    	contextKey = servletContext.getContextPath() + "@"+hostName;
         cacheConfigParams = areConfigParamsCached(servletContext.getInitParameter(MASTERKEY_CONFIG_LIFE_TIME_PARAM));
-        configFileLocation = new ConfigFileLocation(servletContext, hostName);
-        this.serviceName = serviceName;
+        configFileLocation = new ConfigFileLocation(servletContext, hostName);      
     }
 
     private Logger getLogger() {
         return logger;
     }
-
+    
     /**
-     * Creates a singleton MasterkeyConfiguration for each combination of component and host name.
-     * The instance acts as a cache for the location of the specific config file, but is not
-     * a cache for the configuration parameters as such.
-     * In other words: The location of the config file for a given component in a given host is
-     * retrieved once in the servlets life time, how often the configuration parameters are retrieved
-     * is configurable
-     * @param serviceName An identifier for this configuration. Must match the prefix for the properties in the property file, 
-     *                    like AuthServlet.my_property or RecordsResource.my_property
-     *                    Is typically a Servlet name but if identification beyond Servlet name
-     *                    is required - i.e. for REST services - then any other identifier can be used.
+     * Creates a singleton MasterkeyConfiguration for each combination of component name and host name.
+     * 
      * @param servletContext Needed to pick up init parameters regarding the location of config files
      * @param hostName Used for resolving the path to config files.
      */
-    public static MasterkeyConfiguration getInstance (String serviceName, ServletContext servletContext, String hostName) throws IOException {
+    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String hostName) throws IOException {
         MasterkeyConfiguration cfg = null;
-        String cfgKey = servletContext.getContextPath() + "/" + serviceName +"@"+hostName;
+        String cfgKey = servletContext.getContextPath() + "@"+hostName;
         if (configLocationCache.containsKey(cfgKey)) {
             cfg = (MasterkeyConfiguration) (configLocationCache.get(cfgKey));
             cfg.getLogger().debug("Returning cached config location for '" + cfgKey + "': '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
         } else {            
-            cfg = new MasterkeyConfiguration(serviceName, servletContext, hostName);
+            cfg = new MasterkeyConfiguration(servletContext, hostName);
             cfg.getLogger().debug("No previously cached config location reference found for '" + cfgKey + "'. Instantiating a new config location reference: '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
             // Check that config file is readable, if not, analyze and throw exception
             cfg.getConfigFileLocation().evaluate();
@@ -77,6 +74,29 @@ public class MasterkeyConfiguration {
         return cfg;
     }
     
+    /**
+     * Provides a unique key for this configuration context (unique per j2ee component and vhost)
+     *  
+     * @return Unique key for the context within which given sub-modules are executed.
+     */
+    public String getContextKey () {
+    	return contextKey;
+    }
+    
+    /**
+     * Creates a ModuleConfiguration holding the subset of properties that applies to the given module
+     * 
+     * @param moduleName Must match the prefix of the properties to pick up
+     * @return
+     * @throws IOException
+     */
+    public ModuleConfiguration getModuleConfiguration (String moduleName) throws IOException {    	
+    	return new ModuleConfiguration(this, moduleName);
+    }
+    
+    public boolean areConfigParamsCached () {
+    	return cacheConfigParams;
+    }
     
     /**
      * Sets the life time of configuration parameters to 'servlet' (cache=true) or 'request' (cache=false
@@ -102,11 +122,11 @@ public class MasterkeyConfiguration {
 
 
     /**
-     * Retrieves all config parameter names for the servlet
+     * Retrieves all config parameter names for the module
      * @return
      * @throws javax.servlet.ServletException
      */
-    private Enumeration getConfigParameterNames(String prefix) throws IOException {
+    public Enumeration getConfigParameterNames(String prefix) throws IOException {
         Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
         Hashtable<String, String> keyList = new Hashtable<String, String>();
         Iterator keysIter = prop.keySet().iterator();
@@ -121,29 +141,10 @@ public class MasterkeyConfiguration {
         return keyList.elements();
     }
 
-    /**
-     * Retrieves all config paramers prefixed with the given service name (ie the servlet name) 
-     * @return
-     * @throws IOException
-     */
-    private Enumeration getConfigParameterNames() throws IOException {
-        Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
-        Hashtable<String, String> keyList = new Hashtable<String, String>();
-        Iterator keysIter = prop.keySet().iterator();
-        int i = 0;
-        while (keysIter.hasNext()) {
-            String key = (String) keysIter.next();
-            if (key.startsWith(serviceName)) {
-                key = key.replace(serviceName + ".", "");
-                keyList.put("" + (i++), key);
-            }
-        }
-        return keyList.elements();
-    }
     
     
     /**
-     * Retrieves a given init parameter that applies to the invoking Servlet.
+     * Retrieves a given config parameter by name and module/prefix.
      * @param name
      * @return
      * @throws javax.servlet.ServletException
@@ -158,25 +159,27 @@ public class MasterkeyConfiguration {
         }
         return propertyValue;
     }
-
+       
     /**
-     * Retrieves a given init parameter prefixed with a given service name (ie a servlet name) 
-     * @param name  The name of the parameter, without the service name prefix.
+     * Retrieves all config parameters for a module/prefix as a HashMap. 
+     *
      * @return
      * @throws javax.servlet.ServletException
      */
-    public String getConfigParameter(String name) throws IOException {
-        Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
-        String propertyValue = (String) prop.get(serviceName + "." + name);
-        if (propertyValue == null || propertyValue.length() == 0) {
-            logger.error("Could not find value for key '" + name + "'");
-        } else {
-            logger.debug("Found value '" + propertyValue + "' for key '" + name + "'");
+    public Map<String, String> getConfigParamsAsMap(String prefix) throws IOException {
+        Map<String, String> paramMap = new HashMap<String, String>();
+        Enumeration paramNames = getConfigParameterNames(prefix);
+        while (paramNames.hasMoreElements()) {
+            String paramName = (String) paramNames.nextElement();
+            paramMap.put(paramName, getConfigParameter(prefix, paramName));
         }
-        return propertyValue;
+        return paramMap;
     }
     
-
+    public ConfigFileLocation getConfigFileLocation () {
+        return configFileLocation;
+    }
+    
     /**
      * Retrieves properties (configuration) for a given J2EE module
      * Will cache the properties if so specified in the deployment descriptor
@@ -209,28 +212,20 @@ public class MasterkeyConfiguration {
     }
 
     /**
-     * Retrieves all servlet init parameters as a HashMap. This is the way the
-     * Pazpar2 proxy factory likes to get its arguments.
-     *
+     * Returns the config parameters as Properties for a module/prefix
      * @return
-     * @throws javax.servlet.ServletException
+     * @throws IOException
      */
-    public Map<String, String> getConfigParamsAsMap(String prefix) throws IOException {
-        Map<String, String> paramMap = new HashMap<String, String>();
-        Enumeration paramNames = getConfigParameterNames(prefix);
-        while (paramNames.hasMoreElements()) {
-            String paramName = (String) paramNames.nextElement();
-            paramMap.put(paramName, getConfigParameter(prefix, paramName));
-        }
-        return paramMap;
+    public Properties getConfigParamsAsProperties (String prefix) throws IOException {
+    	Properties moduleProps = new Properties();
+    	Properties componentProps = getComponentProperties(configFileLocation.getConfigFilePath());
+    	for (String key : componentProps.stringPropertyNames()) {
+    		if (key.startsWith(prefix + ".")) {
+    			moduleProps.put(key.replaceFirst(prefix+".", ""), componentProps.get(key));
+    		}    		
+    	}
+    	return moduleProps;
     }
 
-    public void writeTemplatePropertyFile () throws ServletException {
-        
-    }
-
-    private ConfigFileLocation getConfigFileLocation () {
-        return configFileLocation;
-    }
-
+    
 }

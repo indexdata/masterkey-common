@@ -34,7 +34,7 @@ class ConfigFileLocation {
      * @param serverName Used for resolving the config directory
      * @throws javax.servlet.IOException If any of three basic context params are missing
      */
-    ConfigFileLocation(ServletContext context, String serverName) throws IOException {
+    public ConfigFileLocation(ServletContext context, String serverName) throws IOException {
         MASTERKEY_ROOT_CONFIG_DIR = context.getInitParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM);
         checkMandatoryParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM, MASTERKEY_ROOT_CONFIG_DIR);
         this.componentDir = context.getInitParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM);
