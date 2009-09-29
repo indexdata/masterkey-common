@@ -16,7 +16,14 @@ public class ModuleConfiguration {
 	
 	public ModuleConfiguration (MasterkeyConfiguration mkConfigContext, String moduleName) {
 		mkContext = mkConfigContext;
-		this.moduleName = moduleName;				
+		this.moduleName = moduleName;	
+		try {
+			if (getConfigParamsAsMap().size()==0) {
+				logger.warn("There are no properties in " + mkContext.getConfigFileLocation().getConfigFilePath() + " with prefix '" + moduleName + "'");
+			}
+		} catch (IOException e) {
+			// will be thrown and caught later
+		}
 	}
 	    
     /**
@@ -36,7 +43,7 @@ public class ModuleConfiguration {
      * @throws javax.servlet.ServletException
      */
     public Map<String, String> getConfigParamsAsMap() throws IOException {
-    	return mkContext.getConfigParamsAsMap(moduleName);
+    	return mkContext.getConfigParamsAsMap(moduleName); 
     }
 
 
