@@ -153,7 +153,7 @@ public class MasterkeyConfiguration {
         Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
         String propertyValue = (String) prop.get(prefix + "." + name);
         if (propertyValue == null || propertyValue.length() == 0) {
-            logger.error("Could not find value for key '" + name + "'");
+            logger.warn("Could not find value for key '" + name + "'");
         } else {
             logger.debug("Found value '" + propertyValue + "' for key '" + name + "'");
         }
