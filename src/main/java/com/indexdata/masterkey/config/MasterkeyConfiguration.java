@@ -34,11 +34,11 @@ public class MasterkeyConfiguration {
     public static final String MASTERKEY_CONFIG_LIFE_TIME_PARAM = "MASTERKEY_CONFIG_LIFE_TIME";
 
     private Logger logger = Logger.getLogger("com.indexdata.masterkey.config.");
-    private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap();    
+    private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap<String, MasterkeyConfiguration>();    
     private boolean cacheConfigParams = true;           
     private String contextKey = null;
 
-    private ConcurrentHashMap<String,Properties> configParametersCache = new ConcurrentHashMap();
+    private ConcurrentHashMap<String,Properties> configParametersCache = new ConcurrentHashMap<String, Properties>();
     private ConfigFileLocation configFileLocation = null;
 
     private MasterkeyConfiguration(ServletContext servletContext, String hostName) throws IOException {
@@ -151,7 +151,7 @@ public class MasterkeyConfiguration {
      */
     public String getConfigParameter(String prefix, String name) throws IOException {
         Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
-        String propertyValue = (String) prop.get(prefix + "." + name);
+        String propertyValue = ((String) prop.get(prefix + "." + name)).trim();
         if (propertyValue == null || propertyValue.length() == 0) {
             logger.warn("Could not find value for key '" + name + "'");
         } else {
