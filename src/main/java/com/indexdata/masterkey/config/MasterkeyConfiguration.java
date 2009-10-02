@@ -150,13 +150,15 @@ public class MasterkeyConfiguration {
      * @throws javax.servlet.ServletException
      */
     public String getConfigParameter(String prefix, String name) throws IOException {
+    	logger.debug("Looking for key " + name + " in module " + prefix);
         Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
-        String propertyValue = ((String) prop.get(prefix + "." + name)).trim();
-        if (propertyValue == null || propertyValue.length() == 0) {
+        String propertyValue = ((String) prop.get(prefix + "." + name))+"";
+        if (propertyValue == null || propertyValue.length() == 0 || propertyValue.equals("null")) {
             logger.warn("Could not find value for key '" + name + "'");
             propertyValue = "";
         } else {
-            logger.debug("Found value '" + propertyValue + "' for key '" + name + "'");
+        	propertyValue = propertyValue.trim();
+            logger.debug("Found value '" + propertyValue + "' for key '" + name + "' in module " + prefix);
         }
         return propertyValue;
     }

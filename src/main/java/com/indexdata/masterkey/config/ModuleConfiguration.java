@@ -11,9 +11,7 @@ public class ModuleConfiguration {
 	private Logger logger = Logger.getLogger("com.indexdata.masterkey.config.");
 	private MasterkeyConfiguration mkContext = null;
 	private String moduleName = null;
-
-	
-	
+		
 	public ModuleConfiguration (MasterkeyConfiguration mkConfigContext, String moduleName) {
 		mkContext = mkConfigContext;
 		this.moduleName = moduleName;	
@@ -22,7 +20,7 @@ public class ModuleConfiguration {
 				logger.warn("There are no properties in " + mkContext.getConfigFileLocation().getConfigFilePath() + " with prefix '" + moduleName + "'");
 			}
 		} catch (IOException e) {
-			// will be thrown and caught later
+			logger.warn(e.getMessage());
 		}
 	}
 	    
@@ -65,11 +63,11 @@ public class ModuleConfiguration {
      * @return
      */
     public String get(String name) {
-    	try {
+    	try {    		
     		return mkContext.getConfigParameter(moduleName, name);
     	} catch (IOException ioe) {
     		logger.error("Error reading config parameter [" + name + "]");
-    		return null;
+    		return "";
     	}    	
     }
 
@@ -79,18 +77,18 @@ public class ModuleConfiguration {
      * @return the parameter value
      * @throws Exception if mandatory parameter was not found
      */
-    public String getMandatory (String name) throws Exception {
+    public String getMandatory (String name) throws MissingMandatoryParameterException {
     	try {
     		String value = mkContext.getConfigParameter(moduleName, name);    		
     		if (value == null || value.length()==0) {
     			logger.error("Mandatory parameter [" + name + "] not found");
-    			throw new Exception("Mandatory parameter [" + name + "] not found");
+    			throw new MissingMandatoryParameterException("Mandatory parameter [" + name + "] not found for module [" + moduleName + "]");
     		} else {
     			return value;
     		}
     	} catch (IOException ioe) {
     		logger.error("Error reading config parameter [" + name + "]");
-    		throw new Exception("Mandatory parameter [" + name + "] not found");    		
+    		throw new MissingMandatoryParameterException("Mandatory parameter [" + name + "] not found for module [" + moduleName + "]");    		
     	}    	    	
     }
     
@@ -99,12 +97,21 @@ public class ModuleConfiguration {
      * @param name
      * @return true if the parameter name exists in the modules properties
      */
-    public boolean containsKey (String name) {
+    public boolean hasParameter (String name) {
     	try {
     		return mkContext.getConfigParamsAsMap(moduleName).containsKey(name);
     	} catch	(IOException ioe) {
     		logger.error("Error checking config param [" + name + "] for module ["+ moduleName + "]");
     		return false;
     	}    	
+    }
+    
+    public String toString() {
+        try {
+			return getConfigProperties().toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "Error reading properties";			
+		}	
     }
 }
