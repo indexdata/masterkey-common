@@ -18,6 +18,8 @@ public class ModuleConfiguration {
 		try {
 			if (getConfigMap().size()==0) {
 				logger.warn("There are no properties in " + mkContext.getConfigFileLocation().getConfigFilePath() + " with prefix '" + moduleName + "'");
+			} else {
+				logger.info(moduleName + " config: " + this.toString());
 			}
 		} catch (IOException e) {
 			logger.warn(e.getMessage());
@@ -110,7 +112,7 @@ public class ModuleConfiguration {
         try {
 			return getConfigProperties().toString();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("toString() could not read the config properties.");
 			return "Error reading properties";			
 		}	
     }

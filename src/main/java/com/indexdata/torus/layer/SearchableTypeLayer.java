@@ -31,6 +31,7 @@ public class SearchableTypeLayer extends Layer {
     private String authentication;
     private String urlRecipe;
     private String serviceProvider;
+    private String categories;
 
     public String getRecordEncoding() {
         return recordEncoding;
@@ -151,6 +152,14 @@ public class SearchableTypeLayer extends Layer {
 
     public void setServiceProvider(String serviceProvider) {
         this.serviceProvider = serviceProvider;
-    }    
+    }
+    
+    public String getCategories() {
+    	return categories;
+    }
+    
+    public void setCategories (String categories) {
+    	this.categories = categories;
+    }
     
 }
