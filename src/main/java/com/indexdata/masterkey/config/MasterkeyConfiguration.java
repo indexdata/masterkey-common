@@ -20,7 +20,9 @@ import org.apache.log4j.Logger;
  * 
  * From this context it is possible to obtain configurations for sub-modules within the component. The configuration
  * of a sub-module would be those properties in the components properties file that are prefixed with a given module name.
- * 
+ *
+ * It is possible to force the file name (but not the path to it) to be something data-dependent.
+ *
  * 'Component': Basically a .war file
  * 'Module': Sub-functions within the component, i.e. a Servlet, a REST service, a plug-in, etc.
  * 
@@ -41,10 +43,18 @@ public class MasterkeyConfiguration {
     private ConcurrentHashMap<String,Properties> configParametersCache = new ConcurrentHashMap<String, Properties>();
     private ConfigFileLocation configFileLocation = null;
 
-    private MasterkeyConfiguration(ServletContext servletContext, String hostName) throws IOException {
+    private MasterkeyConfiguration(ServletContext servletContext,
+                String hostName, String configFilename)
+            throws IOException {
+        initMasterkeyConfiguration(servletContext, hostName, configFilename);
+
+    }
+    private void initMasterkeyConfiguration(ServletContext servletContext,
+                String hostName, String configFileName)
+            throws IOException {
     	contextKey = servletContext.getContextPath() + "@"+hostName;
         cacheConfigParams = areConfigParamsCached(servletContext.getInitParameter(MASTERKEY_CONFIG_LIFE_TIME_PARAM));
-        configFileLocation = new ConfigFileLocation(servletContext, hostName);      
+        configFileLocation = new ConfigFileLocation(servletContext, hostName, configFileName);
     }
 
     private Logger getLogger() {
@@ -58,13 +68,20 @@ public class MasterkeyConfiguration {
      * @param hostName Used for resolving the path to config files.
      */
     public static MasterkeyConfiguration getInstance (ServletContext servletContext, String hostName) throws IOException {
+        return init(servletContext, hostName, "");
+    }
+    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String hostName, String configFileName) throws IOException {
+        return init(servletContext, hostName, configFileName);
+
+    }
+    private static MasterkeyConfiguration init (ServletContext servletContext, String hostName, String configFileName) throws IOException {
         MasterkeyConfiguration cfg = null;
         String cfgKey = servletContext.getContextPath() + "@"+hostName;
         if (configLocationCache.containsKey(cfgKey)) {
             cfg = (MasterkeyConfiguration) (configLocationCache.get(cfgKey));
             cfg.getLogger().debug("Returning cached config location for '" + cfgKey + "': '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
         } else {            
-            cfg = new MasterkeyConfiguration(servletContext, hostName);
+            cfg = new MasterkeyConfiguration(servletContext, hostName, configFileName);
             cfg.getLogger().debug("No previously cached config location reference found for '" + cfgKey + "'. Instantiating a new config location reference: '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
             // Check that config file is readable, if not, analyze and throw exception
             cfg.getConfigFileLocation().evaluate();

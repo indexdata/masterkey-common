@@ -32,20 +32,32 @@ class ConfigFileLocation {
      *
      * @param context
      * @param serverName Used for resolving the config directory
+     * @param configFileName optionally overriding the (base) name of the config file.
      * @throws javax.servlet.IOException If any of three basic context params are missing
      */
-    public ConfigFileLocation(ServletContext context, String serverName) throws IOException {
+    public ConfigFileLocation(ServletContext context, String serverName)
+            throws IOException {
+        init(context, serverName,"");
+    }
+    public ConfigFileLocation(ServletContext context, String serverName, String configFileName)
+            throws IOException {
+        init(context, serverName,configFileName);
+    }
+
+    private void init(ServletContext context, String serverName, String configFileName) throws IOException {
         MASTERKEY_ROOT_CONFIG_DIR = context.getInitParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM);
         checkMandatoryParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM, MASTERKEY_ROOT_CONFIG_DIR);
         this.componentDir = context.getInitParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM);
         checkMandatoryParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM, componentDir);
-        this.fileName = context.getInitParameter(MASTERKEY_CONFIG_FILE_NAME_PARAM);
+        if ( (configFileName != null) && ( !configFileName.isEmpty()) )
+            this.fileName = configFileName;
+        else
+            this.fileName = context.getInitParameter(MASTERKEY_CONFIG_FILE_NAME_PARAM);
         checkMandatoryParameter(MASTERKEY_CONFIG_FILE_NAME_PARAM, fileName);
         this.serverName = serverName;
         this.domainMappingFileName = serverName + DOMAIN_CONFIG_FILE_POSTFIX;
         this.configDirForServerName = getConfigDirForServerName(componentDir, domainMappingFileName);
     }
-
     /**
      * Gets the full path to the configuration file, excluding the file itself
      * @return String representing the path
