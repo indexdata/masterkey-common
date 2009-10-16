@@ -16,12 +16,16 @@ import org.apache.log4j.Logger;
 /**
  * Represents the configuration context for modules within this J2EE component.
  * 
- * An instance of this class basically has a one-to-one relationship with the properties file for the component/vhost
+ * An instance of this class basically has a one-to-one relationship with the
+ * properties file for the component/vhost
  * 
- * From this context it is possible to obtain configurations for sub-modules within the component. The configuration
- * of a sub-module would be those properties in the components properties file that are prefixed with a given module name.
+ * From this context it is possible to obtain configurations for sub-modules
+ * within the component. The configuration of a sub-module would be those
+ * properties in the components properties file that are prefixed with a given
+ * module name.
  *
- * It is possible to force the file name (but not the path to it) to be something data-dependent.
+ * It is possible to force the file name (but not the path to it) to be
+ * something data-dependent.
  *
  * 'Component': Basically a .war file
  * 'Module': Sub-functions within the component, i.e. a Servlet, a REST service, a plug-in, etc.
@@ -76,7 +80,9 @@ public class MasterkeyConfiguration {
     }
     private static MasterkeyConfiguration init (ServletContext servletContext, String hostName, String configFileName) throws IOException {
         MasterkeyConfiguration cfg = null;
-        String cfgKey = servletContext.getContextPath() + "@"+hostName;
+        if (configFileName == null)
+            configFileName = "";
+        String cfgKey = servletContext.getContextPath() + "/" + configFileName + "@"+hostName;
         if (configLocationCache.containsKey(cfgKey)) {
             cfg = (MasterkeyConfiguration) (configLocationCache.get(cfgKey));
             cfg.getLogger().debug("Returning cached config location for '" + cfgKey + "': '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
