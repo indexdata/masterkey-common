@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * Throws ServletException 
  *    If the configuration file (property file) is not found
  *
- * @author nielserik
+ * @author Niels Erik
  */
 public class MasterkeyConfiguration {
 
@@ -74,10 +74,28 @@ public class MasterkeyConfiguration {
     public static MasterkeyConfiguration getInstance (ServletContext servletContext, String hostName) throws IOException {
         return init(servletContext, hostName, "");
     }
+    
+    /**
+     * Creates a singleton MasterkeyConfiguration for each combination of component name, host name, and property file name.
+     * <br/>
+     * Provides support for a special case scenario where some feature is deployed separately from the .war file of the
+     * component. It allows for a deploy script (ie Debian) to <i>add</i>  a new property file for the new feature rather than 
+     * updating a sub-section within the already existing configuration file for the .war file.
+     * <br/>
+     * Was specifically implemented for the Torus, which can have additional data stores deployed after the .war file.   
+     * 
+     * @param servletContext Needed to pick up init parameters regarding the location of config files
+     * @param hostName       Used for resolving the path to config files.
+     * @param configFileName Defined by components code.
+     */
     public static MasterkeyConfiguration getInstance (ServletContext servletContext, String hostName, String configFileName) throws IOException {
         return init(servletContext, hostName, configFileName);
 
     }
+
+    /**
+     * Creates a singleton MasterkeyConfiguration for each combination of component name and host name (and possibly config file name).
+	 */
     private static MasterkeyConfiguration init (ServletContext servletContext, String hostName, String configFileName) throws IOException {
         MasterkeyConfiguration cfg = null;
         if (configFileName == null)
