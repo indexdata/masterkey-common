@@ -43,6 +43,7 @@ public class MasterkeyConfiguration {
     private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap<String, MasterkeyConfiguration>();    
     private boolean cacheConfigParams = true;           
     private String contextKey = null;
+    private String hostName = null;
 
     private ConcurrentHashMap<String,Properties> configParametersCache = new ConcurrentHashMap<String, Properties>();
     private ConfigFileLocation configFileLocation = null;
@@ -57,6 +58,7 @@ public class MasterkeyConfiguration {
                 String hostName, String configFileName)
             throws IOException {
     	contextKey = servletContext.getContextPath() + "@"+hostName;
+    	this.hostName = hostName;
         cacheConfigParams = areConfigParamsCached(servletContext.getInitParameter(MASTERKEY_CONFIG_LIFE_TIME_PARAM));
         configFileLocation = new ConfigFileLocation(servletContext, hostName, configFileName);
     }
@@ -222,6 +224,15 @@ public class MasterkeyConfiguration {
     
     public ConfigFileLocation getConfigFileLocation () {
         return configFileLocation;
+    }
+    
+    /**
+     * Host name intended for use in logging.
+     * 
+     * @return Name of the (virtual) host the request is made to
+     */
+    public String getHostName() {
+    	return hostName;
     }
     
     /**

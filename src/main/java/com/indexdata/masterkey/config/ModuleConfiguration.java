@@ -58,6 +58,15 @@ public class ModuleConfiguration {
     public String getContextKey() {
         return mkContext.getContextKey();
     }
+    
+    /**
+     * Host name intended for logging.
+     * 
+     * @return Name of (virtual) host to which the HTTP request was made.
+     */
+    public String getHostName () {
+    	return mkContext.getHostName();
+    }
 
     /**
      * Short-hand for getting a parameter value by name
