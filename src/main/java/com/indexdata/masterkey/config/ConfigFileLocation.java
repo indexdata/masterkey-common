@@ -174,7 +174,9 @@ class ConfigFileLocation {
         if (domainConfigMappingProperties == null) {
             domainConfigMappingProperties = new Properties();
             try {
-                domainConfigMappingProperties.load(new FileInputStream(MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + domainMappingFileName));
+            	FileInputStream fis = new FileInputStream(MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + domainMappingFileName);
+                domainConfigMappingProperties.load(fis);
+                fis.close();
             } catch (IOException ioe) {
             	domainConfigMappingProperties = null;
                 logger.warn(ioe + "Could not load domain-to-config mapping file " + MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + domainMappingFileName + ".");
