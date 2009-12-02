@@ -250,7 +250,9 @@ public class MasterkeyConfiguration {
         } else {
             componentProperties = new Properties();
             try {
-                componentProperties.load(new FileInputStream(configFileLocation.getConfigFilePath()));
+            	FileInputStream fis = new FileInputStream(configFileLocation.getConfigFilePath());
+                componentProperties.load(fis);
+                fis.close();
                 logger.debug("Loaded properties from file system using '" + configFilePath + "'");
             } catch (FileNotFoundException fnfe) {
                 logger.error(fnfe + "Could not find property file '" + configFilePath + "'");
