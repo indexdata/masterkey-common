@@ -81,6 +81,28 @@ public class ModuleConfiguration {
             return "";
         }
     }
+    
+    /**
+     * Short-hand for getting a parameter value by name, while returning
+     * the provided defaultValue if the parameter is not found
+     * @param name
+     * @param defaultValue
+     * @return The value of the parameter, or defaultValue if not found
+     */
+    public String get (String name, String defaultValue) {
+    	String value = "";
+        try {
+            value = mkContext.getConfigParameter(moduleName, name);
+        } catch (IOException ioe) {
+            logger.error("Error reading config parameter [" + name + "]");
+            value = "";
+        }
+    	if (value.length()==0) {
+    		logger.debug("Config parameter ["+name+"] not found. Using default value [" + defaultValue + "]");
+    		value = defaultValue;
+    	}
+    	return value;
+    }
 
     /**
      * Gets a mandatory parameter value by name
