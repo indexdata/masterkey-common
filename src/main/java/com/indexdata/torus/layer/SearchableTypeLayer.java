@@ -33,6 +33,7 @@ public class SearchableTypeLayer extends Layer {
     private String serviceProvider;
     private String categories;
     private String comment;
+    private String explode;
 
     public String getRecordEncoding() {
         return recordEncoding;
@@ -169,6 +170,13 @@ public class SearchableTypeLayer extends Layer {
 
     public void setComment(String comment) {
       this.comment = comment;
-    }    
+    }
 
+    public String getExplode() {
+    return explode;
+  }
+
+    public void setExplode(String explode) {
+    this.explode = explode;
+  }    
 }
