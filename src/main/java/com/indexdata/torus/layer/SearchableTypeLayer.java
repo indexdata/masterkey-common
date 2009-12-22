@@ -34,6 +34,7 @@ public class SearchableTypeLayer extends Layer {
     private String categories;
     private String comment;
     private String explode;
+    private String useUrlProxy;
 
     public String getRecordEncoding() {
         return recordEncoding;
@@ -178,5 +179,13 @@ public class SearchableTypeLayer extends Layer {
 
     public void setExplode(String explode) {
     this.explode = explode;
-  }    
+  }
+      
+  public String getUseUrlProxy() {	  
+    return useUrlProxy;
+  }
+
+  public void setUseUrlProxy(String useUrlProxy) {
+    this.useUrlProxy = useUrlProxy;
+  }
 }
