@@ -35,6 +35,9 @@ public class SearchableTypeLayer extends Layer {
     private String comment;
     private String explode;
     private String useUrlProxy;
+    private String cfAuth;
+    private String cfSubDB;
+    private String cfProxy;
 
     public String getRecordEncoding() {
         return recordEncoding;
@@ -187,5 +190,29 @@ public class SearchableTypeLayer extends Layer {
 
   public void setUseUrlProxy(String useUrlProxy) {
     this.useUrlProxy = useUrlProxy;
+  }
+
+  public String getCfAuth() {
+    return cfAuth;
+  }
+
+  public void setCfAuth(String cfAuth) {
+    this.cfAuth = cfAuth;
+  }
+
+  public String getCfProxy() {
+    return cfProxy;
+  }
+
+  public void setCfProxy(String cfProxy) {
+    this.cfProxy = cfProxy;
+  }
+
+  public String getCfSubDB() {
+    return cfSubDB;
+  }
+
+  public void setCfSubDB(String cfSubDB) {
+    this.cfSubDB = cfSubDB;
   }
 }
