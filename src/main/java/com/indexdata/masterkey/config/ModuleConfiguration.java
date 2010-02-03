@@ -60,8 +60,7 @@ public class ModuleConfiguration {
     }
 
     /**
-     * Retrieves the location of this service-proxy instance's 
-     * property file.
+     * Retrieves the location of this components property file.
      * Allows the module to keep and retrieve additional configuration 
      * files from there - i.e. a Pazpar2 service definition XML file
      *  
