@@ -22,7 +22,7 @@
       <!-- automatic jaxb.index generation for xml binded classess annotated with XmlElement-->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>apt-maven-plugin</artifactId>
-        <version>1.0-alpha-2</version>
+        <version>1.0-alpha-3</version>
         <configuration>
           <factory>net.sf.jelly.apt.freemarker.FreemarkerProcessorFactory</factory>
           <executable>${java.home}/../bin/apt</executable>
