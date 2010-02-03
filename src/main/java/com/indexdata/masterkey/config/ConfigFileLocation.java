@@ -21,10 +21,10 @@ class ConfigFileLocation {
     public static final String DOMAIN_CONFIG_DIR_PROPERTY_NAME = "CONFIG_DIR";
     public static final String DOMAIN_CONFIG_FILE_POSTFIX = "_confd";
     private String componentDir = null;
-    String fileName = null;
-    String serverName = null;
-    String configDirForServerName = null;
-    String domainMappingFileName = null;
+    private String fileName = null;
+    private String serverName = null;
+    private String configDirForServerName = null;
+    private String domainMappingFileName = null;
     Properties domainConfigMappingProperties = null;
     private static Logger logger = Logger.getLogger("com.indexdata.masterkey.config");
 
@@ -62,7 +62,7 @@ class ConfigFileLocation {
      * Gets the full path to the configuration file, excluding the file itself
      * @return String representing the path
      */
-    private String getConfigDir() {
+    String getConfigDir() {
         return MASTERKEY_ROOT_CONFIG_DIR + componentDir + "/conf.d" + configDirForServerName;
     }
 
