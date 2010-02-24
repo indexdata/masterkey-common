@@ -58,6 +58,17 @@ public class ModuleConfiguration {
     public String getContextKey() {
         return mkContext.getContextKey();
     }
+
+    /**
+     * Retrieves the location of this components property file.
+     * Allows the module to keep and retrieve additional configuration 
+     * files from there - i.e. a Pazpar2 service definition XML file
+     *  
+     * @return Path to the config file directory
+     */
+    public String getConfigFilePath () {
+    	return mkContext.getConfigFileLocation().getConfigDir();
+    }
     
     /**
      * Host name intended for logging.

@@ -169,10 +169,10 @@ public class MasterkeyConfiguration {
      * @return
      * @throws javax.servlet.ServletException
      */
-    public Enumeration getConfigParameterNames(String prefix) throws IOException {
+    public Enumeration<String> getConfigParameterNames(String prefix) throws IOException {
         Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
         Hashtable<String, String> keyList = new Hashtable<String, String>();
-        Iterator keysIter = prop.keySet().iterator();
+        Iterator<Object> keysIter = prop.keySet().iterator();
         int i = 0;
         while (keysIter.hasNext()) {
             String key = (String) keysIter.next();
@@ -214,7 +214,7 @@ public class MasterkeyConfiguration {
      */
     public Map<String, String> getConfigParamsAsMap(String prefix) throws IOException {
         Map<String, String> paramMap = new HashMap<String, String>();
-        Enumeration paramNames = getConfigParameterNames(prefix);
+        Enumeration<String> paramNames = getConfigParameterNames(prefix);
         while (paramNames.hasMoreElements()) {
             String paramName = (String) paramNames.nextElement();
             paramMap.put(paramName, getConfigParameter(prefix, paramName));
