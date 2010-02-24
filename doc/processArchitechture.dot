@@ -1,0 +1,93 @@
+digraph callgraph {
+     fontname="verdana";
+     node [fontname="verdana"];
+     label="Process Architechture";
+	 subgraph cluster_legend {
+		label="Legend"
+	 	Database[shape="circle", fontsize="9"];
+	 	UI;
+	 	Process[shape="box"];
+ 	 }
+     oclcWC[label="OCLC\n WorldCat"];
+     masterkey[label="MasterKey II"];
+     oclcWC -> serviceProxy;
+     masterkey -> serviceProxy[label="PP2 protocol", fontname="verdana"];
+     serviceProxy[Label="Service Proxy", shape=box];
+     serviceProxy -> pazpar2[label="PP2 protocol"];
+     serviceProxy -> Torus;
+     Torus[shape=box];
+     subgraph {
+		rank = same; serviceProxy; Torus; Searchables;
+     }
+     TargetAdmin -> Torus[label="Torus WSAPI"];
+     Torus -> T2[label="Torus WSAPI"];
+     T2[shape="box"];
+     Torus -> Searchables;
+     Searchables[label="Searchables", fontsize=10];
+     Searchables[shape=circle];
+     T2 -> T3[label="Torus WSAPI"];
+     T3[shape=box];
+     T2 -> T4[label="Torus WSAPI"];
+     T4[label="Another\n Torus", shape=box];
+     harvester -> T4[label="Torus WSAPI"];
+     T2 -> "IRSPY Toroid"[label="Torus WSAPI"];
+     "IRSPY Toroid" -> Zebra[label="Z39.50"];
+     Zebra[shape="box"];
+     "IRSPY Toroid"[shape="box"];
+     Zebra -> IRSPY_DB;
+     IRSPY_DB[label="IRSPY\n database", shape=circle];
+     IRSPY -> Zebra[label="Z39.50"];
+     subgraph {
+	rank = same; IRSPY; Zebra;
+     }
+     pazpar2 -> cfEngine;
+     pazpar2 -> ocg;
+     node ocg[label="Open\n Connector\n Gateway", shape="box"]; 
+     pazpar2 -> metaProxy[label="z39.50/SRU"];
+	 metaProxy[label="MetaProxy", shape="box"];
+	 metaProxy -> sruTarget[label="SRU"];
+	 metaProxy -> cfz[label="z39.50"];
+	 metaProxy -> zTarget[label="z39.50"];
+	 zTarget[shape="box"];
+	 zTarget -> zData1;
+	 cfz[shape="box"];
+	 cfz -> cfEngine;
+	 sruTarget -> zData3;
+	 zData1[shape="circle", label="data"];
+	 zData3[shape="circle", label="data"];
+	 zTarget[shape="box"];
+	 sruTarget[shape="box"];
+     pazpar2 -> localIndex1;
+     pazpar2 -> localIndex2;
+     pazpar2 -> localIndex3 [label="Z39.50"];
+     pazpar2[label="Pazpar2", shape="box"];
+     localIndex3 -> Anything3;
+     subgraph cluster_localIndexes {
+	label = "Local Indexes";
+	localIndex1[label="Local Index\n (zebrasrv)" shape="box"];
+	localIndex2[label="Local Index\n (zebrasrv)" shape="box"];
+	localIndex3[label="Local Index\n (zebrasrv)" shape="box"];
+     }
+     harvesterAdmin -> harvester;
+     harvesterAdmin[label="Harvester\n Admin"];
+     
+     harvester[label="Harvester", shape="box"];
+     harvester -> localIndex1;
+     subgraph cluster_CFEngine {
+	     label = "Connector Framework";
+	     cfEngine -> cfRepo;
+	     cfEngine[shape="box"];
+	     CF_Wizard -> cfRepo;
+	     cfRepo[label="CFRepo", shape=circle, fontsize="10"];
+     }
+     cfEngine -> Anything;
+     ocg -> WebFeetConnectors;
+     WebFeetConnectors[label="WebFeet\n Connectors", shape="box"];
+     WebFeetConnectors -> Anything2;
+     Anything[label="data", shape=circle, image="database.png"];
+     Anything2[label="data", shape=circle];
+     node Anything3[label="data",shape=circle];
+     subgraph {
+		rank = same; Anything; Anything2; Anything3; zData1; zData3; 
+	}
+}
