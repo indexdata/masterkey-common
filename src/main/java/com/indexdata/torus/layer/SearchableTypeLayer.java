@@ -26,6 +26,7 @@ public class SearchableTypeLayer extends Layer {
     private String cclMapAu;
     private String cclMapTi;
     private String cclMapSu;
+    private String cclMapIsbn;
     private String cclMapDate;
     private String cclMapTerm;
     private String authentication;
@@ -103,6 +104,7 @@ public class SearchableTypeLayer extends Layer {
     public void setCclMapDate(String cclMapDate) {
         this.cclMapDate = cclMapDate;
     }
+    
     @XmlElement(name="cclmap_su")
     public String getCclMapSu() {
         return cclMapSu;
@@ -111,6 +113,16 @@ public class SearchableTypeLayer extends Layer {
     public void setCclMapSu(String cclMapSu) {
         this.cclMapSu = cclMapSu;
     }
+
+    @XmlElement(name="cclmap_isbn")
+    public String getCclMapIsbn() {
+       return cclMapIsbn;
+    }
+    
+    public void setCclMapIsbn(String cclMapIsbn) {
+       this.cclMapIsbn = cclMapIsbn;
+    }
+    
     @XmlElement(name="cclmap_term")
     public String getCclMapTerm() {
         return cclMapTerm;
