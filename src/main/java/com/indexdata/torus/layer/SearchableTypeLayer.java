@@ -39,6 +39,7 @@ public class SearchableTypeLayer extends Layer {
     private String cfAuth;
     private String cfSubDB;
     private String cfProxy;
+    private String secondaryRequestSyntax;
 
     public String getRecordEncoding() {
         return recordEncoding;
@@ -227,4 +228,12 @@ public class SearchableTypeLayer extends Layer {
   public void setCfSubDB(String cfSubDB) {
     this.cfSubDB = cfSubDB;
   }
+
+   public String getSecondaryRequestSyntax() {
+      return secondaryRequestSyntax;
+   }
+
+   public void setSecondaryRequestSyntax(String secondaryRequestSyntax) {
+      this.secondaryRequestSyntax = secondaryRequestSyntax;
+   }
 }
