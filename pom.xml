@@ -4,7 +4,7 @@
   <groupId>com.indexdata</groupId>
   <artifactId>masterkey-common</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1</version>
+  <version>0.0.1-SNAPSHOT</version>
   <name>masterkey-common</name>
   <url>http://www.indexdata.com</url>
   <build>
@@ -98,6 +98,20 @@
       </exclusions>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>id-maven-repo</id>
+      <name>Index Data Maven Repository</name>
+      <url>scp://maven.indexdata.com/var/www/maven/repository</url>
+    </repository>
+  </distributionManagement>
+  <repositories>
+    <repository>
+      <id>id-maven-repo</id>
+      <url>http://maven.indexdata.com</url>
+    </repository>
+  </repositories>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
