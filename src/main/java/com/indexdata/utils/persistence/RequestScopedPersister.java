@@ -29,7 +29,10 @@ public class RequestScopedPersister implements ServletRequestListener, ServletCo
 
     @Override
     public void contextInitialized(ServletContextEvent e) {
-        EntityUtil.initialize("localindicesPU");
+        String puName = e.getServletContext().getInitParameter("persistence-unit-name");
+        if (puName == null || puName.isEmpty())
+          throw new RuntimeException("Missing init paremeter 'persistence-unit-name' from web.xml");
+        EntityUtil.initialize(puName);
     }
 
     @Override
