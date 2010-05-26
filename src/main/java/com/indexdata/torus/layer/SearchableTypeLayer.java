@@ -23,6 +23,7 @@ public class SearchableTypeLayer extends Layer {
     private String requestSyntax;
     private String queryEncoding;
     private String recordEncoding;
+	private String useTurboMarc;
     private String cclMapAu;
     private String cclMapTi;
     private String cclMapSu;
@@ -56,6 +57,14 @@ public class SearchableTypeLayer extends Layer {
     public void setRequestSyntax(String requestSyntax) {
         this.requestSyntax = requestSyntax;
     }
+    
+    public String getUseTurboMarc() {
+		return useTurboMarc;
+	}
+
+	public void setUseTurboMarc(String useTurboMarc) {
+		this.useTurboMarc = useTurboMarc;
+	}
 
     public String getTransform() {
         return transform;
@@ -64,6 +73,8 @@ public class SearchableTypeLayer extends Layer {
     public void setTransform(String transform) {
         this.transform = transform;
     }
+    
+    
                         
     public void setElementSet(String elementSet) {
         this.elementSet = elementSet;
