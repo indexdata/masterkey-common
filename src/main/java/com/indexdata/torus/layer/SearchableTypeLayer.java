@@ -34,6 +34,7 @@ public class SearchableTypeLayer extends Layer {
     private String urlRecipe;
     private String serviceProvider;
     private String categories;
+    private String medium;
     private String comment;
     private String explode;
     private String useUrlProxy;
@@ -190,6 +191,14 @@ public class SearchableTypeLayer extends Layer {
     
     public void setCategories (String categories) {
     	this.categories = categories;
+    }
+    
+    public String getMedium () {
+    	return medium;
+    }
+    
+    public void setMedium (String medium) {
+    	this.medium = medium;
     }
     
     public String getComment() {
