@@ -48,16 +48,16 @@ public class MasterkeyConfiguration {
     private ConcurrentHashMap<String,Properties> configParametersCache = new ConcurrentHashMap<String, Properties>();
     private ConfigFileLocation configFileLocation = null;
 
-    private MasterkeyConfiguration(ServletContext servletContext,
+    private MasterkeyConfiguration(ServletContext servletContext, String appId,
                 String hostName, String configFilename)
             throws IOException {
-        initMasterkeyConfiguration(servletContext, hostName, configFilename);
+        initMasterkeyConfiguration(servletContext, appId, hostName, configFilename);
 
     }
     private void initMasterkeyConfiguration(ServletContext servletContext,
-                String hostName, String configFileName)
+                String appId, String hostName, String configFileName)
             throws IOException {
-    	contextKey = servletContext.getContextPath() + "@"+hostName;
+    	contextKey = appId + "@"+hostName;
     	this.hostName = hostName;
         cacheConfigParams = areConfigParamsCached(servletContext.getInitParameter(MASTERKEY_CONFIG_LIFE_TIME_PARAM));
         configFileLocation = new ConfigFileLocation(servletContext, hostName, configFileName);
@@ -73,8 +73,8 @@ public class MasterkeyConfiguration {
      * @param servletContext Needed to pick up init parameters regarding the location of config files
      * @param hostName Used for resolving the path to config files.
      */
-    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String hostName) throws IOException {
-        return init(servletContext, hostName, "");
+    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String appId, String hostName) throws IOException {
+        return init(servletContext, appId, hostName, "");
     }
     
     /**
@@ -90,24 +90,24 @@ public class MasterkeyConfiguration {
      * @param hostName       Used for resolving the path to config files.
      * @param configFileName Defined by components code.
      */
-    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String hostName, String configFileName) throws IOException {
-        return init(servletContext, hostName, configFileName);
+    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String appId, String hostName, String configFileName) throws IOException {
+        return init(servletContext, appId, hostName, configFileName);
 
     }
 
     /**
      * Creates a singleton MasterkeyConfiguration for each combination of component name and host name (and possibly config file name).
 	 */
-    private static MasterkeyConfiguration init (ServletContext servletContext, String hostName, String configFileName) throws IOException {
+    private static MasterkeyConfiguration init (ServletContext servletContext, String appId, String hostName, String configFileName) throws IOException {
         MasterkeyConfiguration cfg = null;
         if (configFileName == null)
             configFileName = "";
-        String cfgKey = servletContext.getContextPath() + "/" + configFileName + "@"+hostName;
+        String cfgKey = appId + "/" + configFileName + "@"+hostName;
         if (configLocationCache.containsKey(cfgKey)) {
             cfg = (MasterkeyConfiguration) (configLocationCache.get(cfgKey));
             cfg.getLogger().debug("Returning cached config location for '" + cfgKey + "': '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
         } else {            
-            cfg = new MasterkeyConfiguration(servletContext, hostName, configFileName);
+            cfg = new MasterkeyConfiguration(servletContext, appId, hostName, configFileName);
             cfg.getLogger().debug("No previously cached config location reference found for '" + cfgKey + "'. Instantiating a new config location reference: '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
             // Check that config file is readable, if not, analyze and throw exception
             cfg.getConfigFileLocation().evaluate();
