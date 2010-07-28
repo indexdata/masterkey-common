@@ -10,7 +10,7 @@ public class ModuleConfiguration {
 
     private Logger logger = Logger.getLogger("com.indexdata.masterkey.config.");
     private MasterkeyConfiguration mkContext = null;
-    private String moduleName = null;
+    public String moduleName = null;
 
     public ModuleConfiguration(MasterkeyConfiguration mkConfigContext, String moduleName) {
         mkContext = mkConfigContext;

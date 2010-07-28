@@ -202,8 +202,20 @@ public class MasterkeyConfiguration {
         } else {
         	propertyValue = propertyValue.trim();
             logger.debug("Found value '" + propertyValue + "' for key '" + name + "' in module " + prefix);
+            propertyValue = substituteVariables(propertyValue);
         }
         return propertyValue;
+    }
+    
+    private String substituteVariables(String propertyValue) {
+    	String returnStr = propertyValue;
+    	returnStr = propertyValue.replace("${thisHost}", getHostName());
+    	if (logger.isDebugEnabled()) {
+    		if (!propertyValue.equals(returnStr)) {
+    			logger.debug("Config parameter after substitution: " + returnStr);
+    		}
+    	}
+    	return returnStr;
     }
        
     /**
