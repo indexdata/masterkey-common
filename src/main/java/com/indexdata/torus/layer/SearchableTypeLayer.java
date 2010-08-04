@@ -38,7 +38,8 @@ public class SearchableTypeLayer extends Layer {
     private String comment;
     private String explode;
     private String useUrlProxy;
-    private String cfAuth;
+    private String useThumbnails;
+	private String cfAuth;
     private String cfSubDB;
     private String cfProxy;
     private String secondaryRequestSyntax;
@@ -223,6 +224,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setUseUrlProxy(String useUrlProxy) {
     this.useUrlProxy = useUrlProxy;
+  }
+  
+  public String getUseThumbnails() {
+	return useThumbnails;
+  }
+
+  public void setUseThumbnails(String useThumbnails) {
+	this.useThumbnails = useThumbnails;
   }
 
   public String getCfAuth() {
