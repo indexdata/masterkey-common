@@ -39,7 +39,7 @@ public class MasterkeyConfiguration {
 
     public static final String MASTERKEY_CONFIG_LIFE_TIME_PARAM = "MASTERKEY_CONFIG_LIFE_TIME";
 
-    private Logger logger = Logger.getLogger("com.indexdata.masterkey.config.");
+    private Logger logger = Logger.getLogger(MasterkeyConfiguration.class);
     private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap<String, MasterkeyConfiguration>();    
     private boolean cacheConfigParams = true;           
     private String contextKey = null;
@@ -183,9 +183,7 @@ public class MasterkeyConfiguration {
         }
         return keyList.elements();
     }
-
-    
-    
+        
     /**
      * Retrieves a given config parameter by name and module/prefix.
      * @param name
@@ -196,8 +194,9 @@ public class MasterkeyConfiguration {
     	logger.debug("Looking for key " + name + " in module " + prefix);
         Properties prop = getComponentProperties(configFileLocation.getConfigFilePath());
         String propertyValue = ((String) prop.get(prefix + "." + name))+"";
+        propertyValue = dereference(prop, propertyValue);
         if (propertyValue == null || propertyValue.length() == 0 || propertyValue.equals("null")) {
-            logger.warn("Could not find value for key '" + name + "'");
+            logger.info("Could not find value for key '" + name + "'");
             propertyValue = "";
         } else {
         	propertyValue = propertyValue.trim();
@@ -205,6 +204,19 @@ public class MasterkeyConfiguration {
             propertyValue = substituteVariables(propertyValue);
         }
         return propertyValue;
+    }
+    
+    private String dereference (Properties props, String propertyValue) throws IOException {
+    	if (propertyValue.startsWith("REF:")) {
+        	String[] referenceValue = propertyValue.split(":",2);
+        	String[] referenceName = referenceValue[1].split("\\.",2);
+        	propertyValue = ((String) props.get(referenceName[0] + "." + referenceName[1]))+""; 
+        	if (propertyValue.startsWith("REF:")) {
+        		logger.error("Recursive config parameter references detected for " + propertyValue);
+        		propertyValue = null;
+        	}
+    	}
+    	return propertyValue;
     }
     
     private String substituteVariables(String propertyValue) {
