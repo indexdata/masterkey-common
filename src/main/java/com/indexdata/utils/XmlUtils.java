@@ -74,8 +74,7 @@ public class XmlUtils {
       return doc;
     }
     
-    public static Document parse(InputStream source) 
-            throws ParserConfigurationException, SAXException, IOException {
+    public static Document parse(InputStream source) throws SAXException, IOException {
         return builderLocal.get().parse(source);
     }
     
