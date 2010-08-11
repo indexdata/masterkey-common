@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.Writer;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import javax.xml.parsers.DocumentBuilder;
@@ -60,17 +61,20 @@ public class XmlUtils {
     };
 
     private XmlUtils() {
-    }    
+    }
 
-    public static Document newDoc(String rootNode) throws ParserConfigurationException {
-        Document doc = builderLocal.get().newDocument();
-        Element root = doc.createElement(rootNode);
-        doc.appendChild(root);
-        return doc;
+    public static Document newDoc() {
+        return builderLocal.get().newDocument();
+    }
+
+    public static Document newDoc(String rootNode) {
+      Document doc = newDoc();
+      Element root = doc.createElement(rootNode);
+      doc.appendChild(root);
+      return doc;
     }
     
-    public static Document parse(InputStream source) 
-            throws ParserConfigurationException, SAXException, IOException {
+    public static Document parse(InputStream source) throws SAXException, IOException {
         return builderLocal.get().parse(source);
     }
     
@@ -79,12 +83,16 @@ public class XmlUtils {
         return builderLocal.get().parse(path);
     }
     
-    public static Document parse(StringReader reader) throws ParserConfigurationException, SAXException, IOException {
+    public static Document parse(StringReader reader) throws SAXException, IOException {
         return builderLocal.get().parse(new InputSource(reader));
     }
     
-    public static void serialize(Document doc, OutputStream dest) throws TransformerConfigurationException, TransformerException {
+    public static void serialize(Document doc, OutputStream dest) throws TransformerException {
         transformerLocal.get().transform(new DOMSource(doc), new StreamResult(dest));
+    }
+
+    public static void serialize(Document doc, Writer writer) throws TransformerException {
+        transformerLocal.get().transform(new DOMSource(doc), new StreamResult(writer));
     }
 
     /**
