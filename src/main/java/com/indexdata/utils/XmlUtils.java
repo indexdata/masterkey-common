@@ -60,13 +60,17 @@ public class XmlUtils {
     };
 
     private XmlUtils() {
-    }    
+    }
+
+    public static Document newDoc() {
+        return builderLocal.get().newDocument();
+    }
 
     public static Document newDoc(String rootNode) throws ParserConfigurationException {
-        Document doc = builderLocal.get().newDocument();
-        Element root = doc.createElement(rootNode);
-        doc.appendChild(root);
-        return doc;
+      Document doc = newDoc();
+      Element root = doc.createElement(rootNode);
+      doc.appendChild(root);
+      return doc;
     }
     
     public static Document parse(InputStream source) 
