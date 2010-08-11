@@ -67,7 +67,7 @@ public class XmlUtils {
         return builderLocal.get().newDocument();
     }
 
-    public static Document newDoc(String rootNode) throws ParserConfigurationException {
+    public static Document newDoc(String rootNode) {
       Document doc = newDoc();
       Element root = doc.createElement(rootNode);
       doc.appendChild(root);
@@ -84,11 +84,11 @@ public class XmlUtils {
         return builderLocal.get().parse(path);
     }
     
-    public static Document parse(StringReader reader) throws ParserConfigurationException, SAXException, IOException {
+    public static Document parse(StringReader reader) throws SAXException, IOException {
         return builderLocal.get().parse(new InputSource(reader));
     }
     
-    public static void serialize(Document doc, OutputStream dest) throws TransformerConfigurationException, TransformerException {
+    public static void serialize(Document doc, OutputStream dest) throws TransformerException {
         transformerLocal.get().transform(new DOMSource(doc), new StreamResult(dest));
     }
 
