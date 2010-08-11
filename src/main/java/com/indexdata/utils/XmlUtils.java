@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.Writer;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import javax.xml.parsers.DocumentBuilder;
@@ -89,6 +90,10 @@ public class XmlUtils {
     
     public static void serialize(Document doc, OutputStream dest) throws TransformerConfigurationException, TransformerException {
         transformerLocal.get().transform(new DOMSource(doc), new StreamResult(dest));
+    }
+
+    public static void serialize(Document doc, Writer writer) throws TransformerException {
+        transformerLocal.get().transform(new DOMSource(doc), new StreamResult(writer));
     }
 
     /**
