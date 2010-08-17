@@ -103,6 +103,10 @@ public class EntityUtil {
             perThread = null;
         }
     }
+    
+    public static synchronized boolean isInitialized() {
+      return emf != null;
+    }
 
     /**
      * Returns an entity manager associated with a current thread. It is usually used in

@@ -6,16 +6,20 @@
 
 package com.indexdata.utils.persistence;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author jakub
  */
 public class RequestScopedPersister implements ServletRequestListener, ServletContextListener {
+
+    private final static Logger logger = Logger.getLogger("com.indexdata.masterkey");
 
     @Override
     public void requestInitialized(ServletRequestEvent e) {
@@ -24,15 +28,26 @@ public class RequestScopedPersister implements ServletRequestListener, ServletCo
 
     @Override
     public void requestDestroyed(ServletRequestEvent e) {
-        EntityUtil.closeManager();
+        if (EntityUtil.isInitialized()) {
+          EntityUtil.closeManager();
+        } else {
+          logger.warn("EnityUtil is not initialized -- persistence will not be closed.");
+        }
     }
 
     @Override
     public void contextInitialized(ServletContextEvent e) {
         String puName = e.getServletContext().getInitParameter("persistence-unit-name");
-        if (puName == null || puName.isEmpty())
-          throw new RuntimeException("Missing init paremeter 'persistence-unit-name' from web.xml");
-        EntityUtil.initialize(puName);
+        if (puName == null || puName.isEmpty()) {
+          logger.warn("Missing init paremeter 'persistence-unit-name' from web.xml");
+          return;
+        }
+        try {
+          EntityUtil.initialize(puName);
+        } catch (PersistenceException pe) {
+          logger.warn("Cannot initialize EntityUtil (persistence context cannot be created), plugins that need persistence may throw errors");
+          logger.debug(pe);
+        }
     }
 
     @Override
