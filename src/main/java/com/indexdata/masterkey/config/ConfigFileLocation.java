@@ -45,7 +45,14 @@ class ConfigFileLocation {
     }
 
     private void init(ServletContext context, String serverName, String configFileName) throws IOException {
-        MASTERKEY_ROOT_CONFIG_DIR = context.getInitParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM);
+        String rootConfigDir = context.getInitParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM);
+        //look for sepcial paths that are relative to the servlet context
+        if (rootConfigDir.startsWith("war://")) {
+          MASTERKEY_ROOT_CONFIG_DIR = context.getRealPath(rootConfigDir.substring(6));
+          logger.debug("MASTERKEY_ROOT_CONFIG is relative to servlet context, resolving as " + MASTERKEY_ROOT_CONFIG_DIR);
+        } else {
+          MASTERKEY_ROOT_CONFIG_DIR = rootConfigDir;
+        }
         checkMandatoryParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM, MASTERKEY_ROOT_CONFIG_DIR);
         this.componentDir = context.getInitParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM);
         checkMandatoryParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM, componentDir);
