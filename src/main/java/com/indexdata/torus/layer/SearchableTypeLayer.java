@@ -43,8 +43,10 @@ public class SearchableTypeLayer extends Layer {
     private String cfSubDB;
     private String cfProxy;
     private String secondaryRequestSyntax;
+    private String SRU;
+    private String SRUVersion;
 
-    public String getRecordEncoding() {
+	public String getRecordEncoding() {
         return recordEncoding;
     }
 
@@ -265,4 +267,21 @@ public class SearchableTypeLayer extends Layer {
    public void setSecondaryRequestSyntax(String secondaryRequestSyntax) {
       this.secondaryRequestSyntax = secondaryRequestSyntax;
    }
+
+   public String getSRUVersion() {
+		return SRUVersion;
+	}
+
+	public void setSRUVersion(String sRUVersion) {
+		SRUVersion = sRUVersion;
+	}
+
+	public String getSRU() {
+		return SRU;
+	}
+
+	public void setSRU(String sRU) {
+		SRU = sRU;
+	}
+
 }
