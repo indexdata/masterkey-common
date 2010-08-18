@@ -22,7 +22,7 @@ public class ResourceConnector<T> {
     private URL url;
     private String mimeType = "application/xml";
     private String entityPackages;
-    private Class entityType;
+    private Class<T> entityType;
     private JAXBContext jaxbCtx;
 
     public ResourceConnector(URL url, Class<T> type) {
@@ -46,7 +46,8 @@ public class ResourceConnector<T> {
         return jaxbCtx;
     }
 
-    public T get() throws ResourceConnectionException {        
+    @SuppressWarnings("unchecked")
+	public T get() throws ResourceConnectionException {        
         Object obj = null;
         try {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

@@ -11,7 +11,12 @@ package com.indexdata.utils;
  * @author jakub
  */
 public class CronLineParseException extends IllegalArgumentException {
-    public CronLineParseException (String msg, Exception e) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8444690944244202086L;
+
+	public CronLineParseException (String msg, Exception e) {
         super(msg,e);
     }
     

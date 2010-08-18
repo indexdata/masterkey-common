@@ -12,7 +12,12 @@ package com.indexdata.rest.client;
  */
 public class ResourceConnectionException extends Exception {
 
-    public ResourceConnectionException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3794084230779019415L;
+
+	public ResourceConnectionException(String message) {
         super(message);
     }
     
