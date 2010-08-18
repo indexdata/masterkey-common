@@ -54,12 +54,14 @@ digraph callgraph {
 	 zData3[shape="circle", label="data"];
 	 zTarget[shape="box"];
 	 sruTarget[label="SRU\nTarget", shape="box"];
-     pazpar2 -> localIndex1;
-     pazpar2 -> localIndex1;
      pazpar2 -> localIndex1[label="Z39.50"];
      pazpar2[label="Pazpar2", shape="box"];
      localIndex1 -> Anything3;
-	 localIndex1[label="Local Indexes\n (zebrasrv)", shape="none", image="multiple_processes.png"];
+	 localIndex1[label="Local Indexes\n (zebrasrv)", shape="none", shape="box", image="multiple_processes.png"];
+     pazpar2 -> localIndex2[label="HTTP/SOLR"];
+     localIndex2[label="SOLR Server", shape="box"] -> Anything3;
+     localIndex2 -> Anything4;
+
      harvesterAdmin -> harvester;
      harvesterAdmin[label="Harvester\n Admin"];
      
@@ -75,7 +77,8 @@ digraph callgraph {
 	 }
      Anything[label="data", shape=circle];
      Anything3[label="data",shape=circle];
+     Anything4[label="data",shape=circle];
      subgraph {
-		rank = same; Anything; Anything3; zData1; zData3; 
+		rank = same; Anything; Anything3; zData1; zData3; Anything4; 
 	}
 }
