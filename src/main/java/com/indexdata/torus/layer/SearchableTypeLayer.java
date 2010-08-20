@@ -276,6 +276,7 @@ public class SearchableTypeLayer extends Layer {
 		SRUVersion = sRUVersion;
 	}
 
+    @XmlElement(name="sru")
 	public String getSRU() {
 		return SRU;
 	}
