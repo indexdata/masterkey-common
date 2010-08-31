@@ -31,14 +31,13 @@ digraph callgraph {
      harvester -> T4[label="Torus WSAPI"];
      T2 -> "IRSpy Toroid"[label="Torus WSAPI"];
      "IRSpy Toroid" -> Zebra[label="Z39.50"];
-     Zebra[shape="record", label="{GFS |zebra2}"];
+     Zebra[shape="record", label="{GFS |<z2> zebra2}"];
      "IRSpy Toroid"[shape="box"];
      Zebra -> IRSpy_DB;
      IRSpy_DB[label="IRSpy\n database", shape=circle];
      IRSpy -> Zebra[label="Z39.50"];
-     pazpar2 -> cfz;
      pazpar2 -> metaProxy[label="z39.50/SRU"];
-	 metaProxy[label="Metaproxy", shape="box"];
+	 metaProxy[label="Metaproxy\n(optional)", shape="box"];
 	 metaProxy -> sruTarget[label="SRU"];
 	 metaProxy -> zTarget[label="z39.50"];
 	 metaProxy -> cfz[label="z39.50"];
@@ -54,16 +53,16 @@ digraph callgraph {
      pazpar2 -> localIndex1[label="Z39.50"];
      pazpar2[label="Pazpar2", shape="box"];
      localIndex1 -> Anything3;
-	 localIndex1[shape="record", label="{GFS |zebra2}"];
+	 localIndex1[shape="record", label="{GFS |<z2> zebra2}"];
      pazpar2 -> localIndex2[label="HTTP/SOLR"];
-     localIndex2[label="{SOLR|Lucene}", shape="record"] -> Anything3;
+     localIndex2[shape="record", label="{SOLR|Lucene}"];
      localIndex2 -> Anything4;
 
      harvesterAdmin -> harvester;
      harvesterAdmin[label="HarvesterAdmin"];
      
      harvester[label="Harvester", shape="box"];
-     harvester -> localIndex1;
+     harvester -> localIndex1:z2;
      cfRepo[label="CF\nRepo", shape=circle];
      cfz -> cfRepo;
      CF_Builder -> cfRepo;
