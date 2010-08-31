@@ -46,6 +46,9 @@ public class SearchableTypeLayer extends Layer {
     private String SRU;
     private String SRUVersion;
 
+    private String termlistTermSort;
+    private String termlistTermCount;
+    
 	public String getRecordEncoding() {
         return recordEncoding;
     }
@@ -285,4 +288,19 @@ public class SearchableTypeLayer extends Layer {
 		SRU = sRU;
 	}
 
+	public String getTermlistTermSort() {
+		return termlistTermSort;
+	}
+
+	public void setTermlistTermSort(String termlistTermSort) {
+		this.termlistTermSort = termlistTermSort;
+	}
+
+	public String getTermlistTermCount() {
+		return termlistTermCount;
+	}
+
+	public void setTermlistTermCount(String termlistTermCount) {
+		this.termlistTermCount = termlistTermCount;
+	}
 }
