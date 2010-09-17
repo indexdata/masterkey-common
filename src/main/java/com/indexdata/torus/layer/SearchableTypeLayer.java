@@ -48,6 +48,10 @@ public class SearchableTypeLayer extends Layer {
 
     private String termlistTermSort;
     private String termlistTermCount;
+    // Classify a target to be local/preferred
+    private String preferredTarget;
+    // Classify a target to be local/preferred
+    private String blockTimeout;
     
 	public String getRecordEncoding() {
         return recordEncoding;
@@ -302,5 +306,21 @@ public class SearchableTypeLayer extends Layer {
 
 	public void setTermlistTermCount(String termlistTermCount) {
 		this.termlistTermCount = termlistTermCount;
+	}
+
+	public String getPreferredTarget() {
+		return preferredTarget;
+	}
+
+	public void setPreferredTarget(String preferred) {
+		this.preferredTarget = preferred;
+	}
+
+	public String getBlockTimeout() {
+		return blockTimeout;
+	}
+
+	public void setBlockTimeout(String blockTimeout) {
+		this.blockTimeout = blockTimeout;
 	}
 }
