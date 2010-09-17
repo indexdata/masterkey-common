@@ -22,9 +22,16 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -136,4 +143,26 @@ public class XmlUtils {
         parent.appendChild(newNode);
         return newNode;
     }
+    
+    /**
+     * Gets a list of nodes by XPath from given starting point
+     * 
+     * @param startingPoint
+     *          The context node
+     * @param xPathString
+     *          The search string
+     * @return The node list found by the XPath
+     * @throws StandardServiceException
+     *           If XPath evaluation fails.
+     */
+    public static NodeList getNodeList(Object startingPoint, String xPathString)
+        throws XPathExpressionException {
+      NodeList nodeList = null;
+      XPathFactory factory = XPathFactory.newInstance();
+      XPath xPath = factory.newXPath();
+      XPathExpression expr = xPath.compile(xPathString);
+      nodeList = (NodeList) expr.evaluate(startingPoint, XPathConstants.NODESET);
+      return nodeList;
+    }
+
 }
