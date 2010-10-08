@@ -26,7 +26,7 @@ class ConfigFileLocation {
     private String configDirForServerName = null;
     private String domainMappingFileName = null;
     Properties domainConfigMappingProperties = null;
-    private static Logger logger = Logger.getLogger("com.indexdata.masterkey.config");
+    private static Logger logger = Logger.getLogger(ConfigFileLocation.class);
 
     /**
      *

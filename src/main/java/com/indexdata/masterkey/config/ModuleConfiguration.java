@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 public class ModuleConfiguration {
 
-    private Logger logger = Logger.getLogger("com.indexdata.masterkey.config.");
+    private Logger logger = Logger.getLogger(ModuleConfiguration.class);
     private MasterkeyConfiguration mkContext = null;
     public String moduleName = null;
 
