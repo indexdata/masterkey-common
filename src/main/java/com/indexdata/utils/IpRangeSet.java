@@ -10,12 +10,16 @@ import java.util.List;
  * <p/>
  * A given set -- IP range set A -- is considered to 'enclose' another
  * set -- IP range set B -- if all possible IP numbers in set B is a subset of 
- * all possible IP numbers in set A.
+ * all possible IP numbers in set A (note).
  * <p/>
  * A IP range set is a space separated list of one or more IP ranges and/or 
  * single IP numbers.
  * <br/>
  * An IP range is a hyphen separated list of two IP numbers. 
+ * 
+ * 
+ * Note: Is not guaranteed to handle IP ranges that are split in two with 
+ * the end-point of one being back-to-back with the start-point of the next. 
  * 
  * @author Niels Erik Nielsen
  * 
