@@ -35,6 +35,7 @@ public class SearchableTypeLayer extends Layer {
     private String serviceProvider;
     private String categories;
     private String medium;
+    private String fullTextTarget;
     private String comment;
     private String explode;
     private String useUrlProxy;
@@ -210,6 +211,15 @@ public class SearchableTypeLayer extends Layer {
     public void setMedium (String medium) {
     	this.medium = medium;
     }
+    
+    public String getFullTextTarget () {
+      return fullTextTarget;
+    }
+    
+    public void setFullTextTarget (String fullTextTarget) {
+      this.fullTextTarget = fullTextTarget;
+    }
+    
     
     public String getComment() {
       return comment;
