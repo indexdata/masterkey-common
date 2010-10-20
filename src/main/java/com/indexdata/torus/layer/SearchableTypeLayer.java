@@ -53,7 +53,10 @@ public class SearchableTypeLayer extends Layer {
     private String preferredTarget;
     // Classify a target to be local/preferred
     private String blockTimeout;
-    
+
+    // File for per target APDU log
+    private String apduLog;
+
 	public String getRecordEncoding() {
         return recordEncoding;
     }
