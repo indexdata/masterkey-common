@@ -54,7 +54,7 @@ public class SearchableTypeLayer extends Layer {
     // Classify a target to be local/preferred
     private String blockTimeout;
 
-    // File for per target APDU log
+    // APDU log file name
     private String apduLog;
 
 	public String getRecordEncoding() {
@@ -335,5 +335,13 @@ public class SearchableTypeLayer extends Layer {
 
 	public void setBlockTimeout(String blockTimeout) {
 		this.blockTimeout = blockTimeout;
+	}
+
+	public String getApduLog() {
+		return apduLog;
+	}
+
+	public void setApduLog(String apduLog) {
+		this.apduLog = apduLog;
 	}
 }
