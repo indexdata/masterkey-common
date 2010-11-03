@@ -12,13 +12,15 @@ import java.net.URL;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import com.indexdata.utils.PerformanceLogger;
+
 /**
  * 
  * @param <T> resource binded type
  * @author jakub
  */
 public class ResourceConnector<T> {
-
+    
     private URL url;
     private String mimeType = "application/xml";
     private String entityPackages;
@@ -47,15 +49,16 @@ public class ResourceConnector<T> {
     }
 
     @SuppressWarnings("unchecked")
-	public T get() throws ResourceConnectionException {        
+	public T get() throws ResourceConnectionException {
+    	long start = PerformanceLogger.start();
         Object obj = null;
-        try {
+        try {        
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            int responseCode = conn.getResponseCode();
-            if (responseCode == 200) {
+            int responseCode = conn.getResponseCode();        
+            if (responseCode == 200) {            
                 JAXBContext context = getJAXBContext();
-                obj = context.createUnmarshaller().unmarshal(conn.getInputStream());
+                obj = context.createUnmarshaller().unmarshal(conn.getInputStream());                
             } else {
                 throw new ResourceConnectionException("Cannot retrieve resource - status code " + responseCode);
             }
@@ -64,7 +67,7 @@ public class ResourceConnector<T> {
         } catch (JAXBException jaxbe) {
             throw new ResourceConnectionException(jaxbe);
         }
-
+        PerformanceLogger.finish("TORUS",url.getPath()+"?"+url.getQuery(),start);
         return (T) obj;
     }
 
