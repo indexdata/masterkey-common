@@ -25,7 +25,7 @@ public class PerformanceLogger {
    */
   public static long start(String label, String message) {    
     if (performanceLog.isDebugEnabled()) {
-      log(String.format("%10s %-7.7s %-80.80s", filler, label, message));      
+      log(String.format("%6s %-16.16s %-80.80s", filler, label, message));      
     }
     return System.currentTimeMillis();      
   }
@@ -38,7 +38,7 @@ public class PerformanceLogger {
    */
   public static long start(String message) {    
     if (performanceLog.isDebugEnabled()) {      
-      log(String.format("%10s %-80.80s", filler, message));
+      log(String.format("%6s %-80.80s", filler, message));
     }
     return System.currentTimeMillis();      
   }
@@ -60,7 +60,7 @@ public class PerformanceLogger {
    */
   public static void finish (String message, long startTime) {
     long time = System.currentTimeMillis() - startTime;    
-    log(String.format("%10d %7.7s %-80.80s", time, filler, message));
+    log(String.format("%6d %16.16s %-80.80s", time, filler, message));
   }
   
   /**
@@ -73,7 +73,7 @@ public class PerformanceLogger {
    */
   public static void finish (String label, String message, long startTime) {
     long time = System.currentTimeMillis() - startTime;
-    log(String.format("%10d %-7.7s %-80.80s", time, label, message));
+    log(String.format("%6d %-16.16s %-80.80s", time, label, message));
   }
   
   /**
