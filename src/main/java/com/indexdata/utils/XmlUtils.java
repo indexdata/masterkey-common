@@ -13,6 +13,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -93,13 +94,25 @@ public class XmlUtils {
     public static Document parse(StringReader reader) throws SAXException, IOException {
         return builderLocal.get().parse(new InputSource(reader));
     }
-    
+
     public static void serialize(Document doc, OutputStream dest) throws TransformerException {
-        transformerLocal.get().transform(new DOMSource(doc), new StreamResult(dest));
+      serialize(doc, dest, null);
     }
 
     public static void serialize(Document doc, Writer writer) throws TransformerException {
-        transformerLocal.get().transform(new DOMSource(doc), new StreamResult(writer));
+      serialize(doc, writer, null);
+    }
+    
+    public static void serialize(Document doc, OutputStream dest, Properties props) throws TransformerException {
+      Transformer tf = transformerLocal.get();
+      if (props != null) tf.setOutputProperties(props);
+      tf.transform(new DOMSource(doc), new StreamResult(dest));
+    }
+
+    public static void serialize(Document doc, Writer writer, Properties props) throws TransformerException {
+      Transformer tf = transformerLocal.get();
+      if (props != null) tf.setOutputProperties(props);
+      transformerLocal.get().transform(new DOMSource(doc), new StreamResult(writer));
     }
 
     /**
