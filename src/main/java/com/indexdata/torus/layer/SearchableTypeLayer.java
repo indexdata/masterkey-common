@@ -46,6 +46,7 @@ public class SearchableTypeLayer extends Layer {
     private String secondaryRequestSyntax;
     private String SRU;
     private String SRUVersion;
+    private String pqfPrefix;
 
     private String termlistTermSort;
     private String termlistTermCount;
@@ -296,7 +297,15 @@ public class SearchableTypeLayer extends Layer {
 		SRUVersion = sRUVersion;
 	}
 
-    @XmlElement(name="sru")
+    public String getPqfPrefix() {
+		return pqfPrefix;
+	}
+
+	public void setPqfPrefix(String pqfPrefix) {
+		this.pqfPrefix = pqfPrefix;
+	}
+
+	@XmlElement(name="sru")
 	public String getSRU() {
 		return SRU;
 	}
