@@ -11,7 +11,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import com.indexdata.utils.PerformanceLogger;
 
 /**
  * Represents the configuration context for modules within this J2EE component.
@@ -268,16 +272,18 @@ public class MasterkeyConfiguration {
      */
     private Properties getComponentProperties(String configFilePath) throws IOException {
         Properties componentProperties = null;
+        long startTime = PerformanceLogger.start();        
         if (cacheConfigParams && configParametersCache.containsKey(configFilePath)) {
             componentProperties = configParametersCache.get(configFilePath);
-            logger.debug("Found cached properties for '" + configFilePath + "'");
+            logger.trace("Found cached properties for '" + configFilePath + "'");
+            PerformanceLogger.finish(Level.TRACE, "CONFIG", "Found cached component properties", startTime);
         } else {
             componentProperties = new Properties();
             try {
             	FileInputStream fis = new FileInputStream(configFileLocation.getConfigFilePath());
                 componentProperties.load(fis);
                 fis.close();
-                logger.debug("Loaded properties from file system using '" + configFilePath + "'");
+                logger.trace("Loaded properties from file system using '" + configFilePath + "'");
             } catch (FileNotFoundException fnfe) {
                 logger.error(fnfe + "Could not find property file '" + configFilePath + "'");
                 configFileLocation.evaluate();
@@ -288,7 +294,9 @@ public class MasterkeyConfiguration {
             if (cacheConfigParams) {
                configParametersCache.put(configFilePath, componentProperties);
             }
+            PerformanceLogger.finish(Level.TRACE,"CONFIG", "Loaded component properties", startTime);
         }
+        
         return componentProperties;
     }
 
