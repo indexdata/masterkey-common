@@ -30,6 +30,7 @@ public class SearchableTypeLayer extends Layer {
     private String cclMapIsbn;
     private String cclMapDate;
     private String cclMapTerm;
+    private String piggyback;
     private String authentication;
     private String urlRecipe;
     private String serviceProvider;
@@ -159,6 +160,15 @@ public class SearchableTypeLayer extends Layer {
     public void setCclMapTerm(String cclMapTerm) {
         this.cclMapTerm = cclMapTerm;
     }
+    
+    public String getPiggyback() {
+      return piggyback;
+    }
+
+    public void setPiggyback(String piggyback) {
+      this.piggyback = piggyback;
+    }
+
     @XmlElement(name="cclmap_ti")
     public String getCclMapTi() {
         return cclMapTi;
