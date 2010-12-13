@@ -4,7 +4,7 @@
   <groupId>com.indexdata</groupId>
   <artifactId>masterkey-common</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.14-SNAPSHOT</version>
+  <version>0.0.15-SNAPSHOT</version>
   <name>masterkey-common</name>
   <url>http://www.indexdata.com</url>
   <build>
