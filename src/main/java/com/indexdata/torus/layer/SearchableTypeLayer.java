@@ -59,6 +59,7 @@ public class SearchableTypeLayer extends Layer {
 
     // APDU log file name
     private String apduLog;
+    private String maxRecords;
 
 	public String getRecordEncoding() {
         return recordEncoding;
@@ -373,4 +374,14 @@ public class SearchableTypeLayer extends Layer {
 	public void setApduLog(String apduLog) {
 		this.apduLog = apduLog;
 	}
+
+  public String getMaxRecords() {
+    return maxRecords;
+  }
+
+  public void setMaxRecords(String maxRecords) {
+    this.maxRecords = maxRecords;
+  }
+
+        
 }
