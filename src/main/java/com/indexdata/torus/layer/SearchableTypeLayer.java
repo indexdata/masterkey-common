@@ -50,8 +50,11 @@ public class SearchableTypeLayer extends Layer {
     private String SRUVersion;
     private String pqfPrefix;
 
+    // Termlist/facet settings
     private String termlistTermSort;
     private String termlistTermCount;
+    private String termlistUseTermFactor;
+
     // Classify a target to be local/preferred
     private String preferredTarget;
     // Classify a target to be local/preferred
@@ -382,6 +385,14 @@ public class SearchableTypeLayer extends Layer {
   public void setMaxRecords(String maxRecords) {
     this.maxRecords = maxRecords;
   }
+
+public String getTermlistUseTermFactor() {
+	return termlistUseTermFactor;
+}
+
+public void setTermlistUseTermFactor(String termlistUseTermFactor) {
+	this.termlistUseTermFactor = termlistUseTermFactor;
+}
 
         
 }
