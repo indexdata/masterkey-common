@@ -95,21 +95,21 @@ public class XmlUtils {
         return builderLocal.get().parse(new InputSource(reader));
     }
 
-    public static void serialize(Document doc, OutputStream dest) throws TransformerException {
+    public static void serialize(Node doc, OutputStream dest) throws TransformerException {
       serialize(doc, dest, null);
     }
 
-    public static void serialize(Document doc, Writer writer) throws TransformerException {
+    public static void serialize(Node doc, Writer writer) throws TransformerException {
       serialize(doc, writer, null);
     }
     
-    public static void serialize(Document doc, OutputStream dest, Properties props) throws TransformerException {
+    public static void serialize(Node doc, OutputStream dest, Properties props) throws TransformerException {
       Transformer tf = transformerLocal.get();
       if (props != null) tf.setOutputProperties(props);
       tf.transform(new DOMSource(doc), new StreamResult(dest));
     }
 
-    public static void serialize(Document doc, Writer writer, Properties props) throws TransformerException {
+    public static void serialize(Node doc, Writer writer, Properties props) throws TransformerException {
       Transformer tf = transformerLocal.get();
       if (props != null) tf.setOutputProperties(props);
       transformerLocal.get().transform(new DOMSource(doc), new StreamResult(writer));
