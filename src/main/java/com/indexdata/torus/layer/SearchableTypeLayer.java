@@ -49,6 +49,10 @@ public class SearchableTypeLayer extends Layer {
     private String SRU;
     private String SRUVersion;
     private String pqfPrefix;
+    // Target specific parameters. e.g. ZOOM option extraArgs
+    private String extraArgs;
+    // Override target to PQF or CQL
+    private String querySyntax;
 
     // Termlist/facet settings
     private String termlistTermSort;
@@ -392,6 +396,22 @@ public String getTermlistUseTermFactor() {
 
 public void setTermlistUseTermFactor(String termlistUseTermFactor) {
 	this.termlistUseTermFactor = termlistUseTermFactor;
+}
+
+public String getExtraArgs() {
+	return extraArgs;
+}
+
+public void setExtraArgs(String extraArgs) {
+	this.extraArgs = extraArgs;
+}
+
+public String getQuerySyntax() {
+	return querySyntax;
+}
+
+public void setQuerySyntax(String querySyntax) {
+	this.querySyntax = querySyntax;
 }
 
         
