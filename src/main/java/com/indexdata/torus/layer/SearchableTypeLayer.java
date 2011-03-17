@@ -31,6 +31,7 @@ public class SearchableTypeLayer extends Layer {
     private String cclMapIssn;
     private String cclMapDate;
     private String cclMapTerm;
+    private String cclMapJournalTitle;
     private String piggyback;
     private String authentication;
     private String urlRecipe;
@@ -195,6 +196,16 @@ public class SearchableTypeLayer extends Layer {
     public void setCclMapTi(String cclMapTi) {
         this.cclMapTi = cclMapTi;
     }
+
+  @XmlElement(name="cclmap_jt")
+  public String getCclMapJournalTitle() {
+    return cclMapJournalTitle;
+  }
+
+  public void setCclMapJournalTitle(String cclMapJournalTitle) {
+    this.cclMapJournalTitle = cclMapJournalTitle;
+  }
+
 
     public String getQueryEncoding() {
         return queryEncoding;
