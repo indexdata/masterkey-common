@@ -31,6 +31,8 @@
         <artifactId>apt-maven-plugin</artifactId>
         <version>1.0-alpha-4</version>
         <configuration>
+          <!-- for backwards compat with alpha-3 -->
+          <outputDirectory>${project.build.directory}/generated-resources/apt</outputDirectory>
           <factory>net.sf.jelly.apt.freemarker.FreemarkerProcessorFactory</factory>
           <fork>true</fork>
           <options>
