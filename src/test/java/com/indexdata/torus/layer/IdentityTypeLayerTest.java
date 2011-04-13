@@ -71,6 +71,7 @@ public class IdentityTypeLayerTest {
     }
     List<Layer> layers = rec.getLayers();
     IdentityTypeLayer itl = (IdentityTypeLayer) layers.get(0);
+    assertEquals("my_library", itl.getIdentityId());
     assertEquals("searchable.my_library", itl.getSearchablesRealm());
     assertEquals("cat.my_library", itl.getCategoriesRealm());
   }
@@ -101,6 +102,7 @@ public class IdentityTypeLayerTest {
     }
     List<Layer> layers = rec.getLayers();
     IdentityTypeLayer itl = (IdentityTypeLayer) layers.get(0);
+    assertEquals(null, itl.getIdentityId());
     assertEquals("my_library-searchables", itl.getSearchablesRealm());
     assertEquals("my_library-categories", itl.getCategoriesRealm());
   }
@@ -133,6 +135,7 @@ public class IdentityTypeLayerTest {
     }
     List<Layer> layers = rec.getLayers();
     IdentityTypeLayer itl = (IdentityTypeLayer) layers.get(0);
+    assertEquals("my_library", itl.getIdentityId());
     assertEquals("my_library-searchables", itl.getSearchablesRealm());
     assertEquals("my_library-categories", itl.getCategoriesRealm());
   }

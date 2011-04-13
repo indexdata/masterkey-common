@@ -24,14 +24,21 @@ public class IdentityTypeLayer extends Layer {
     private String proxyPattern;
     private String referer;
     private String comment;
+    private String identityId;
     //for older identity layers fallback to construction of searchableRealm and
     // categoryRealm from the (no longer public) idenityId field
-    @XmlElement(name="identityId")
-    private String identityId;
     @XmlElement(name="searchablesRealm")
     private String searchablesRealm;
     @XmlElement(name="categoriesRealm")
     private String categoriesRealm;
+
+    public String getIdentityId() {
+      return identityId;
+    }
+
+   public void setIdentityId(String identityId) {
+      this.identityId = identityId;
+    }
 
     @XmlTransient
     public String getSearchablesRealm() {
