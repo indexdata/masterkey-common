@@ -20,7 +20,6 @@ import com.indexdata.utils.PerformanceLogger;
  * @author jakub
  */
 public class ResourceConnector<T> {
-    
     private URL url;
     private String mimeType = "application/xml";
     private String entityPackages;
@@ -46,6 +45,10 @@ public class ResourceConnector<T> {
             }
         }
         return jaxbCtx;
+    }
+
+    public URL getURL() {
+      return url;
     }
 
     @SuppressWarnings("unchecked")
