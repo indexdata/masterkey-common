@@ -13,14 +13,22 @@ package com.indexdata.utils;
 public class TextUtils {
 
   public static String joinPath(String... comps) {
+    return TextUtils.joinPath('/', comps);
+  }
+
+  public static String joinPath(char sep, String... comps) {
     StringBuilder sb = new StringBuilder();
     char prev = '\0';
     for (String comp : comps) {
+      if (prev != '\0' && prev != sep) {
+        sb.append(sep);
+        prev = sep;
+      }
       int idx = comp.indexOf("://");
       int bound = idx == -1 ? -1 : idx + 3;
-      for (int i = 0 ; i<comp.length();i++) {
+      for (int i = 0; i<comp.length(); i++) {
         char c = comp.charAt(i);
-        if (i > bound && prev == '/' && c == '/') {
+        if (i > bound && prev == sep && c == sep) {
         } else {
           sb.append(c);
         }

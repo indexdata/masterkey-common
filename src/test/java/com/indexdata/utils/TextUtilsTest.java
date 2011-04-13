@@ -42,10 +42,19 @@ public class TextUtilsTest {
    * Test of joinPath method, of class TextUtils.
    */
   @Test
-  public void testJoinPath() {
+  public void testJoinPathWithSlashes() {
     System.out.println("joinPath");
     String expResult = "http://user:user@www.indexdata.com/service-proxy/index.html";
     String result = TextUtils.joinPath("http://user:user@www.indexdata.com/", "/", "/service-proxy/", "index.html");
+    System.out.println(expResult + " ?= " + result);
+    assertEquals(expResult, result);
+  }
+
+    @Test
+  public void testJoinPathNoSlashes() {
+    System.out.println("joinPath");
+    String expResult = "http://user:user@www.indexdata.com/service-proxy/index.html";
+    String result = TextUtils.joinPath("http://user:user@www.indexdata.com", "service-proxy", "index.html");
     System.out.println(expResult + " ?= " + result);
     assertEquals(expResult, result);
   }
