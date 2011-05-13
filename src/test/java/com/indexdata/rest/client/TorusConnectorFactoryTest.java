@@ -61,11 +61,11 @@ public class TorusConnectorFactoryTest {
   @Test
   public void testGetTorus2URL() {
     System.out.println("getTorusURL");
-    String torusURL = "http://host.indexdata.com/torus/2.0";
+    String torusURL = "http://host.indexdata.com/torus2/";
     String prefix = "searchable";
     String identityId = "my_library";
     String queryParams = "";
-    String expResult = "http://host.indexdata.com/torus/2.0/searchable.my_library/records/";
+    String expResult = "http://host.indexdata.com/torus2/searchable.my_library/records/";
     String result =
       TorusConnectorFactory.getTorusURL(torusURL, prefix, identityId,
       queryParams);

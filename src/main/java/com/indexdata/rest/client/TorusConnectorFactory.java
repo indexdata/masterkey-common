@@ -25,7 +25,7 @@ public class TorusConnectorFactory {
   public static String getTorusURL(String torusURL, String prefix, String identityId, String queryParams) {
     String url = null;
     try {
-      if (torusURL.contains("2.0")) {
+      if (torusURL.contains("torus2")) {
         //use the dotted notation to construct realm names
         url = TextUtils.joinPath(torusURL,
           URLEncoder.encode(prefix+"."+identityId, "UTF-8").replaceAll("[+]","%20"),
