@@ -23,7 +23,7 @@ public class TorusConnectorFactory {
   }
   
   public static String getTorusURL(String torusURL, String prefix, String identityId, String queryParams) {
-    String url = null;
+    String url = null;    
     try {
       if (torusURL.contains("torus2")) {
         //use the dotted notation to construct realm names
@@ -40,7 +40,10 @@ public class TorusConnectorFactory {
           url = TextUtils.joinPath(torusURL, prefix, "records",
             URLEncoder.encode(identityId, "UTF-8").replaceAll("[+]", "%20"), "/");
       }
-      return url;
+      if (url!=null) {
+        url+=(queryParams==null ? "" : queryParams);
+      }
+      return url;      
     } catch (UnsupportedEncodingException uee) {
       throw new RuntimeException(uee);
     }
