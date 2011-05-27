@@ -9,6 +9,7 @@ package com.indexdata.torus.layer;
 import com.indexdata.torus.Layer;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -19,11 +20,43 @@ public class IdentityTypeLayer extends Layer {
     private String displayName;
     private String userName;
     private String ipRanges;
-    private String realm;
     private String iconUrl;
     private String proxyPattern;
     private String referer;
     private String comment;
+    private String identityId;
+    //for older identity layers fallback to construction of searchableRealm and
+    // categoryRealm from the (no longer public) idenityId field
+    @XmlElement(name="searchablesRealm")
+    private String searchablesRealm;
+    @XmlElement(name="categoriesRealm")
+    private String categoriesRealm;
+
+    public String getIdentityId() {
+      return identityId;
+    }
+
+   public void setIdentityId(String identityId) {
+      this.identityId = identityId;
+    }
+
+    @XmlTransient
+    public String getSearchablesRealm() {
+      return searchablesRealm != null ? searchablesRealm : "searchable."+identityId;
+    }
+
+    public void setSearchablesRealm(String searchablesRealm) {
+      this.searchablesRealm = searchablesRealm;
+    }
+
+    @XmlTransient
+    public String getCategoriesRealm() {
+      return categoriesRealm != null ? categoriesRealm : "cat."+identityId;
+    }
+
+    public void setCategoriesRealm(String categoriesRealm) {
+      this.categoriesRealm = categoriesRealm;
+    }
 
     public String getDisplayName() {
         return displayName;
@@ -31,15 +64,6 @@ public class IdentityTypeLayer extends Layer {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    @XmlElement(name="identityId")
-    public String getRealm() {
-        return realm;
-    }
-
-    public void setRealm(String realm) {
-        this.realm = realm;
     }
 
     public String getComment() {
