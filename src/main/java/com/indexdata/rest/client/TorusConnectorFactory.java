@@ -40,8 +40,8 @@ public class TorusConnectorFactory {
           url = TextUtils.joinPath(torusURL, prefix, "records",
             URLEncoder.encode(identityId, "UTF-8").replaceAll("[+]", "%20"), "/");
       }
-      if (url!=null) {
-        url+=(queryParams==null ? "" : queryParams);
+      if (url != null && queryParams != null) {
+        url += queryParams;
       }
       return url;      
     } catch (UnsupportedEncodingException uee) {
