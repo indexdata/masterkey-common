@@ -60,7 +60,7 @@ public class ResourceConnector<T> {
                 JAXBContext context = getJAXBContext();
                 obj = context.createUnmarshaller().unmarshal(conn.getInputStream());                
             } else {
-                throw new ResourceConnectionException("Cannot retrieve resource - status code " + responseCode);
+                throw new ResourceConnectionException("Cannot retrieve resource " + url.toString() + " - status code " + responseCode);
             }
         } catch (IOException ioe) {
             throw new ResourceConnectionException(ioe);
@@ -93,9 +93,9 @@ public class ResourceConnector<T> {
                     //Partial
                     break;
                 case 405:
-                    throw new ResourceConnectionException("Cannot update resource - HTTP method not allowed (405)");
+                    throw new ResourceConnectionException("Cannot update resource " + url.toString() + " - HTTP method not allowed (405)");
                 default:
-                    throw new ResourceConnectionException("Cannot update resource - status code " + responseCode);
+                    throw new ResourceConnectionException("Cannot update resource " + url.toString() + " status code " + responseCode);
             }
         } catch (JAXBException jaxbe) {
             throw new ResourceConnectionException(jaxbe);
@@ -120,9 +120,9 @@ public class ResourceConnector<T> {
                 case 206:   //Partial
                     break;
                 case 405:
-                    throw new ResourceConnectionException("Cannot delete resource - HTTP method not allowed (405)");
+                    throw new ResourceConnectionException("Cannot delete resource " + url.toString() + " - HTTP method not allowed (405)");
                 default:
-                    throw new ResourceConnectionException("Cannot delete resource - status code " + responseCode);
+                    throw new ResourceConnectionException("Cannot delete resource " + url.toString() + " - status code " + responseCode);
             }
         } catch (IOException ioe) {
             throw new ResourceConnectionException(ioe);
@@ -150,9 +150,9 @@ public class ResourceConnector<T> {
                 case 206:   //Partial
                     break;
                 case 405:
-                    throw new ResourceConnectionException("Cannot create resource - HTTP method not allowed (405)");
+                    throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - HTTP method not allowed (405)");
                 default:
-                    throw new ResourceConnectionException("Cannot create resource - status code " + responseCode);
+                    throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - status code " + responseCode);
             }        
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
@@ -183,9 +183,9 @@ public class ResourceConnector<T> {
                 case 206:   //Partial
                     break;
                 case 405:
-                    throw new ResourceConnectionException("Cannot create resource - HTTP method not allowed (405)");
+                    throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - HTTP method not allowed (405)");
                 default:
-                    throw new ResourceConnectionException("Cannot create resource - staus code " + responseCode);
+                    throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - staus code " + responseCode);
             }
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
