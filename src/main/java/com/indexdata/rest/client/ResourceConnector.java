@@ -65,10 +65,10 @@ public class ResourceConnector<T> {
             } else {
                 throw new ResourceConnectionException("Cannot retrieve resource " + url.toString() + " - status code " + responseCode);
             }
-        } catch (IOException ioe) {
-            throw new ResourceConnectionException(ioe);
         } catch (JAXBException jaxbe) {
-            throw new ResourceConnectionException(jaxbe);
+            throw new ResourceConnectionException("Get URL " + url.toString() + " failed: " + jaxbe.getMessage());
+        } catch (IOException ioe) {
+            throw new ResourceConnectionException("Get URL " + url.toString() + " failed: " + ioe.getMessage());
         }
         PerformanceLogger.finish("TORUS",url.getPath()+"?"+url.getQuery(),start);
         return (T) obj;
@@ -101,9 +101,9 @@ public class ResourceConnector<T> {
                     throw new ResourceConnectionException("Cannot update resource " + url.toString() + " status code " + responseCode);
             }
         } catch (JAXBException jaxbe) {
-            throw new ResourceConnectionException(jaxbe);
+            throw new ResourceConnectionException("Put URL " + url.toString() + " failed: " + jaxbe.getMessage());
         } catch (IOException ioe) {
-            throw new ResourceConnectionException(ioe);
+            throw new ResourceConnectionException("Put URL " + url.toString() + " failed: " + ioe.getMessage());
         }
     }
 
@@ -128,7 +128,7 @@ public class ResourceConnector<T> {
                     throw new ResourceConnectionException("Cannot delete resource " + url.toString() + " - status code " + responseCode);
             }
         } catch (IOException ioe) {
-            throw new ResourceConnectionException(ioe);
+            throw new ResourceConnectionException("Delete URL " + url.toString() + " failed: " + ioe.getMessage());
         }
     }
 
@@ -159,9 +159,9 @@ public class ResourceConnector<T> {
             }        
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
-            throw new ResourceConnectionException(ioe);
+            throw new ResourceConnectionException("Post URL " + url.toString() + " failed: " + ioe.getMessage());
         } catch (JAXBException jaxbe) {
-            throw new ResourceConnectionException(jaxbe);
+            throw new ResourceConnectionException("Post URL " + url.toString() + " failed: " + jaxbe.getMessage());
         }
     }
 
@@ -192,9 +192,9 @@ public class ResourceConnector<T> {
             }
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
-            throw new ResourceConnectionException(ioe);
+            throw new ResourceConnectionException("PostAny URL " + url.toString() + " failed: " + ioe.getMessage());
         } catch (JAXBException jaxbe) {
-            throw new ResourceConnectionException(jaxbe);
+            throw new ResourceConnectionException("PostAny URL " + url.toString() + " failed: " + jaxbe.getMessage());
         }
     }
 }
