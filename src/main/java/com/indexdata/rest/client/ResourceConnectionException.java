@@ -6,6 +6,7 @@
 
 package com.indexdata.rest.client;
 
+
 /**
  * General resource connection exception
  * @author jakub
@@ -23,6 +24,10 @@ public class ResourceConnectionException extends Exception {
     
     public ResourceConnectionException(Exception cause) {
         super(cause);
+    }
+    
+    public String toString() {
+    	return super.getMessage();
     }
     
 }
