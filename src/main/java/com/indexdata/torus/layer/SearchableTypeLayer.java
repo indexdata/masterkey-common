@@ -12,80 +12,87 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * A "definition" of the searchable type.
+ * 
  * @author jakub
  */
-@XmlRootElement(name="layer")
+@XmlRootElement(name = "layer")
 public class SearchableTypeLayer extends Layer {
-    private String name;
-    private String zurl;
-    private String transform;
-    private String elementSet;
-    private String requestSyntax;
-    private String queryEncoding;
-    private String recordEncoding;
+	private String name;
+	private String zurl;
+	private String transform;
+	private String elementSet;
+	private String requestSyntax;
+	private String queryEncoding;
+	private String recordEncoding;
 	private String useTurboMarc;
-    private String cclMapAu;
-    private String cclMapTi;
-    private String cclMapSu;
-    private String cclMapIsbn;
-    private String cclMapIssn;
-    private String cclMapDate;
-    private String cclMapTerm;
-    private String cclMapJournalTitle;
-    private String piggyback;
-    private String authentication;
-    private String urlRecipe;
-    private String serviceProvider;
-    private String categories;
-    private String medium;
-    private String fullTextTarget;
-    private String comment;
-    private String explode;
-    private String useUrlProxy;
-    private String useThumbnails;
+	private String cclMapAu;
+	private String cclMapTi;
+	private String cclMapSu;
+	private String cclMapIsbn;
+	private String cclMapIssn;
+	private String cclMapDate;
+	private String cclMapTerm;
+	private String cclMapJournalTitle;
+
+	private String facetMapAu;
+	private String facetMapSu;
+	private String facetMapDate;
+	private String facetMapJournalTitle;
+
+	private String piggyback;
+	private String authentication;
+	private String urlRecipe;
+	private String serviceProvider;
+	private String categories;
+	private String medium;
+	private String fullTextTarget;
+	private String comment;
+	private String explode;
+	private String useUrlProxy;
+	private String useThumbnails;
 	private String cfAuth;
-    private String cfSubDB;
-    private String cfProxy;
-    private String secondaryRequestSyntax;
-    private String SRU;
-    private String SRUVersion;
-    private String pqfPrefix;
-    // Target specific parameters. e.g. ZOOM option extraArgs
-    private String extraArgs;
-    // Override target to PQF or CQL
-    private String querySyntax;
+	private String cfSubDB;
+	private String cfProxy;
+	private String secondaryRequestSyntax;
+	private String SRU;
+	private String SRUVersion;
+	private String pqfPrefix;
+	// Target specific parameters. e.g. ZOOM option extraArgs
+	private String extraArgs;
+	// Override target to PQF or CQL
+	private String querySyntax;
 
-    // Termlist/facet settings
-    private String termlistTermSort;
-    private String termlistTermCount;
-    private String termlistUseTermFactor;
+	// Termlist/facet settings
+	private String termlistTermSort;
+	private String termlistTermCount;
+	private String termlistUseTermFactor;
 
-    // Classify a target to be local/preferred
-    private String preferredTarget;
-    // Classify a target to be local/preferred
-    private String blockTimeout;
+	// Classify a target to be local/preferred
+	private String preferredTarget;
+	// Classify a target to be local/preferred
+	private String blockTimeout;
 
-    // APDU log file name
-    private String apduLog;
-    private String maxRecords;
+	// APDU log file name
+	private String apduLog;
+	private String maxRecords;
 
 	public String getRecordEncoding() {
-        return recordEncoding;
-    }
+		return recordEncoding;
+	}
 
-    public void setRecordEncoding(String recordEncoding) {
-        this.recordEncoding = recordEncoding;
-    }
+	public void setRecordEncoding(String recordEncoding) {
+		this.recordEncoding = recordEncoding;
+	}
 
-    public String getRequestSyntax() {
-        return requestSyntax;
-    }
+	public String getRequestSyntax() {
+		return requestSyntax;
+	}
 
-    public void setRequestSyntax(String requestSyntax) {
-        this.requestSyntax = requestSyntax;
-    }
-    
-    public String getUseTurboMarc() {
+	public void setRequestSyntax(String requestSyntax) {
+		this.requestSyntax = requestSyntax;
+	}
+
+	public String getUseTurboMarc() {
 		return useTurboMarc;
 	}
 
@@ -93,242 +100,240 @@ public class SearchableTypeLayer extends Layer {
 		this.useTurboMarc = useTurboMarc;
 	}
 
-    public String getTransform() {
-        return transform;
-    }    
-    
-    public void setTransform(String transform) {
-        this.transform = transform;
-    }
-    
-    
-                        
-    public void setElementSet(String elementSet) {
-        this.elementSet = elementSet;
-    }
-    
-    public String getElementSet() {
-        return elementSet;
-    }
-        
-    @XmlElement(name="displayName")
-    public String getName() {
-        return name;
-    }
+	public String getTransform() {
+		return transform;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setTransform(String transform) {
+		this.transform = transform;
+	}
 
-    public String getZurl() {
-        return zurl;
-    }
+	public void setElementSet(String elementSet) {
+		this.elementSet = elementSet;
+	}
 
-    public void setZurl(String zurl) {
-        this.zurl = zurl;
-    }
-    @XmlElement(name="cclmap_au")
-    public String getCclMapAu() {
-        return cclMapAu;
-    }
+	public String getElementSet() {
+		return elementSet;
+	}
 
-    public void setCclMapAu(String cclMapAu) {
-        this.cclMapAu = cclMapAu;
-    }
-    @XmlElement(name="cclmap_date")
-    public String getCclMapDate() {
-        return cclMapDate;
-    }
+	@XmlElement(name = "displayName")
+	public String getName() {
+		return name;
+	}
 
-    public void setCclMapDate(String cclMapDate) {
-        this.cclMapDate = cclMapDate;
-    }
-    
-    @XmlElement(name="cclmap_su")
-    public String getCclMapSu() {
-        return cclMapSu;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setCclMapSu(String cclMapSu) {
-        this.cclMapSu = cclMapSu;
-    }
+	public String getZurl() {
+		return zurl;
+	}
 
-    @XmlElement(name="cclmap_isbn")
-    public String getCclMapIsbn() {
-       return cclMapIsbn;
-    }
-    
-    public void setCclMapIsbn(String cclMapIsbn) {
-       this.cclMapIsbn = cclMapIsbn;
-    }
+	public void setZurl(String zurl) {
+		this.zurl = zurl;
+	}
 
-    @XmlElement(name="cclmap_issn")
-    public String getCclMapIssn() {
-       return cclMapIssn;
-    }
-    
-    public void setCclMapIssn(String cclMapIssn) {
-       this.cclMapIssn = cclMapIssn;
-    }
-    
-    @XmlElement(name="cclmap_term")
-    public String getCclMapTerm() {
-        return cclMapTerm;
-    }
+	@XmlElement(name = "cclmap_au")
+	public String getCclMapAu() {
+		return cclMapAu;
+	}
 
-    public void setCclMapTerm(String cclMapTerm) {
-        this.cclMapTerm = cclMapTerm;
-    }
-    
-    public String getPiggyback() {
-      return piggyback;
-    }
+	public void setCclMapAu(String cclMapAu) {
+		this.cclMapAu = cclMapAu;
+	}
 
-    public void setPiggyback(String piggyback) {
-      this.piggyback = piggyback;
-    }
+	@XmlElement(name = "cclmap_date")
+	public String getCclMapDate() {
+		return cclMapDate;
+	}
 
-    @XmlElement(name="cclmap_ti")
-    public String getCclMapTi() {
-        return cclMapTi;
-    }
+	public void setCclMapDate(String cclMapDate) {
+		this.cclMapDate = cclMapDate;
+	}
 
-    public void setCclMapTi(String cclMapTi) {
-        this.cclMapTi = cclMapTi;
-    }
+	@XmlElement(name = "cclmap_su")
+	public String getCclMapSu() {
+		return cclMapSu;
+	}
 
-  @XmlElement(name="cclmap_jt")
-  public String getCclMapJournalTitle() {
-    return cclMapJournalTitle;
-  }
+	public void setCclMapSu(String cclMapSu) {
+		this.cclMapSu = cclMapSu;
+	}
 
-  public void setCclMapJournalTitle(String cclMapJournalTitle) {
-    this.cclMapJournalTitle = cclMapJournalTitle;
-  }
+	@XmlElement(name = "cclmap_isbn")
+	public String getCclMapIsbn() {
+		return cclMapIsbn;
+	}
 
+	public void setCclMapIsbn(String cclMapIsbn) {
+		this.cclMapIsbn = cclMapIsbn;
+	}
 
-    public String getQueryEncoding() {
-        return queryEncoding;
-    }
+	@XmlElement(name = "cclmap_issn")
+	public String getCclMapIssn() {
+		return cclMapIssn;
+	}
 
-    public void setQueryEncoding(String queryEncoding) {
-        this.queryEncoding = queryEncoding;
-    }
+	public void setCclMapIssn(String cclMapIssn) {
+		this.cclMapIssn = cclMapIssn;
+	}
 
-    public String getAuthentication() {
-        return authentication;
-    }
+	@XmlElement(name = "cclmap_term")
+	public String getCclMapTerm() {
+		return cclMapTerm;
+	}
 
-    public void setAuthentication(String authentication) {
-        this.authentication = authentication;
-    }
+	public void setCclMapTerm(String cclMapTerm) {
+		this.cclMapTerm = cclMapTerm;
+	}
 
-    public String getUrlRecipe() {
-        return urlRecipe;
-    }
+	public String getPiggyback() {
+		return piggyback;
+	}
 
-    public void setUrlRecipe(String urlRecipe) {
-        this.urlRecipe = urlRecipe;
-    }
+	public void setPiggyback(String piggyback) {
+		this.piggyback = piggyback;
+	}
 
-    public String getServiceProvider() {
-        return serviceProvider;
-    }
+	@XmlElement(name = "cclmap_ti")
+	public String getCclMapTi() {
+		return cclMapTi;
+	}
 
-    public void setServiceProvider(String serviceProvider) {
-        this.serviceProvider = serviceProvider;
-    }
-    
-    public String getCategories() {
-    	return categories;
-    }
-    
-    public void setCategories (String categories) {
-    	this.categories = categories;
-    }
-    
-    public String getMedium () {
-    	return medium;
-    }
-    
-    public void setMedium (String medium) {
-    	this.medium = medium;
-    }
-    
-    public String getFullTextTarget () {
-      return fullTextTarget;
-    }
-    
-    public void setFullTextTarget (String fullTextTarget) {
-      this.fullTextTarget = fullTextTarget;
-    }
-    
-    
-    public String getComment() {
-      return comment;
-    }
+	public void setCclMapTi(String cclMapTi) {
+		this.cclMapTi = cclMapTi;
+	}
 
-    public void setComment(String comment) {
-      this.comment = comment;
-    }
+	@XmlElement(name = "cclmap_jt")
+	public String getCclMapJournalTitle() {
+		return cclMapJournalTitle;
+	}
 
-    public String getExplode() {
-    return explode;
-  }
+	public void setCclMapJournalTitle(String cclMapJournalTitle) {
+		this.cclMapJournalTitle = cclMapJournalTitle;
+	}
 
-    public void setExplode(String explode) {
-    this.explode = explode;
-  }
-      
-  public String getUseUrlProxy() {	  
-    return useUrlProxy;
-  }
+	public String getQueryEncoding() {
+		return queryEncoding;
+	}
 
-  public void setUseUrlProxy(String useUrlProxy) {
-    this.useUrlProxy = useUrlProxy;
-  }
-  
-  public String getUseThumbnails() {
-	return useThumbnails;
-  }
+	public void setQueryEncoding(String queryEncoding) {
+		this.queryEncoding = queryEncoding;
+	}
 
-  public void setUseThumbnails(String useThumbnails) {
-	this.useThumbnails = useThumbnails;
-  }
+	public String getAuthentication() {
+		return authentication;
+	}
 
-  public String getCfAuth() {
-    return cfAuth;
-  }
+	public void setAuthentication(String authentication) {
+		this.authentication = authentication;
+	}
 
-  public void setCfAuth(String cfAuth) {
-    this.cfAuth = cfAuth;
-  }
+	public String getUrlRecipe() {
+		return urlRecipe;
+	}
 
-  public String getCfProxy() {
-    return cfProxy;
-  }
+	public void setUrlRecipe(String urlRecipe) {
+		this.urlRecipe = urlRecipe;
+	}
 
-  public void setCfProxy(String cfProxy) {
-    this.cfProxy = cfProxy;
-  }
+	public String getServiceProvider() {
+		return serviceProvider;
+	}
 
-  public String getCfSubDB() {
-    return cfSubDB;
-  }
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
 
-  public void setCfSubDB(String cfSubDB) {
-    this.cfSubDB = cfSubDB;
-  }
+	public String getCategories() {
+		return categories;
+	}
 
-   public String getSecondaryRequestSyntax() {
-      return secondaryRequestSyntax;
-   }
+	public void setCategories(String categories) {
+		this.categories = categories;
+	}
 
-   public void setSecondaryRequestSyntax(String secondaryRequestSyntax) {
-      this.secondaryRequestSyntax = secondaryRequestSyntax;
-   }
+	public String getMedium() {
+		return medium;
+	}
 
-   public String getSRUVersion() {
+	public void setMedium(String medium) {
+		this.medium = medium;
+	}
+
+	public String getFullTextTarget() {
+		return fullTextTarget;
+	}
+
+	public void setFullTextTarget(String fullTextTarget) {
+		this.fullTextTarget = fullTextTarget;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public String getExplode() {
+		return explode;
+	}
+
+	public void setExplode(String explode) {
+		this.explode = explode;
+	}
+
+	public String getUseUrlProxy() {
+		return useUrlProxy;
+	}
+
+	public void setUseUrlProxy(String useUrlProxy) {
+		this.useUrlProxy = useUrlProxy;
+	}
+
+	public String getUseThumbnails() {
+		return useThumbnails;
+	}
+
+	public void setUseThumbnails(String useThumbnails) {
+		this.useThumbnails = useThumbnails;
+	}
+
+	public String getCfAuth() {
+		return cfAuth;
+	}
+
+	public void setCfAuth(String cfAuth) {
+		this.cfAuth = cfAuth;
+	}
+
+	public String getCfProxy() {
+		return cfProxy;
+	}
+
+	public void setCfProxy(String cfProxy) {
+		this.cfProxy = cfProxy;
+	}
+
+	public String getCfSubDB() {
+		return cfSubDB;
+	}
+
+	public void setCfSubDB(String cfSubDB) {
+		this.cfSubDB = cfSubDB;
+	}
+
+	public String getSecondaryRequestSyntax() {
+		return secondaryRequestSyntax;
+	}
+
+	public void setSecondaryRequestSyntax(String secondaryRequestSyntax) {
+		this.secondaryRequestSyntax = secondaryRequestSyntax;
+	}
+
+	public String getSRUVersion() {
 		return SRUVersion;
 	}
 
@@ -336,7 +341,7 @@ public class SearchableTypeLayer extends Layer {
 		SRUVersion = sRUVersion;
 	}
 
-    public String getPqfPrefix() {
+	public String getPqfPrefix() {
 		return pqfPrefix;
 	}
 
@@ -344,7 +349,7 @@ public class SearchableTypeLayer extends Layer {
 		this.pqfPrefix = pqfPrefix;
 	}
 
-	@XmlElement(name="sru")
+	@XmlElement(name = "sru")
 	public String getSRU() {
 		return SRU;
 	}
@@ -393,37 +398,72 @@ public class SearchableTypeLayer extends Layer {
 		this.apduLog = apduLog;
 	}
 
-  public String getMaxRecords() {
-    return maxRecords;
-  }
+	public String getMaxRecords() {
+		return maxRecords;
+	}
 
-  public void setMaxRecords(String maxRecords) {
-    this.maxRecords = maxRecords;
-  }
+	public void setMaxRecords(String maxRecords) {
+		this.maxRecords = maxRecords;
+	}
 
-public String getTermlistUseTermFactor() {
-	return termlistUseTermFactor;
-}
+	public String getTermlistUseTermFactor() {
+		return termlistUseTermFactor;
+	}
 
-public void setTermlistUseTermFactor(String termlistUseTermFactor) {
-	this.termlistUseTermFactor = termlistUseTermFactor;
-}
+	public void setTermlistUseTermFactor(String termlistUseTermFactor) {
+		this.termlistUseTermFactor = termlistUseTermFactor;
+	}
 
-public String getExtraArgs() {
-	return extraArgs;
-}
+	public String getExtraArgs() {
+		return extraArgs;
+	}
 
-public void setExtraArgs(String extraArgs) {
-	this.extraArgs = extraArgs;
-}
+	public void setExtraArgs(String extraArgs) {
+		this.extraArgs = extraArgs;
+	}
 
-public String getQuerySyntax() {
-	return querySyntax;
-}
+	public String getQuerySyntax() {
+		return querySyntax;
+	}
 
-public void setQuerySyntax(String querySyntax) {
-	this.querySyntax = querySyntax;
-}
+	public void setQuerySyntax(String querySyntax) {
+		this.querySyntax = querySyntax;
+	}
 
-        
+	@XmlElement(name = "facetmap_au")
+	public String getFacetMapAu() {
+		return facetMapAu;
+	}
+
+	public void setFacetMapAu(String facetMapAu) {
+		this.facetMapAu = facetMapAu;
+	}
+
+	@XmlElement(name = "facetmap_su")
+	public String getFacetMapSu() {
+		return facetMapSu;
+	}
+
+	public void setFacetMapSu(String facetMapSu) {
+		this.facetMapSu = facetMapSu;
+	}
+
+	@XmlElement(name = "facetmap_date")
+	public String getFacetMapDate() {
+		return facetMapDate;
+	}
+
+	public void setFacetMapDate(String facetMapDate) {
+		this.facetMapDate = facetMapDate;
+	}
+
+	@XmlElement(name = "facetmap_jt")
+	public String getFacetMapJournalTitle() {
+		return facetMapJournalTitle;
+	}
+
+	public void setFacetMapJournalTitle(String facetMapJournalTitle) {
+		this.facetMapJournalTitle = facetMapJournalTitle;
+	}
+
 }
