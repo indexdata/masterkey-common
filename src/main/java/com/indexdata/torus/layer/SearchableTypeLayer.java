@@ -38,6 +38,7 @@ public class SearchableTypeLayer extends Layer {
 	private String facetMapSu;
 	private String facetMapDate;
 	private String facetMapJournalTitle;
+	private String facetMapMedium;
 
 	private String piggyback;
 	private String authentication;
@@ -464,6 +465,15 @@ public class SearchableTypeLayer extends Layer {
 
 	public void setFacetMapJournalTitle(String facetMapJournalTitle) {
 		this.facetMapJournalTitle = facetMapJournalTitle;
+	}
+
+	@XmlElement(name = "facetmap_medium")
+	public String getFacetMapMedium() {
+		return facetMapMedium;
+	}
+
+	public void setFacetMapMedium(String facetMapMedium) {
+		this.facetMapMedium = facetMapMedium;
 	}
 
 }
