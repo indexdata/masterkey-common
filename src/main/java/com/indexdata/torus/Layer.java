@@ -33,7 +33,12 @@ public abstract class Layer {
         return layerName;
     }
 
+    @Deprecated 
     final public void seLayertName(String name) {
+    	setLayerName(name);
+    }
+
+    final public void setLayerName(String name) {
         layerName = name;
     }
     
