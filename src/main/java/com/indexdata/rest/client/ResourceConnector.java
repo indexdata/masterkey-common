@@ -12,6 +12,8 @@ import java.net.URL;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import org.apache.log4j.Logger;
+
 import com.indexdata.utils.PerformanceLogger;
 
 /**
@@ -65,6 +67,7 @@ public class ResourceConnector<T> {
             } else {
                 throw new ResourceConnectionException("Cannot retrieve resource " + url.toString() + " - status code " + responseCode);
             }
+            Logger.getLogger(getClass()).debug("GET. Status" + responseCode +  "Location:" + conn.getHeaderField("Location"));
         } catch (JAXBException jaxbe) {
             throw new ResourceConnectionException("Get URL " + url.toString() + " failed: " + jaxbe.getMessage());
         } catch (IOException ioe) {
@@ -88,7 +91,7 @@ public class ResourceConnector<T> {
             switch (responseCode) {
                 case 200: //OK
                 case 201: //Created
-                case 202: //Accpeted
+                case 202: //Accepted
                 case 203: //Non-authoritative
                 case 204: //No-content
                 case 205: //Reset
@@ -100,6 +103,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot update resource " + url.toString() + " status code " + responseCode);
             }
+            Logger.getLogger(getClass()).debug("PUT. Status" + responseCode +  "Location:" + conn.getHeaderField("Location"));
         } catch (JAXBException jaxbe) {
             throw new ResourceConnectionException("Put URL " + url.toString() + " failed: " + jaxbe.getMessage());
         } catch (IOException ioe) {
@@ -116,7 +120,7 @@ public class ResourceConnector<T> {
             switch (responseCode) {
                 case 200:   //OK
                 case 201:   //Created
-                case 202:   //Accpeted
+                case 202:   //Accepted
                 case 203:   //Non-authoritative
                 case 204:   //No-content
                 case 205:   //Reset
@@ -127,6 +131,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot delete resource " + url.toString() + " - status code " + responseCode);
             }
+            Logger.getLogger(getClass()).debug("DELETE. Status" + responseCode +  "Location:" + conn.getHeaderField("Location"));
         } catch (IOException ioe) {
             throw new ResourceConnectionException("Delete URL " + url.toString() + " failed: " + ioe.getMessage());
         }
@@ -146,7 +151,7 @@ public class ResourceConnector<T> {
             switch (responseCode) {
                 case 200:   //OK
                 case 201:   //Created
-                case 202:   //Accpeted
+                case 202:   //Accepted
                 case 203:   //Non-authoritative
                 case 204:   //No-content
                 case 205:   //Reset
@@ -157,6 +162,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - status code " + responseCode);
             }        
+            Logger.getLogger(getClass()).debug("POST. Status: " + responseCode +  "Location:" + conn.getHeaderField("Location"));
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
             throw new ResourceConnectionException("Post URL " + url.toString() + " failed: " + ioe.getMessage());
@@ -179,7 +185,7 @@ public class ResourceConnector<T> {
             switch (responseCode) {
                 case 200:   //OK
                 case 201:   //Created
-                case 202:   //Accpeted
+                case 202:   //Accepted
                 case 203:   //Non-authoritative
                 case 204:   //No-content
                 case 205:   //Reset
@@ -190,6 +196,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - staus code " + responseCode);
             }
+            Logger.getLogger(getClass()).debug("POST Any. Status: " + responseCode +  "Location:" + conn.getHeaderField("Location"));
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
             throw new ResourceConnectionException("PostAny URL " + url.toString() + " failed: " + ioe.getMessage());
