@@ -18,6 +18,9 @@ public class ResourceConnectionException extends Exception {
 	 */
 	private static final long serialVersionUID = 3794084230779019415L;
 
+	public ResourceConnectionException(String message, Exception cause) {
+        super(message, cause);
+    }
 	public ResourceConnectionException(String message) {
         super(message);
     }
