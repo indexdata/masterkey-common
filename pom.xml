@@ -26,6 +26,14 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.2.1</version>
+        <configuration>
+          <tagBase>https://svn.apache.org/repos/asf/maven/components/releases</tagBase>
+        </configuration>
+      </plugin>
+      <plugin>
       <!-- automatic jaxb.index generation for xml binded classess annotated with XmlElement-->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>apt-maven-plugin</artifactId>
@@ -127,6 +135,10 @@
       <url>scp://maven.indexdata.com:222/var/www/maven/repository</url>
     </repository>
   </distributionManagement>
+  <scm>
+    <connection>scm:git:ssh://git.indexdata.com:222/home/git/private/masterkey-common</connection>
+    <url>http://gitid.indexdata.com/?p=masterkey-common.git</url>
+  </scm>
   <repositories>
     <repository>
       <id>id-maven-repo</id>
