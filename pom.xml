@@ -3,7 +3,7 @@
   <groupId>com.indexdata</groupId>
   <artifactId>masterkey-common</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.27-SNAPSHOT</version>
+  <version>0.1.0</version>
   <name>masterkey-common</name>
   <url>http://www.indexdata.com</url>
   <build>
@@ -95,7 +95,7 @@
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
-                                    <ignore></ignore>
+                                    <ignore />
                                 </action>
                             </pluginExecution>
                         </pluginExecutions>
