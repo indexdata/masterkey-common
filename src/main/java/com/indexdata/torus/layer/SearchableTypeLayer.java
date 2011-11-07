@@ -34,12 +34,6 @@ public class SearchableTypeLayer extends Layer {
 	private String cclMapTerm;
 	private String cclMapJournalTitle;
 
-	private String facetMapAu;
-	private String facetMapSu;
-	private String facetMapDate;
-	private String facetMapJournalTitle;
-	private String facetMapMedium;
-
 	private String piggyback;
 	private String authentication;
 	private String urlRecipe;
@@ -430,50 +424,4 @@ public class SearchableTypeLayer extends Layer {
 	public void setQuerySyntax(String querySyntax) {
 		this.querySyntax = querySyntax;
 	}
-
-	@XmlElement(name = "facetmap_au")
-	public String getFacetMapAu() {
-		return facetMapAu;
-	}
-
-	public void setFacetMapAu(String facetMapAu) {
-		this.facetMapAu = facetMapAu;
-	}
-
-	@XmlElement(name = "facetmap_su")
-	public String getFacetMapSu() {
-		return facetMapSu;
-	}
-
-	public void setFacetMapSu(String facetMapSu) {
-		this.facetMapSu = facetMapSu;
-	}
-
-	@XmlElement(name = "facetmap_date")
-	public String getFacetMapDate() {
-		return facetMapDate;
-	}
-
-	public void setFacetMapDate(String facetMapDate) {
-		this.facetMapDate = facetMapDate;
-	}
-
-	@XmlElement(name = "facetmap_jt")
-	public String getFacetMapJournalTitle() {
-		return facetMapJournalTitle;
-	}
-
-	public void setFacetMapJournalTitle(String facetMapJournalTitle) {
-		this.facetMapJournalTitle = facetMapJournalTitle;
-	}
-
-	@XmlElement(name = "facetmap_medium")
-	public String getFacetMapMedium() {
-		return facetMapMedium;
-	}
-
-	public void setFacetMapMedium(String facetMapMedium) {
-		this.facetMapMedium = facetMapMedium;
-	}
-
 }
