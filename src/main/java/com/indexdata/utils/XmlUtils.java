@@ -87,9 +87,9 @@ public class XmlUtils {
         return builderLocal.get().parse(source);
     }
     
-    public static Document parse(String path) 
+    public static Document parse(String uri) 
             throws ParserConfigurationException, SAXException, IOException {
-        return builderLocal.get().parse(path);
+        return builderLocal.get().parse(uri);
     }
     
     public static Document parse(StringReader reader) throws SAXException, IOException {
