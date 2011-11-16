@@ -6,6 +6,7 @@
 
 package com.indexdata.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,6 +94,10 @@ public class XmlUtils {
     
     public static Document parse(StringReader reader) throws SAXException, IOException {
         return builderLocal.get().parse(new InputSource(reader));
+    }
+    
+    public static Document parse(File file) throws SAXException, IOException {
+        return builderLocal.get().parse(file);
     }
 
     public static void serialize(Node doc, OutputStream dest) throws TransformerException {
