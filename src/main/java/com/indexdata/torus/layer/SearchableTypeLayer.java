@@ -50,7 +50,7 @@ public class SearchableTypeLayer extends Layer {
 	private String cfProxy;
 	private String secondaryRequestSyntax;
 	private String SRU;
-	private String SRUVersion;
+	private String sruVersion;
 	private String pqfPrefix;
 	// Target specific parameters. e.g. ZOOM option extraArgs
 	private String extraArgs;
@@ -328,12 +328,12 @@ public class SearchableTypeLayer extends Layer {
 		this.secondaryRequestSyntax = secondaryRequestSyntax;
 	}
 
-	public String getSRUVersion() {
-		return SRUVersion;
+	public String getSruVersion() {
+		return sruVersion;
 	}
 
-	public void setSRUVersion(String sRUVersion) {
-		SRUVersion = sRUVersion;
+	public void setSruVersion(String sruVersion) {
+		this.sruVersion = sruVersion;
 	}
 
 	public String getPqfPrefix() {
