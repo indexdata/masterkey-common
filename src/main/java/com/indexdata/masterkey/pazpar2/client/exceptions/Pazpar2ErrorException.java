@@ -19,7 +19,7 @@ public class Pazpar2ErrorException extends Exception {
 
 	public Pazpar2ErrorException(String msg, int errorCode, 
 			String errorMsg, String addInfo) {
-		//super(msg);
+		super(msg);
 		this.errorCode = errorCode;
 		this.errorMsg = errorMsg;
 		this.addInfo = addInfo;
