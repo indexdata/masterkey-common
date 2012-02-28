@@ -34,12 +34,6 @@ public class SearchableTypeLayer extends Layer {
 	private String cclMapTerm;
 	private String cclMapJournalTitle;
 
-	private String facetMapAu;
-	private String facetMapSu;
-	private String facetMapDate;
-	private String facetMapJournalTitle;
-	private String facetMapMedium;
-
 	private String piggyback;
 	private String authentication;
 	private String urlRecipe;
@@ -56,7 +50,7 @@ public class SearchableTypeLayer extends Layer {
 	private String cfProxy;
 	private String secondaryRequestSyntax;
 	private String SRU;
-	private String SRUVersion;
+	private String sruVersion;
 	private String pqfPrefix;
 	// Target specific parameters. e.g. ZOOM option extraArgs
 	private String extraArgs;
@@ -334,12 +328,12 @@ public class SearchableTypeLayer extends Layer {
 		this.secondaryRequestSyntax = secondaryRequestSyntax;
 	}
 
-	public String getSRUVersion() {
-		return SRUVersion;
+	public String getSruVersion() {
+		return sruVersion;
 	}
 
-	public void setSRUVersion(String sRUVersion) {
-		SRUVersion = sRUVersion;
+	public void setSruVersion(String sruVersion) {
+		this.sruVersion = sruVersion;
 	}
 
 	public String getPqfPrefix() {
@@ -430,50 +424,4 @@ public class SearchableTypeLayer extends Layer {
 	public void setQuerySyntax(String querySyntax) {
 		this.querySyntax = querySyntax;
 	}
-
-	@XmlElement(name = "facetmap_au")
-	public String getFacetMapAu() {
-		return facetMapAu;
-	}
-
-	public void setFacetMapAu(String facetMapAu) {
-		this.facetMapAu = facetMapAu;
-	}
-
-	@XmlElement(name = "facetmap_su")
-	public String getFacetMapSu() {
-		return facetMapSu;
-	}
-
-	public void setFacetMapSu(String facetMapSu) {
-		this.facetMapSu = facetMapSu;
-	}
-
-	@XmlElement(name = "facetmap_date")
-	public String getFacetMapDate() {
-		return facetMapDate;
-	}
-
-	public void setFacetMapDate(String facetMapDate) {
-		this.facetMapDate = facetMapDate;
-	}
-
-	@XmlElement(name = "facetmap_jt")
-	public String getFacetMapJournalTitle() {
-		return facetMapJournalTitle;
-	}
-
-	public void setFacetMapJournalTitle(String facetMapJournalTitle) {
-		this.facetMapJournalTitle = facetMapJournalTitle;
-	}
-
-	@XmlElement(name = "facetmap_medium")
-	public String getFacetMapMedium() {
-		return facetMapMedium;
-	}
-
-	public void setFacetMapMedium(String facetMapMedium) {
-		this.facetMapMedium = facetMapMedium;
-	}
-
 }
