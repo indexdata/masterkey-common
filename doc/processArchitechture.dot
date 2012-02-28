@@ -16,7 +16,7 @@ digraph callgraph {
      serviceProxy -> Torus[label="TWSP"];
      Torus[shape=box];
      subgraph {
-		rank = same; serviceProxy; Torus;
+		rank = same; serviceProxy; Torus; Searchables;
      }
      TargetAdmin[label="MK2\nConsole"];
      TargetAdmin -> Torus[label="TWSP"];
@@ -70,7 +70,7 @@ digraph callgraph {
      Anything3[label="data",shape=circle];
      Anything4[label="data",shape=circle];
      subgraph {
-		rank = same; Anything; Anything3; zData1; zData3; Anything4; IRSpy_DB;
+		rank = same; Anything; Anything3; zData1; zData3; Anything4;
 	}
 
 }
