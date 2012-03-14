@@ -2,80 +2,75 @@ digraph callgraph {
      fontname="verdana";
      node [fontname="verdana"];
      label="Process Architechture";
-	 subgraph cluster_legend {
-		label="Legend"
-	 	Data[shape="circle", fontsize="9"];
-	 	UI;
-	 	Process[shape="box"];
- 	 }
-	 CF_Builder[label="CF Builder"];
+     subgraph cluster_legend {
+     	      label="Legend"
+	      Data[shape="circle", fontsize="9"];
+	      UI;
+	      Process[shape="box"];
+     }
+     CF_Builder[label="CF Builder"];
      masterkey[label="MasterKey"];
      masterkey -> serviceProxy[label="PP2 protocol", fontname="verdana"];
      serviceProxy[label="Service\nProxy", shape=box];
      serviceProxy -> pazpar2[label="PP2 protocol"];
-     serviceProxy -> Torus;
+     serviceProxy -> Torus[label="TWSP"];
      Torus[shape=box];
      subgraph {
 		rank = same; serviceProxy; Torus; Searchables;
      }
-     TargetAdmin -> Torus[label="Torus WSAPI"];
-     Torus -> T2[label="Torus WSAPI"];
-     T2[shape="box"];
+     TargetAdmin[label="MK2\nConsole"];
+     TargetAdmin -> Torus[label="TWSP"];
      Torus -> Searchables;
-     Searchables[label="Data"];
-     Searchables[shape=circle];
-     T2 -> T3[label="Torus WSAPI"];
-     T3[shape=box];
-     T2 -> T4[label="Torus WSAPI"];
-     T4[label="Another\n Torus", shape=box];
-     harvester -> T4[label="Torus WSAPI"];
-     T2 -> "IRSpy Toroid"[label="Torus WSAPI"];
-     "IRSpy Toroid" -> Zebra[label="Z39.50"];
+     Searchables[shape=circle, label="data"]];
+     Torus -> harvester:T4[label="TWSP"];
+     Torus -> IRspyToroid[label="TWSP"];
+     IRspyToroid -> Zebra[label="Z39.50"];
+     IRspyToroid[label="IRSpy", shape="box"];
      Zebra[shape="record", label="{GFS |<z2> zebra2}"];
-     "IRSpy Toroid"[shape="box"];
      Zebra -> IRSpy_DB;
-     IRSpy_DB[label="IRSpy\n database", shape=circle];
+     IRSpy_DB[label="data", shape=circle];
      IRSpy -> Zebra[label="Z39.50"];
-     pazpar2 -> metaProxy[label="z39.50/SRU"];
-	 metaProxy[label="Metaproxy\n(optional)", shape="box"];
-	 metaProxy -> sruTarget[label="SRU"];
-	 metaProxy -> zTarget[label="z39.50"];
-	 metaProxy -> cfz[label="z39.50"];
-	 zTarget[label="Z39.50\n Target", shape="box"];
-	 zTarget -> zData1;
-	 sruTarget -> zData3;
-	 cfz[shape="record", label="{cfz | cfengine}"];
-	 cfz -> Anything;
-	 zData1[shape="circle", label="data"];
-	 zData3[shape="circle", label="data"];
-	 zTarget[shape="box"];
-	 sruTarget[label="SRU\nTarget", shape="box"];
-     pazpar2 -> localIndex1[label="Z39.50"];
-     pazpar2[label="Pazpar2", shape="box"];
+     pazpar2 -> metaProxy[label="SRU/\nZ39.50"];
+     metaProxy[label="Metaproxy\n(optional)", shape="box"];
+     metaProxy -> cfz[label="SRU/\nZ39.50"];
+     metaProxy -> sruTarget[label="SRU"];
+     metaProxy -> zTarget[label="Z39.50"];
+     zTarget[label="Z39.50\n Target", shape="box"];
+     zTarget -> zData1;
+     sruTarget -> zData3;
+     cfz[shape="record", label="{cfz | cfengine}"];
+     cfz -> Anything;
+     zData1[shape="circle", label="data"];
+     zData3[shape="circle", label="data"];
+     zTarget[shape="box"];
+     sruTarget[label="SRU\nTarget", shape="box"];
+     pazpar2[label="{Pazpar2|ZOOM}", shape="record"];
+     metaProxy -> localIndex1[label="Z39.50"];
      localIndex1 -> Anything3;
-	 localIndex1[shape="record", label="{GFS |<z2> zebra2}"];
-     pazpar2 -> localIndex2[label="HTTP/SOLR"];
+     localIndex1[shape="record", label="{GFS |<z2> zebra2}"];
+     pazpar2 -> localIndex2[label="SOLR"];
      localIndex2[shape="record", label="{SOLR|Lucene}"];
      localIndex2 -> Anything4;
 
      harvesterAdmin -> harvester;
-     harvesterAdmin[label="HarvesterAdmin"];
+     harvesterAdmin[label="Harvester\nAdmin"];
      
-     harvester[label="Harvester", shape="box"];
-     harvester -> localIndex1:z2;
+     harvester[shape="record", label="Harvester|<T4> Torus"];
+     harvester -> localIndex2;
      cfRepo[label="CF\nRepo", shape=circle];
      cfz -> cfRepo;
      CF_Builder -> cfRepo;
-	 subgraph ui_rank {
-		rank=same; masterkey; TargetAdmin; CF_Builder; harvesterAdmin; IRSpy;
-	 }
+     subgraph ui_rank {
+	rank=same; masterkey; TargetAdmin; CF_Builder; harvesterAdmin; IRSpy;
+     	}
      subgraph {
-		rank = same; localIndex1; localIndex2; zTarget; 
-	}
+		rank = same; localIndex1; localIndex2; zTarget; Zebra; 
+     	}
      Anything[label="data", shape=circle];
      Anything3[label="data",shape=circle];
      Anything4[label="data",shape=circle];
      subgraph {
-		rank = same; Anything; Anything3; zData1; zData3; Anything4; 
+		rank = same; Anything; Anything3; zData1; zData3; Anything4;
 	}
+
 }
