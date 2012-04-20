@@ -60,7 +60,7 @@ public class Pazpar2ClientConfiguration {
   private static final String CCLMAP_SU_KEY_FB = "su";
   private static final String CCLMAP_AU_KEY_FB = "au";
   private static final String CCLMAP_TI_KEY_FB = "ti";
-  private static final String CCLMAP_ISBN_KEY_FB = "issbn";
+  private static final String CCLMAP_ISBN_KEY_FB = "isbn";
   private static final String CCLMAP_ISSN_KEY_FB = "issn";
   private static final String CCLMAP_JT_KEY_FB = "jt";
   private static final String CCLMAP_DATE_KEY_FB = "date";
