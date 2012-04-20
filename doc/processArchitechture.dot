@@ -23,10 +23,10 @@ digraph callgraph {
      Torus -> Searchables;
      Searchables[shape=circle, label="data"]];
      Torus -> harvester:T4[label="TWSP"];
-     Torus -> "IRSpy Toroid"[label="TWSP"];
-     "IRSpy Toroid" -> Zebra[label="Z39.50"];
+     Torus -> IRspyToroid[label="TWSP"];
+     IRspyToroid -> Zebra[label="Z39.50"];
+     IRspyToroid[label="IRSpy", shape="box"];
      Zebra[shape="record", label="{GFS |<z2> zebra2}"];
-     "IRSpy Toroid"[shape="box"];
      Zebra -> IRSpy_DB;
      IRSpy_DB[label="data", shape=circle];
      IRSpy -> Zebra[label="Z39.50"];
@@ -64,7 +64,7 @@ digraph callgraph {
 	rank=same; masterkey; TargetAdmin; CF_Builder; harvesterAdmin; IRSpy;
      	}
      subgraph {
-		rank = same; localIndex1; localIndex2; zTarget; 
+		rank = same; localIndex1; localIndex2; zTarget; Zebra; 
      	}
      Anything[label="data", shape=circle];
      Anything3[label="data",shape=circle];
