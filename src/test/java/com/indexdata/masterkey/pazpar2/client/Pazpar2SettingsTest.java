@@ -80,5 +80,6 @@ public class Pazpar2SettingsTest {
     String cclTi = result.getSetting("test-target-1", "pz:cclmap:ti");
     assertEquals("u=4 s=al",cclTi);
     //test fieldMap
+    
   }
 }
