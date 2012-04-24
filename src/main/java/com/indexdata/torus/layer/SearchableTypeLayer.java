@@ -54,6 +54,7 @@ public class SearchableTypeLayer extends Layer {
   private String extraArgs;
   // Override target to PQF or CQL
   private String querySyntax;
+  private String fieldMap;
   // Termlist/facet settings
   private String termlistTermSort;
   private String termlistTermCount;
@@ -419,4 +420,13 @@ public class SearchableTypeLayer extends Layer {
   public void setQuerySyntax(String querySyntax) {
     this.querySyntax = querySyntax;
   }
+
+  public String getFieldMap() {
+    return fieldMap;
+  }
+
+  public void setFieldMap(String fieldMap) {
+    this.fieldMap = fieldMap;
+  }
+  
 }

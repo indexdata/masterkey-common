@@ -38,7 +38,19 @@ import com.indexdata.utils.XmlUtils;
  * METHOD)
  */
 public class Pazpar2Settings {
-  private Map<String, Map<String, String>> settings = new HashMap<String, Map<String, String>>();
+  //avoid re-parssing
+  private static class Setting {
+    String string;
+    Document xml;
+    Setting(Document xml) {
+      this.xml = xml;
+      this.string = "[XML encoded]"; //possibly serialize the XML here
+    }
+    Setting(String string) {
+      this.string = string;
+    }
+  }
+  private Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
   private static Logger logger = Logger.getLogger(Pazpar2Settings.class);
   private Pazpar2ClientConfiguration cfg;
   Pattern hostPortRegEx = Pattern.compile(".*:[0-9]*$");
@@ -279,6 +291,17 @@ public class Pazpar2Settings {
     }
     return null;
   }
+  
+  public boolean setXMLSetting(String targetId, String key, Document value) {
+    if (value == null) return false;
+    Map<String, Setting> setts = settings.get(targetId);
+    if (setts == null) {
+      setts = new HashMap<String, Setting>();
+      settings.put(targetId, setts);
+    }
+    setts.put(key, new Setting(value));
+    return true;
+  }
 
   public boolean setSetting(String targetId, String key, String value) {
     return setSetting(targetId, key, value, null);
@@ -301,32 +324,35 @@ public class Pazpar2Settings {
   public boolean setSetting(String targetId, String key, String value, String defaultValue) {
     String val = ((value != null && !value.isEmpty()) ? value : defaultValue);
     if (val != null) {
-      Map<String, String> setting = settings.get(targetId);
-      if (setting != null) {
+      Map<String, Setting> setts = settings.get(targetId);
+      if (setts != null) {
         //partial application of setting requires that default values are only
         //applied when no settings have been applied previously
         if ((value == null || value.isEmpty()) 
-          && (setting.get(key) != null && !setting.get(key).isEmpty()))
+          //this will allow fallling back things new Setting(null), new 
+          && (setts.get(key) != null && setts.get(key).string != null 
+          && !setts.get(key).string.isEmpty()))
           return false;
       } else {
-	setting = new HashMap<String, String>();
-	settings.put(targetId, setting);
+	setts = new HashMap<String, Setting>();
+	settings.put(targetId, setts);
       }
       if (logger.isDebugEnabled())
 	logger.debug(new StringBuffer("setting on ").append(targetId).append(": ").append(key)
 	    .append(":").append(val).toString());
-      setting.put(key, val);
+      setts.put(key, new Setting(val));
       return true;
     }
     return false;
   }
 
   public String getSetting(String targetId, String key) {
-    Map<String, String> targetSetts = settings.get(targetId);
+    Map<String, Setting> targetSetts = settings.get(targetId);
     if (targetSetts == null) {
       return null;
     }
-    return targetSetts.get(key);
+    Setting s = targetSetts.get(key);
+    return s != null ? s.string : null;
   }
 
   /**
@@ -353,8 +379,10 @@ public class Pazpar2Settings {
     String sep = "";
     for (String targetId : settings.keySet()) {
       for (String settingName : settings.get(targetId).keySet()) {
-	String settingValue = settings.get(targetId).get(settingName);
-	settingValue = settingValue == null ? "" : settingValue;
+	Setting setting = settings.get(targetId).get(settingName);
+        //can't URL encode XML settings
+        if (setting.xml != null) continue;
+	String settingValue = setting.string == null ? "" : setting.string;
 	encodedBuf.append(sep);
 	encodedBuf.append(URLEncoder.encode(settingName, "UTF-8"));
 	encodedBuf.append(URLEncoder.encode("[", "UTF-8"));
@@ -389,11 +417,15 @@ public class Pazpar2Settings {
     root.setAttribute("target", "*");
     for (String targetId : settings.keySet()) {
       for (String settingName : settings.get(targetId).keySet()) {
-	String settingValue = settings.get(targetId).get(settingName);
-	Element setElm = doc.createElement("set");
-	setElm.setAttribute("target", targetId);
-	setElm.setAttribute("name", settingName);
-	setElm.setAttribute("value", settingValue);
+        Element setElm = doc.createElement("set");
+        setElm.setAttribute("target", targetId);
+        setElm.setAttribute("name", settingName);
+	Setting setting = settings.get(targetId).get(settingName);
+        if (setting.xml != null) {
+          //import xml setting
+        } else {
+          setElm.setAttribute("value", setting.string);
+        }
 	root.appendChild(setElm);
       }
     }
@@ -401,18 +433,18 @@ public class Pazpar2Settings {
   }
   
   public void setRecordFilter(String recordFilter, String recordFilterCriteria) {
-    for (Entry<String,Map<String,String>> target : settings.entrySet()) {
+    for (Entry<String,Map<String,Setting>> target : settings.entrySet()) {
       String targetId = target.getKey();
       String rF = (recordFilterCriteria == null 
         || recordFilterCriteria.isEmpty()
         || recordFilterCriteria.contains(targetId))
         ? recordFilter
         : null;
-      Map<String, String> setts = target.getValue();
+      Map<String, Setting> setts = target.getValue();
       if (rF == null || rF.isEmpty())
         setts.remove("pz:recordfilter");
       else
-        setts.put("pz:recordfilter", rF);
+        setts.put("pz:recordfilter", new Setting(rF));
     }
   }
   
