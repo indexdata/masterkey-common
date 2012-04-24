@@ -25,7 +25,7 @@ public class Pazpar2ClientConfiguration {
   public String PAZPAR2_SERVICE_ID = null;
   public String PAZPAR2_SERVICE_XML = null;
   public String XML_FILE_PATH = null;
-  public final String USE_OPAQUE_ID;
+  public String USE_OPAQUE_ID;
   
   //map values
   public final String CCLMAP_TERM;
