@@ -88,6 +88,5 @@ public class Pazpar2SettingsTest {
     
     Document settings = result.toXml(null);
     XmlUtils.serialize(settings, System.out);
-    
   }
 }

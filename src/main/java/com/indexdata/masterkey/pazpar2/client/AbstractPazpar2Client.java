@@ -655,6 +655,46 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client {
     }
     return response;
   }
+  
+  protected HttpResponse post(String queryString, Document entity) 
+    throws Pazpar2IOException, Pazpar2ErrorException {
+    HttpResponse response = null;
+    queryString = "?session=" + getSessionId() + "&" +
+      (queryString != null && !queryString.isEmpty() 
+        ? (queryString.charAt(0) == '?' || queryString.charAt(0) == '&'
+           ? queryString.substring(1) : queryString) 
+        : "");
+    String requestUrl = cfg.PAZPAR2_URL + queryString;
+    long startTime = PerformanceLogger.start(" <PZ2 POST", requestUrl);
+    HttpClient hc = new HttpClient();
+    HttpMethod hm = new PostMethod(requestUrl);
+    StringWriter sw = new StringWriter();
+    try {
+      XmlUtils.serialize(entity, sw);
+      ((EntityEnclosingMethod) hm).setRequestEntity(new StringRequestEntity(
+        sw.toString(), "text/xml", "UTF-8"));
+    } catch (Exception ex) {
+      throw new Pazpar2IOException(
+        "Error serializing document for POST", ex);
+    }
+    try {
+      response = new HttpResponse(hc.executeMethod(hm), hm.
+        getResponseBodyAsStream(), hm.getResponseHeader(
+        "Content-Type").getValue());
+    } catch (IOException e) {
+      throw new Pazpar2IOException("HTTP I/O error when contacting pazpar2", e);
+    }
+    if (response.statusCode == HttpStatus.SC_EXPECTATION_FAILED) // 417
+    {
+      parseAndThrowError(response.body);
+    } else if (response.statusCode != HttpStatus.SC_OK) { // 200 
+      throw new Pazpar2IOException("Unexpected HTTP response code ("
+        + response.statusCode + ") returned for "
+        + hm.getName() + " " + cfg.PAZPAR2_URL + "?" + hm.getQueryString());
+    }
+    PerformanceLogger.finish(" <POST DONE", requestUrl, startTime);
+    return response;
+  }
 
   private void parseAndThrowError(InputStream is) throws Pazpar2ErrorException,
     Pazpar2MalformedOutputException {
