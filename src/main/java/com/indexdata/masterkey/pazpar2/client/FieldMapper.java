@@ -82,7 +82,7 @@ public class FieldMapper {
   private ArrayList<FieldMap> fieldMaps;
   private MapType type;
 
-  public FieldMapper(String input) throws Exception {
+  public FieldMapper(String input) throws ParsingException {
      String[] lines = input.split("\\n");
      fieldMaps = new ArrayList<FieldMap>(lines.length);
      for (int k = 0; k < lines.length; k++) {

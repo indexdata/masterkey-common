@@ -22,6 +22,7 @@ import com.indexdata.torus.Records;
 import com.indexdata.torus.layer.SearchableTypeLayer;
 import com.indexdata.utils.PerformanceLogger;
 import com.indexdata.utils.XmlUtils;
+import org.w3c.dom.Node;
 
 /**
  * Manages Pazpar2Settings
@@ -134,6 +135,15 @@ public class Pazpar2Settings {
     setSetting(id, "pz:url", url);
     setSetting(id, "pz:name", l.getName());
     setSetting(id, "pz:xslt", l.getTransform());
+    //fieldMap overrides xslt
+    if (l.getFieldMap() != null && !l.getFieldMap().isEmpty()) {
+      try {
+        FieldMapper mapper = new FieldMapper(l.getFieldMap());
+        setXMLSetting(id, "pz:xslt", mapper.getStylesheet(null));
+      } catch (FieldMapper.ParsingException pe) {
+        logger.error("Cannot parse fieldMap - " + pe.getMessage());
+      }
+    }      
     setSetting(id, "pz:elements", l.getElementSet());
     setSetting(id, "pz:queryencoding", l.getQueryEncoding());
     setSetting(id, "pz:requestsyntax", l.getRequestSyntax());
@@ -292,6 +302,13 @@ public class Pazpar2Settings {
     return null;
   }
   
+  public Document getXMLSetting(String targetId, String key) {
+    Map<String, Setting> setts = settings.get(targetId);
+    if (setts == null) return null;
+    Setting s = setts.get(key);
+    return s != null ? s.xml : null;
+  }
+  
   public boolean setXMLSetting(String targetId, String key, Document value) {
     if (value == null) return false;
     Map<String, Setting> setts = settings.get(targetId);
@@ -422,7 +439,8 @@ public class Pazpar2Settings {
         setElm.setAttribute("name", settingName);
 	Setting setting = settings.get(targetId).get(settingName);
         if (setting.xml != null) {
-          //import xml setting
+          Node value = doc.importNode(setting.xml.getDocumentElement(), true);
+          setElm.appendChild(value);
         } else {
           setElm.setAttribute("value", setting.string);
         }

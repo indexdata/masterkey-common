@@ -10,10 +10,13 @@ import com.indexdata.torus.Layer;
 import com.indexdata.torus.Record;
 import com.indexdata.torus.Records;
 import com.indexdata.torus.layer.SearchableTypeLayer;
+import com.indexdata.utils.XmlUtils;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.transform.TransformerException;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.w3c.dom.Document;
 
 /**
  *
@@ -43,7 +46,7 @@ public class Pazpar2SettingsTest {
    * Test of fromSearchables method, of class Pazpar2Settings.
    */
   @Test
-  public void testFromSearchables() throws ProxyErrorException {
+  public void testFromSearchables() throws ProxyErrorException, TransformerException {
     Record record = new Record("searchable");
     SearchableTypeLayer layer = new SearchableTypeLayer();
     layer.setId("test-target-1");
@@ -80,6 +83,11 @@ public class Pazpar2SettingsTest {
     String cclTi = result.getSetting("test-target-1", "pz:cclmap:ti");
     assertEquals("u=4 s=al",cclTi);
     //test fieldMap
+    String map = result.getSetting("test-target-1", "pz:xslt");
+    assertEquals("[XML encoded]", map);
+    
+    Document settings = result.toXml(null);
+    XmlUtils.serialize(settings, System.out);
     
   }
 }
