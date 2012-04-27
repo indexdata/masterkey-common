@@ -139,7 +139,7 @@ public class Pazpar2Settings {
     if (l.getFieldMap() != null && !l.getFieldMap().isEmpty()) {
       try {
         FieldMapper mapper = new FieldMapper(l.getFieldMap());
-        setXMLSetting(id, "pz:xslt", mapper.getStylesheet(null));
+        setXMLSetting(id, "pz:xslt", mapper.getStylesheet());
       } catch (FieldMapper.ParsingException pe) {
         logger.error("Cannot parse fieldMap - " + pe.getMessage());
       }

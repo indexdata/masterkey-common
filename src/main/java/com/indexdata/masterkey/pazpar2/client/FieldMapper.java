@@ -6,11 +6,14 @@
 package com.indexdata.masterkey.pazpar2.client;
 
 import com.indexdata.utils.XmlUtils;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -23,7 +26,14 @@ public class FieldMapper {
   public final static String TMARC_NS = "http://www.indexdata.com/turbomarc";
   
   public enum MapType {
-    MARC, XML;
+    MARC("base-tmarc"), XML("base-xml");
+    private String baseXSLName;
+    private MapType(String baseXSLName) {
+      this.baseXSLName = baseXSLName;
+    }
+    public String getBaseXSLName() {
+      return baseXSLName;
+    }
   }
   
   public static class FieldMap {
@@ -77,6 +87,10 @@ public class FieldMapper {
       super(message);
     }
     
+    public ParsingException(String message, Throwable cause) {
+      super(message, cause);
+    }
+    
   }
   
   private ArrayList<FieldMap> fieldMaps;
@@ -122,9 +136,21 @@ public class FieldMapper {
       }  
   }
   
-  public Document getStylesheet(Document defaults) throws ParsingException {
-    Document ss = null;
+  public Document getStylesheet() throws ParsingException {
+    Document ss;
     Element tmpl = null, pzRecord = null;
+    InputStream is = this.getClass().getResourceAsStream("/xsl/"+type.getBaseXSLName()+".xsl");
+    Document defaults = null;
+    if (is != null) {
+      //log it
+      try {
+        defaults = XmlUtils.parse(is);
+      } catch (SAXException se) {
+        throw new ParsingException("Base stylesheet error", se);
+      } catch (IOException ioe) {
+        throw new ParsingException("Base stylesheet error", ioe);
+      }
+    }
     if (defaults != null) {
       ss = defaults;
       // for some reason this doesn't work wiht namespaces!!
@@ -143,13 +169,25 @@ public class FieldMapper {
         PZ2_NS);
       root.setAttribute("version", "1.0");
       ss.appendChild(root);
+      //output indent="yes" method="xml" version="1.0" encoding="UTF-8"
+      Element out = ss.createElementNS(XSL_NS, "xsl:output");
+      out.setAttribute("indent", "yes");
+      out.setAttribute("method", "xml");
+      out.setAttribute("version", "1.0");
+      out.setAttribute("encoding", "UTF-8");
+      root.appendChild(out);
+      //template
       tmpl = ss.createElementNS(XSL_NS, "xsl:template");
       root.appendChild(tmpl);
+      //tex > dev null
+      Element txtTmpl = ss.createElementNS(XSL_NS, "xsl:template");
+      txtTmpl.setAttribute("match", "text()");
+      root.appendChild(txtTmpl);
     }
     switch (type) {
       case MARC: return getMarcStylesheet(tmpl, pzRecord);
       case XML: return getXmlStylesheet(tmpl, pzRecord);
-      default: throw new ParsingException("Unknown stylesheet type: " + type);
+      default: throw new ParsingException("Unsupported stylesheet type: " + type);
     }
   }
   
@@ -157,7 +195,7 @@ public class FieldMapper {
     Document ss = null;
     if (pzRecord == null) {
       ss = tmpl.getOwnerDocument();
-      tmpl.setAttribute("match", "Result");
+      tmpl.setAttribute("match", "/");
       pzRecord = ss.createElementNS(PZ2_NS, "pz:record");
       tmpl.appendChild(pzRecord);
     } else {

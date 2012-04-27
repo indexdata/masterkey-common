@@ -47,7 +47,24 @@ public class FieldMapperTest {
       "100$abc author\n" + 
       "245$!cd title\n";
     FieldMapper instance = new FieldMapper(map);
-    Document result = instance.getStylesheet(null);
+    Document result = instance.getStylesheet();
+    XmlUtils.serialize(result, System.out);
+    //assert
+  }
+  
+  /**
+   * Test of getStylesheet method, of class FieldMapper.
+   */
+  @Test
+  public void testGetStylesheetXML() throws Exception {
+    System.out.println("getStylesheet");
+    String map = 
+      "/some/other jtitle\n" +
+      "/some/other1 jtitle-add\n" +
+      "/some/other3 author\n" + 
+      "/some/other4 title\n";
+    FieldMapper instance = new FieldMapper(map);
+    Document result = instance.getStylesheet();
     XmlUtils.serialize(result, System.out);
     //assert
   }
