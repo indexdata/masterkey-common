@@ -8,6 +8,7 @@ package com.indexdata.masterkey.pazpar2.client;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -117,14 +118,15 @@ public class Pazpar2Settings {
         + "("+l.getId()+") or URL ("+l.getZurl()+")");
       return;
     }
-
-    setSetting(id, "pz:authentication", auth);
-    setSetting(id, "pz:url", url);
-    setSetting(id, "pz:name", l.getName());
-    setSetting(id, "pz:xslt", l.getTransform());
-    setSetting(id, "pz:elements", l.getElementSet());
-    setSetting(id, "pz:queryencoding", l.getQueryEncoding());
-    setSetting(id, "pz:requestsyntax", l.getRequestSyntax());
+    List<String> excludeList = new LinkedList<String>();
+    
+    setSetting(id, "pz:authentication", auth, excludeList);
+    setSetting(id, "pz:url", url, excludeList);
+    setSetting(id, "pz:name", l.getName(), excludeList);
+    setSetting(id, "pz:xslt", l.getTransform(), excludeList);
+    setSetting(id, "pz:elements", l.getElementSet(), excludeList);
+    setSetting(id, "pz:queryencoding", l.getQueryEncoding(), excludeList);
+    setSetting(id, "pz:requestsyntax", l.getRequestSyntax(), excludeList);
     if (l.getRequestSyntax() != null) {
       boolean useTmarc = !"no".equalsIgnoreCase(cfg.USE_TURBO_MARC);
       if (l.getRequestSyntax().equalsIgnoreCase("xml")) {
@@ -135,75 +137,79 @@ public class Pazpar2Settings {
           && (l.getTransform() == null || l.getTransform().contains("tmarc") 
             || l.getTransform().contains("turbomarc"))) {
         String encoding = l.getRecordEncoding() != null ? l.getRecordEncoding() : "MARC8";
-        setSetting(id, "pz:nativesyntax", "txml;" + encoding);
+        setSetting(id, "pz:nativesyntax", "txml;" + encoding, excludeList);
         logger.debug("Using Turbo MARC for target [" + url + "]");
       } else {
         String encoding = l.getRecordEncoding() != null ? l.getRecordEncoding() : "MARC8";
-        setSetting(id, "pz:nativesyntax", "iso2709;" + encoding);
+        setSetting(id, "pz:nativesyntax", "iso2709;" + encoding, excludeList);
         logger.debug("Using iso2709;" + encoding + " for target [" + url + "]");
       }
     }
 
-    setPrefixedSetttings(id, "cclmap", l.getOtherElements());
+    setPrefixedSettings(id, "cclmap", l.getOtherElements());
     //the following are the default that we support, the key is configurable
     //through SP config
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_TERM_KEY,
-      l.getCclMapTerm(), cfg.CCLMAP_TERM);
+      l.getCclMapTerm(), cfg.CCLMAP_TERM, excludeList);
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_SU_KEY, 
-      l.getCclMapSu(), cfg.CCLMAP_SU);
+      l.getCclMapSu(), cfg.CCLMAP_SU, excludeList);
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_AU_KEY, 
-      l.getCclMapAu(), cfg.CCLMAP_AU);
+      l.getCclMapAu(), cfg.CCLMAP_AU, excludeList);
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_TI_KEY, 
-      l.getCclMapTi(), cfg.CCLMAP_TI);
+      l.getCclMapTi(), cfg.CCLMAP_TI, excludeList);
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_ISBN_KEY, 
-      l.getCclMapIsbn(), cfg.CCLMAP_ISBN);
+      l.getCclMapIsbn(), cfg.CCLMAP_ISBN, excludeList);
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_ISSN_KEY, 
-      l.getCclMapIssn(), cfg.CCLMAP_ISSN);
+      l.getCclMapIssn(), cfg.CCLMAP_ISSN, excludeList);
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_JT_KEY, 
-      l.getCclMapJournalTitle(), cfg.CCLMAP_JT);
+      l.getCclMapJournalTitle(), cfg.CCLMAP_JT, excludeList);
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_DATE_KEY, 
-      l.getCclMapDate(), cfg.CCLMAP_DATE);
+      l.getCclMapDate(), cfg.CCLMAP_DATE, excludeList);
     //'term' is magic CCL index that has to be defined even when the actual key
     //has been redefined
     if (!"term".equals(cfg.CCLMAP_TERM_KEY))
-      setSetting(id, "pz:cclmap:term", l.getCclMapTerm(), cfg.CCLMAP_TERM);
+      setSetting(id, "pz:cclmap:term", l.getCclMapTerm(), cfg.CCLMAP_TERM, excludeList);
 
-    setPrefixedSetttings(id, "facetmap", l.getOtherElements());
+    setPrefixedSettings(id, "facetmap", l.getOtherElements());
 
     /*
      * Values: Attribute list or cclmap reference for how to query when
      * limiting a field
      */
-    setPrefixedSetttings(id, "limitmap", l.getOtherElements());
+    setPrefixedSettings(id, "limitmap", l.getOtherElements());
 
-    setPrefixedSetttings(id, "sortmap", l.getOtherElements());
+    setPrefixedSettings(id, "sortmap", l.getOtherElements());
 
-    setSetting(id, "pz:sru", l.getSRU());
-    setSetting(id, "pz:sru_version", l.getSruVersion());
+    setSetting(id, "pz:sru", l.getSRU(), excludeList);
+    setSetting(id, "pz:sru_version", l.getSruVersion(), excludeList);
 
-    setSetting(id, "pz:apdulog", l.getApduLog());
+    setSetting(id, "pz:apdulog", l.getApduLog(), excludeList);
 
-    setSetting(id, "pz:termlist_term_count", l.getTermlistTermCount());
-    setSetting(id, "pz:termlist_term_sort", l.getTermlistTermSort());
-    setSetting(id, "pz:termlist_term_factor", l.getTermlistUseTermFactor(), null);
+    setSetting(id, "pz:termlist_term_count", l.getTermlistTermCount(), excludeList);
+    setSetting(id, "pz:termlist_term_sort", l.getTermlistTermSort(), excludeList);
+    setSetting(id, "pz:termlist_term_factor", l.getTermlistUseTermFactor(), null, excludeList);
 
-    setSetting(id, "pz:preferred", l.getPreferredTarget());
-    setSetting(id, "pz:block_timeout", l.getBlockTimeout());
-    setSetting(id, "pz:pqf_prefix", l.getPqfPrefix());
-    setSetting(id, "pz:piggyback", l.getPiggyback());
-    setSetting(id, "pz:maxrecs", l.getMaxRecords());
-    setSetting(id, "pz:extra_args", l.getExtraArgs());
-    setSetting(id, "pz:query_syntax", l.getQuerySyntax());
+    setSetting(id, "pz:preferred", l.getPreferredTarget(), excludeList);
+    setSetting(id, "pz:block_timeout", l.getBlockTimeout(),excludeList);
+    setSetting(id, "pz:pqf_prefix", l.getPqfPrefix(), excludeList);
+    setSetting(id, "pz:piggyback", l.getPiggyback(), excludeList);
+    setSetting(id, "pz:maxrecs", l.getMaxRecords(), excludeList);
+    setSetting(id, "pz:extra_args", l.getExtraArgs(), excludeList);
+    setSetting(id, "pz:query_syntax", l.getQuerySyntax(), excludeList);
 
-    setSetting(id, "url_recipe", l.getUrlRecipe());
-    setSetting(id, "category", l.getCategories());
-    setSetting(id, "medium", l.getMedium());
-    setSetting(id, "comment", l.getComment());
-    setSetting(id, "explode", l.getExplode());
-    setSetting(id, "use_url_proxy", l.getUseUrlProxy(), "0");
-    setSetting(id, "use_thumbnails", l.getUseThumbnails(), "1");
-    setSetting(id, "secondary_request_syntax", l.getSecondaryRequestSyntax(), null);
-    setSetting(id, "full_text_target", l.getFullTextTarget(), "NO");
+    setSetting(id, "url_recipe", l.getUrlRecipe(), excludeList);
+    setSetting(id, "category", l.getCategories(), excludeList);
+    setSetting(id, "medium", l.getMedium(), excludeList);
+    setSetting(id, "comment", l.getComment(), excludeList);
+    setSetting(id, "explode", l.getExplode(), excludeList);
+    setSetting(id, "use_url_proxy", l.getUseUrlProxy(), "0", excludeList);
+    setSetting(id, "use_thumbnails", l.getUseThumbnails(), "1", excludeList);
+    setSetting(id, "secondary_request_syntax", l.getSecondaryRequestSyntax(), null, excludeList);
+    setSetting(id, "full_text_target", l.getFullTextTarget(), "NO", excludeList);
+
+    /* Now set all other pz_<name> as pz:<name> */
+    setPzSettings(id, l.getOtherElements(), excludeList);
+
   }
 
   /*
@@ -280,7 +286,7 @@ public class Pazpar2Settings {
     return null;
   }
 
-  public boolean setSetting(String targetId, String key, String value) {
+  public boolean setSetting(String targetId, String key, String value, List<String> excludeList) {
     return setSetting(targetId, key, value, null);
   }
 
@@ -298,7 +304,7 @@ public class Pazpar2Settings {
    * @param defaultValue
    *          Fall-back value if 'value' is null
    */
-  public boolean setSetting(String targetId, String key, String value, String defaultValue) {
+  public boolean setSetting(String targetId, String key, String value, String defaultValue, List<String> excludeList) {
     String val = ((value != null && !value.isEmpty()) ? value : defaultValue);
     if (val != null) {
       Map<String, String> setting = settings.get(targetId);
@@ -311,6 +317,8 @@ public class Pazpar2Settings {
       } else {
 	setting = new HashMap<String, String>();
 	settings.put(targetId, setting);
+	if (excludeList != null)
+	  excludeList.add(key);
       }
       if (logger.isDebugEnabled())
 	logger.debug(new StringBuffer("setting on ").append(targetId).append(": ").append(key)
@@ -332,7 +340,7 @@ public class Pazpar2Settings {
   /**
    * setPrefixedSetttings: set a value of maps based on prefix
    */
-  protected void setPrefixedSetttings(String targetId, String mapPrefix, List<Object> elements) {
+  protected void setPrefixedSettings(String targetId, String mapPrefix, List<Object> elements) {
     if (elements == null) return;
     for (Object obj : elements) {
       if (obj instanceof Element) {
@@ -345,6 +353,28 @@ public class Pazpar2Settings {
     }
   }
 
+  /**
+   * setPrefixedSetttings: set a value of maps based on prefix
+   */
+  protected void setPzSettings(String targetId, List<Object> elements, List<String> excludes) {
+    if (elements == null) return;
+    for (Object obj : elements) {
+      if (obj instanceof Element) {
+	Element element = (Element) obj;
+	if (element.getTagName().startsWith("pz_")) {
+	  String pzName = element.getTagName().replaceFirst("pz_", "pz:");
+	  if (!excludes.contains(pzName))
+	    setSetting(targetId, pzName, element.getTextContent(), null); 
+	  else {
+	    logger.warn("Ignored " + pzName + "=" + element.getTextContent());
+	  }
+	}
+      }
+    }
+  }
+
+  
+  
   public String encode()
       throws UnsupportedEncodingException {
     long startTime = PerformanceLogger.start("  >ENCSETTS", "Encode Target Settings, "
