@@ -44,15 +44,20 @@ public class FieldMapperTest {
   @Test
   public void testGetStylesheet() throws Exception {
     System.out.println("getStylesheet");
-    String map = 
+    String map =
+      "%ns marc http://loc.gov/\n"+
+      "%import tmarc-base.xsl\n"+
+      "%import some-base.xsl\n"+
       "999$* jtitle\n" +
       "999$ab jtitle-add\n" +
       "100$abc author\n" + 
       "245$!cd title\n";
-    FieldMapper instance = new FieldMapper(map);
-    Document result = instance.getStylesheet();
+    FieldMapper mapper = new FieldMapper(map);
+    Document result = mapper.getStylesheet();
     XmlUtils.serialize(result, System.out);
     //assert
+    //ns
+    assertEquals("http://loc.gov/", mapper.getNamespaces().get("marc"));
   }
   
   /**
