@@ -5,6 +5,8 @@
  */
 package com.indexdata.masterkey.pazpar2.client;
 
+import static org.junit.Assert.*;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
