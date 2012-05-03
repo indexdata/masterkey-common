@@ -13,8 +13,6 @@ import com.indexdata.rest.client.ResourceConnector;
 import com.indexdata.rest.client.TorusConnectorFactory;
 import com.indexdata.torus.Records;
 import com.indexdata.utils.PerformanceLogger;
-
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.log4j.Logger;
@@ -113,15 +111,8 @@ public class Pazpar2ClientTorus extends AbstractPazpar2Client {
   }
   
   private void setup(Pazpar2Settings settings)
-      throws ProxyErrorException, Pazpar2IOException, Pazpar2ErrorException {
-    try {
-      String encodedSettings = settings.encode();
-      encodedSettings = (encodedSettings != null) ? "&" + encodedSettings : "";
-      this.sendRequest("session=" + this.getSessionId() + "&command=settings" + encodedSettings);
-    } catch (UnsupportedEncodingException ex) {
-      throw new Pazpar2IOException(
-	  "Abnormal behaviour - fetched settings cannot be encoded to UTF-8'", ex);
-    }
+    throws ProxyErrorException, Pazpar2IOException, Pazpar2ErrorException {
+    post("command=settings", settings.toXml(null));
   }
   
   private Records fetchTargetProfiles() throws ProxyErrorException {
