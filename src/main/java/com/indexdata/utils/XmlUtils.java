@@ -3,7 +3,6 @@
  * All rights reserved.
  * See the file LICENSE for details.
  */
-
 package com.indexdata.utils;
 
 import java.io.File;
@@ -14,7 +13,10 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+import java.util.Iterator;
 import java.util.Properties;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,148 +40,219 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Some XML helper methods to hide DOM complexity.
- * Uses thread local variables to create Builders once per thread.
+ * Some XML helper methods to hide DOM complexity. Uses thread local variables
+ * to create Builders once per thread.
+ *
  * @author jakub
  */
 public class XmlUtils {
-    private static final ThreadLocal<DocumentBuilder> builderLocal =
+  private static final ThreadLocal<DocumentBuilder> builderLocal =
     new ThreadLocal<DocumentBuilder>() {
-        @Override
-        protected DocumentBuilder initialValue() {
-          try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setIgnoringElementContentWhitespace(true);
-            return factory.newDocumentBuilder();
-          } catch (ParserConfigurationException pce) {
-            throw new Error(pce);
-          }
+      @Override
+      protected DocumentBuilder initialValue() {
+        try {
+          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+          factory.setIgnoringElementContentWhitespace(true);
+          return factory.newDocumentBuilder();
+        } catch (ParserConfigurationException pce) {
+          throw new Error(pce);
         }
+      }
     };
-
-    private static final ThreadLocal<Transformer> transformerLocal =
+  private static final ThreadLocal<Transformer> transformerLocal =
     new ThreadLocal<Transformer>() {
-        @Override
-        protected Transformer initialValue() {
-          try {
-            return TransformerFactory.newInstance().newTransformer();
-          } catch (TransformerConfigurationException tce) {
-            throw new Error(tce);
-          }
+      @Override
+      protected Transformer initialValue() {
+        try {
+          return TransformerFactory.newInstance().newTransformer();
+        } catch (TransformerConfigurationException tce) {
+          throw new Error(tce);
         }
+      }
     };
 
-    private XmlUtils() {
-    }
+  private XmlUtils() {
+  }
 
-    public static Document newDoc() {
-        return builderLocal.get().newDocument();
-    }
+  public static Document newDoc() {
+    return builderLocal.get().newDocument();
+  }
 
-    public static Document newDoc(String rootNode) {
-      Document doc = newDoc();
-      Element root = doc.createElement(rootNode);
-      doc.appendChild(root);
-      return doc;
-    }
-    
-    public static Document parse(InputStream source) throws SAXException, IOException {
-        return builderLocal.get().parse(source);
-    }
-    
-    public static Document parse(String uri) throws SAXException, IOException {
-        return builderLocal.get().parse(uri);
-    }
-    
-    public static Document parse(StringReader reader) throws SAXException, IOException {
-        return builderLocal.get().parse(new InputSource(reader));
-    }
-    
-    public static Document parse(File file) throws SAXException, IOException {
-        return builderLocal.get().parse(file);
-    }
+  public static Document newDoc(String rootNode) {
+    Document doc = newDoc();
+    Element root = doc.createElement(rootNode);
+    doc.appendChild(root);
+    return doc;
+  }
 
-    public static void serialize(Node doc, OutputStream dest) throws TransformerException {
-      serialize(doc, dest, null);
-    }
+  public static Document parse(InputStream source) throws SAXException,
+    IOException {
+    return builderLocal.get().parse(source);
+  }
 
-    public static void serialize(Node doc, Writer writer) throws TransformerException {
-      serialize(doc, writer, null);
-    }
-    
-    public static void serialize(Node doc, OutputStream dest, Properties props) throws TransformerException {
-      Transformer tf = transformerLocal.get();
-      if (props != null) tf.setOutputProperties(props);
-      tf.transform(new DOMSource(doc), new StreamResult(dest));
-    }
+  public static Document parse(String uri) throws SAXException, IOException {
+    return builderLocal.get().parse(uri);
+  }
 
-    public static void serialize(Node doc, Writer writer, Properties props) throws TransformerException {
-      Transformer tf = transformerLocal.get();
-      if (props != null) tf.setOutputProperties(props);
-      transformerLocal.get().transform(new DOMSource(doc), new StreamResult(writer));
+  public static Document parse(StringReader reader) throws SAXException,
+    IOException {
+    return builderLocal.get().parse(new InputSource(reader));
+  }
+
+  public static Document parse(File file) throws SAXException, IOException {
+    return builderLocal.get().parse(file);
+  }
+
+  public static void serialize(Node doc, OutputStream dest) throws
+    TransformerException {
+    serialize(doc, dest, null);
+  }
+
+  public static void serialize(Node doc, Writer writer) throws
+    TransformerException {
+    serialize(doc, writer, null);
+  }
+
+  public static void serialize(Node doc, OutputStream dest, Properties props)
+    throws TransformerException {
+    Transformer tf = transformerLocal.get();
+    if (props != null)
+      tf.setOutputProperties(props);
+    tf.transform(new DOMSource(doc), new StreamResult(dest));
+  }
+
+  public static void serialize(Node doc, Writer writer, Properties props) throws
+    TransformerException {
+    Transformer tf = transformerLocal.get();
+    if (props != null)
+      tf.setOutputProperties(props);
+    transformerLocal.get().transform(new DOMSource(doc),
+      new StreamResult(writer));
+  }
+
+  /**
+   * Escape five, basic XML entities.
+   *
+   * @param s string to be escaped
+   * @return xml-escaped string
+   */
+  public static String escape(String s) {
+    StringBuilder result = new StringBuilder();
+    StringCharacterIterator i = new StringCharacterIterator(s);
+    char c = i.current();
+    while (c != CharacterIterator.DONE) {
+      switch (c) {
+        case '<':
+          result.append("&lt;");
+          break;
+        case '>':
+          result.append("&gt;");
+          break;
+        case '"':
+          result.append("&quot;");
+          break;
+        case '\'':
+          result.append("&apos;");
+          break;
+        case '&':
+          result.append("&amp;");
+          break;
+        default:
+          result.append(c);
+      }
+      c = i.next();
+    }
+    return result.toString();
+  }
+
+  public static Node appendTextNode(Node parent, String tagName, String text) {
+    Document doc = parent.getOwnerDocument();
+    Node newNode = doc.createElement(tagName);
+    newNode.setTextContent(text);
+    parent.appendChild(newNode);
+    return newNode;
+  }
+
+  /**
+   * Gets a list of nodes by XPath from given starting point
+   *
+   * @param startingPoint The context node
+   * @param xPathString The search string
+   * @return The node list found by the XPath
+   * @throws StandardServiceException If XPath evaluation fails.
+   */
+  public static NodeList getNodeList(Object startingPoint, String xPathString)
+    throws XPathExpressionException {
+    NodeList nodeList = null;
+    XPathFactory factory = XPathFactory.newInstance();
+    XPath xPath = factory.newXPath();
+    XPathExpression expr = xPath.compile(xPathString);
+    nodeList = (NodeList) expr.evaluate(startingPoint, XPathConstants.NODESET);
+    return nodeList;
+  }
+
+  /**
+   * Gets a list of nodes by XPath from given starting point and resolve namespace
+   * prefixes using the document itself.
+   *
+   * @param startingPoint The context node
+   * @param xPathString The search string
+   * @return The node list found by the XPath
+   * @throws StandardServiceException If XPath evaluation fails.
+   */
+  public static NodeList getNodeListNS(Node startingPoint, String xPathString)
+    throws XPathExpressionException {
+    Document owner = startingPoint.getNodeType() == Node.DOCUMENT_NODE ?
+      (Document) startingPoint : startingPoint.getOwnerDocument();
+    NodeList nodeList = null;
+    XPathFactory factory = XPathFactory.newInstance();
+    XPath xPath = factory.newXPath();
+    xPath.setNamespaceContext(
+      new UniversalNamespaceResolver(owner));
+    XPathExpression expr = xPath.compile(xPathString);
+    nodeList = (NodeList) expr.evaluate(startingPoint, XPathConstants.NODESET);
+    return nodeList;
+  }
+
+  private static class UniversalNamespaceResolver implements NamespaceContext {
+    // the delegate
+    private Document sourceDocument;
+
+    /**
+     * This constructor stores the source document to search the namespaces in
+     * it.
+     *
+     * @param document source document
+     */
+    public UniversalNamespaceResolver(Document document) {
+      sourceDocument = document;
     }
 
     /**
-     * Escape five, basic XML entities.
-     * @param s string to be escaped
-     * @return xml-escaped string
+     * The lookup for the namespace uris is delegated to the stored document.
+     *
+     * @param prefix to search for
+     * @return uri
      */
-    public static String escape(String s) {
-        StringBuilder result = new StringBuilder();
-        StringCharacterIterator i = new StringCharacterIterator(s);
-        char c =  i.current();
-        while (c != CharacterIterator.DONE ){
-            switch (c) {
-                case '<':
-                    result.append("&lt;");
-                    break;
-                case '>':
-                    result.append("&gt;");
-                    break;
-                case '"':
-                    result.append("&quot;");
-                    break;
-                case '\'':
-                    result.append("&apos;");
-                    break;
-                case '&':
-                    result.append("&amp;");
-                    break;
-                default:
-                    result.append(c);
-            }
-            c = i.next();
-        }
-        return result.toString();
+    @Override
+    public String getNamespaceURI(String prefix) {
+      if (prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+        return sourceDocument.lookupNamespaceURI(null);
+      } else {
+        return sourceDocument.lookupNamespaceURI(prefix);
+      }
     }
-    
-    public static Node appendTextNode(Node parent, String tagName, String text) {
-        Document doc = parent.getOwnerDocument();
-        Node newNode = doc.createElement(tagName);
-        newNode.setTextContent(text);
-        parent.appendChild(newNode);
-        return newNode;
+
+    @Override
+    public String getPrefix(String namespaceURI) {
+      return sourceDocument.lookupPrefix(namespaceURI);
     }
-    
-    /**
-     * Gets a list of nodes by XPath from given starting point
-     * 
-     * @param startingPoint
-     *          The context node
-     * @param xPathString
-     *          The search string
-     * @return The node list found by the XPath
-     * @throws StandardServiceException
-     *           If XPath evaluation fails.
-     */
-    public static NodeList getNodeList(Object startingPoint, String xPathString)
-        throws XPathExpressionException {
-      NodeList nodeList = null;
-      XPathFactory factory = XPathFactory.newInstance();
-      XPath xPath = factory.newXPath();
-      XPathExpression expr = xPath.compile(xPathString);
-      nodeList = (NodeList) expr.evaluate(startingPoint, XPathConstants.NODESET);
-      return nodeList;
+
+    @Override
+    public Iterator getPrefixes(String namespaceURI) {
+      // not implemented yet
+      return null;
     }
+  }
 
 }
