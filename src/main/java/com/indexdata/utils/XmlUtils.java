@@ -53,6 +53,7 @@ public class XmlUtils {
         try {
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
           factory.setIgnoringElementContentWhitespace(true);
+          factory.setNamespaceAware(true);
           return factory.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
           throw new Error(pce);
