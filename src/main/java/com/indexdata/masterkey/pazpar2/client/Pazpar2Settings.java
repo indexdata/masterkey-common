@@ -152,7 +152,14 @@ public class Pazpar2Settings {
     if (l.getRequestSyntax() != null) {
       boolean useTmarc = !"no".equalsIgnoreCase(cfg.USE_TURBO_MARC);
       if (l.getRequestSyntax().equalsIgnoreCase("xml")) {
-        logger.debug("No nativesyntax chosen for target [" + url + "] (xml)");
+        if (l.getRecordEncoding() != null) {
+          //we force txml to deal with xml-embedded marc records (they will end up tmarc)
+          String ns = "txml; " + l.getRecordEncoding();
+          setSetting(id, "pz:nativesyntax", ns, excludeList);
+          logger.debug("Nativesyntax chosen for target [" + url + "] ("+ns+")");
+        } else {
+          logger.debug("No nativesyntax chosen for target [" + url + "] (xml)");
+        }
       } else if (useTmarc
           && (l.getRequestSyntax().toLowerCase().contains("opac")
             || l.getRequestSyntax().toLowerCase().contains("marc"))
