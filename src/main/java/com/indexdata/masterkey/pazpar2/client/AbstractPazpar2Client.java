@@ -151,7 +151,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client {
     try {
       if (!pazpar2Session.searchChanged() && sessionIsAlive()) {
         logger.info("The same search command [" + pazpar2Session.
-          getLatestQueryString()
+          getSearchQueryString()
           + "] was just issued on session [" + pazpar2Session.getSessionId()
           + "]. Omitting Pazpar2 request.");
         os.write("<search><status>OK</status></search>".getBytes("UTF-8"));
@@ -221,7 +221,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client {
         try {
           logger.debug("Command [" + command.getCommand()
             + "]. Last search was: ["
-            + pazpar2Session.getLatestQueryString() + "]");
+            + pazpar2Session.getSearchQueryString() + "]");
           if (command.record() && !this.hasSearchCommand()) {
             bootstrapRecord(command);
           }
@@ -365,10 +365,9 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client {
       logger.info("Reinitialized session with ID [" + getSessionId() + "]");
       logger.info("Request command '" + command.getCommand()
         + "' requires to re-execute the previous search ["
-        + pazpar2Session.getLatestQueryString() + "] on session ["
+        + pazpar2Session.getSearchQueryString() + "] on session ["
         + getSessionId() + "]");
-      String lastQueryString = pazpar2Session.getLatestQueryString();
-      if (lastQueryString != null) {
+      if (pazpar2Session.getSearchCommand() != null) {
         request(pazpar2Session.getSearchCommand().getPz2queryString());
         doShow();
       } else {

@@ -48,7 +48,7 @@ public class Pazpar2Session {
     return latestSearchCommand;
   }
 
-  public String getLatestQueryString() {
+  public String getSearchQueryString() {
     return (latestSearchCommand == null) ? "" : latestSearchCommand.
       getQueryString();
   }
