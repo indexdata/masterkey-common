@@ -31,6 +31,7 @@ public class IdentityTypeLayer extends Layer {
     private String searchablesRealm;
     @XmlElement(name="categoriesRealm")
     private String categoriesRealm;
+    private String ilsConnector;
 
     public String getIdentityId() {
       return identityId;
@@ -114,4 +115,12 @@ public class IdentityTypeLayer extends Layer {
         this.proxyPattern = proxyPattern;
     }
 
+  public String getIlsConnector() {
+    return ilsConnector;
+  }
+
+  public void setIlsConnector(String ilsConnector) {
+    this.ilsConnector = ilsConnector;
+  }
+   
 }
