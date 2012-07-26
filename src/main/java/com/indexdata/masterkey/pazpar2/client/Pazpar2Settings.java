@@ -235,6 +235,7 @@ public class Pazpar2Settings {
     setSetting(id, "use_thumbnails", l.getUseThumbnails(), "1", excludeList);
     setSetting(id, "secondary_request_syntax", l.getSecondaryRequestSyntax(), null, excludeList);
     setSetting(id, "full_text_target", l.getFullTextTarget(), "NO", excludeList);
+    setSetting(id, "place_holds", l.getPlaceHolds(), "no", excludeList);
 
     /* Now set all other pz_<name> as pz:<name> */
     setPzSettings(id, l.getOtherElements(), excludeList);
