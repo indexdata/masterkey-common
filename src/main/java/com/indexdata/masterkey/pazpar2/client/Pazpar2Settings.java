@@ -100,6 +100,7 @@ public class Pazpar2Settings {
   public void loadSearchable(SearchableTypeLayer l) {
     //build url
     String url = null, auth = null;
+    boolean isCf = false;
     if (l.getZurl() != null && !l.getZurl().isEmpty()) {   
       StringBuffer urlBuilder = new StringBuffer(l.getZurl());
       // Ends with a port number, append a path
@@ -113,9 +114,8 @@ public class Pazpar2Settings {
         logger.debug("Zurl appended with Rich Database Parameters: " + urlBuilder.toString());
       }
       //append CF params, select appropriate authentication
-      auth = checkAndAppendCfParams(l, urlBuilder)
-        ? l.getCfAuth()
-        : l.getAuthentication();
+      isCf = checkAndAppendCfParams(l, urlBuilder);
+      auth = isCf ? l.getCfAuth() : l.getAuthentication();
       url = urlBuilder.toString();
     }
 
@@ -225,6 +225,7 @@ public class Pazpar2Settings {
     setSetting(id, "pz:maxrecs", l.getMaxRecords(), excludeList);
     setSetting(id, "pz:extra_args", l.getExtraArgs(), excludeList);
     setSetting(id, "pz:query_syntax", l.getQuerySyntax(), excludeList);
+    if (!isCf) setSetting(id, "pz:zproxy", l.getCfProxy(), excludeList);
 
     setSetting(id, "url_recipe", l.getUrlRecipe(), excludeList);
     setSetting(id, "category", l.getCategories(), excludeList);
