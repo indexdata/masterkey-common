@@ -315,6 +315,11 @@ public class MasterkeyConfiguration {
     	}
     	return moduleProps;
     }
+    
+    public static ModuleConfiguration getModuleConfiguration (ServletContext servletContext, String hostName, String appId, String moduleName) throws IOException {
+      MasterkeyConfiguration context = getInstance (servletContext, appId, hostName);
+      return context.getModuleConfiguration(moduleName);
+    }
 
     
 }
