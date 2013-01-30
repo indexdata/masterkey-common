@@ -107,6 +107,11 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client {
     return pazpar2Session.getSessionId();
   }
 
+  @Override
+  public Pazpar2ClientConfiguration getConfiguration() {
+    return cfg;
+  }
+
   /**
    * Stores the current search command on the proxy client
    */

@@ -40,6 +40,12 @@ public interface Pazpar2Client {
      * @return The Pazpar2 target settings for the current session
      */
     Pazpar2Settings getSettings();
+    
+    /**
+     * 
+     * @return configuration for this client instance 
+     */
+    Pazpar2ClientConfiguration getConfiguration();
                 
     /**
      * Stores the latest search command issued through this proxy client
