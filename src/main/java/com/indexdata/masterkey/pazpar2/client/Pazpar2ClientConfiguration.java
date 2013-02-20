@@ -1,5 +1,7 @@
 package com.indexdata.masterkey.pazpar2.client;
 
+import java.io.Serializable;
+
 import com.indexdata.masterkey.config.MissingMandatoryParameterException;
 import com.indexdata.masterkey.config.ModuleConfiguration;
 import com.indexdata.masterkey.pazpar2.client.exceptions.ProxyErrorException;
@@ -14,7 +16,8 @@ import org.apache.log4j.Logger;
  * @author Niels Erik
  *
  */
-public class Pazpar2ClientConfiguration {
+public class Pazpar2ClientConfiguration implements Serializable {
+  private static final long serialVersionUID = -656354982746551862L;
   public int PROXY_MODE = 0;
   public String TORUS_BASEURL = null;
   public String USE_TURBO_MARC = null;

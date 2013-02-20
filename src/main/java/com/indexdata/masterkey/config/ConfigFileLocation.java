@@ -3,6 +3,7 @@ package com.indexdata.masterkey.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
@@ -12,8 +13,9 @@ import org.apache.log4j.Logger;
  * Structure to hold all elements of the path leading to the config file,
  * including method for troubleshooting.
  */
-class ConfigFileLocation {
+class ConfigFileLocation implements Serializable {
 
+  private static final long serialVersionUID = 950891180639044889L;
     public static String MASTERKEY_ROOT_CONFIG_DIR;
     public static final String MASTERKEY_ROOT_CONFIG_DIR_PARAM = "MASTERKEY_ROOT_CONFIG_DIR";
     public static final String MASTERKEY_COMPONENT_CONFIG_DIR_PARAM = "MASTERKEY_COMPONENT_CONFIG_DIR";

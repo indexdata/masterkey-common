@@ -105,6 +105,8 @@ public class FieldMapper {
   
   public class ParsingException extends Exception {
 
+    private static final long serialVersionUID = -673112951362595374L;
+
     public ParsingException(String message) {
       super(message);
     }

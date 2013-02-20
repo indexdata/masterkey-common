@@ -1,5 +1,7 @@
 package com.indexdata.masterkey.pazpar2.client;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -18,11 +20,12 @@ import org.apache.log4j.Logger;
  * 
  * @author jakub
  */
-public class Pazpar2Session {
+public class Pazpar2Session implements Serializable {
+  private static final long serialVersionUID = 6251032233249975769L;
   private String sessionId;
   private ClientCommand latestSearchCommand = null;
   private ClientCommand previousSearchCommand = null;
-  private Logger logger = Logger.getLogger(Pazpar2Session.class);
+  private static Logger logger = Logger.getLogger(Pazpar2Session.class);
 
   public Pazpar2Session() {
   }

@@ -1,14 +1,16 @@
 package com.indexdata.masterkey.config;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-public class ModuleConfiguration {
+public class ModuleConfiguration implements Serializable {
 
-    private Logger logger = Logger.getLogger(ModuleConfiguration.class);
+  private static final long serialVersionUID = -7649779517458494774L;
+    private static Logger logger = Logger.getLogger(ModuleConfiguration.class);
     private MasterkeyConfiguration mkContext = null;
     public String moduleName = null;
 

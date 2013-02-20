@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -16,10 +17,8 @@ import java.net.URLEncoder;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -52,7 +51,8 @@ import com.indexdata.utils.XmlUtils;
  * @author jakub, nielserik
  *
  */
-public abstract class AbstractPazpar2Client implements Pazpar2Client {
+public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializable {
+  private static final long serialVersionUID = -5281057457054297741L;
   private static int MAX_URL_LENGTH = 2048;
   private static Logger logger = Logger.getLogger(AbstractPazpar2Client.class);
   protected Pazpar2ClientConfiguration cfg = null;
@@ -60,7 +60,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client {
   protected Pazpar2Session pazpar2Session = new Pazpar2Session();
   private ConcurrentHashMap<String, Document> results =
     new ConcurrentHashMap<String, Document>();
-  private Map<String, long[]> commandTimeStamps = new HashMap<String, long[]>();
+  private Map<String, long[]> commandTimeStamps = new ConcurrentHashMap<String, long[]>();
   private int searchCount = 0;
   public final String XML_CT = "text/xml;charset=UTF-8";
 
@@ -734,7 +734,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client {
   private String getTimeStampsLogStmt() {
     StringBuilder logstr = new StringBuilder("Requests on pz2 session ["
       + pazpar2Session.getSessionId() + "]: ");
-    Map<Date, String> sort = new TreeMap<Date, String>();
+    Map<Date, String> sort = new ConcurrentHashMap<Date, String>();
     Iterator<String> timestampIter = commandTimeStamps.keySet().iterator();
     while (timestampIter.hasNext()) {
       String key = timestampIter.next();

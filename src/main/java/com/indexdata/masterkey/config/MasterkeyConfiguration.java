@@ -3,6 +3,7 @@ package com.indexdata.masterkey.config;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -39,11 +40,13 @@ import com.indexdata.utils.PerformanceLogger;
  *
  * @author Niels Erik
  */
-public class MasterkeyConfiguration {
+public class MasterkeyConfiguration implements Serializable {
+
+  private static final long serialVersionUID = -8887051580796525503L;
 
     public static final String MASTERKEY_CONFIG_LIFE_TIME_PARAM = "MASTERKEY_CONFIG_LIFE_TIME";
 
-    private Logger logger = Logger.getLogger(MasterkeyConfiguration.class);
+    private static Logger logger = Logger.getLogger(MasterkeyConfiguration.class);
     private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap<String, MasterkeyConfiguration>();    
     private boolean cacheConfigParams = true;           
     private String contextKey = null;

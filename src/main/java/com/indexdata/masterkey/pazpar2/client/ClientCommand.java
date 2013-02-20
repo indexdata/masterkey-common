@@ -1,5 +1,6 @@
 package com.indexdata.masterkey.pazpar2.client;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -14,7 +15,8 @@ import org.apache.log4j.Logger;
  * @author Niels Erik Nielsen
  *
  */
-public class ClientCommand {
+public class ClientCommand implements Serializable {
+  private static final long serialVersionUID = 5584296831521617821L;
   private static Logger logger = Logger.getLogger(ClientCommand.class);
   public final static String CLIENT_WINDOW_ID_PARAMETER = "windowid";
   public final static String RECORD_FILTER_PARAMETER = "recordfilter";

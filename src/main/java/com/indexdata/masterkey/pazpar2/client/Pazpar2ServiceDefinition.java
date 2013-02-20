@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
@@ -26,7 +27,8 @@ import com.indexdata.masterkey.pazpar2.client.exceptions.ProxyErrorException;
  * </ol>
  * @author Niels Erik
  */
-public class Pazpar2ServiceDefinition {
+public class Pazpar2ServiceDefinition implements Serializable {
+  private static final long serialVersionUID = 8787002565960285137L;
   public static final int UNDEFINED = 0;
   private static final int USES_XML = 1;
   private static final int USES_ID = 2;

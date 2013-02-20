@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
  * @author jakub
  */
 public class Pazpar2ClientTorus extends AbstractPazpar2Client {
+  private static final long serialVersionUID = 6228919774442869371L;
   private static Logger logger = Logger.getLogger(Pazpar2ClientTorus.class);
   private Pazpar2Settings targetSettings = null;
   private String realm = null;

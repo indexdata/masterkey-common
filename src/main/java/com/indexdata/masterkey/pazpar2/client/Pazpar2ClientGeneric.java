@@ -15,6 +15,7 @@ import com.indexdata.masterkey.pazpar2.client.exceptions.ProxyErrorException;
  *
  */
 public class Pazpar2ClientGeneric extends AbstractPazpar2Client {
+  private static final long serialVersionUID = -972629015790377227L;
 
   public Pazpar2ClientGeneric(Pazpar2ClientConfiguration cfg) 
     throws ProxyErrorException {
