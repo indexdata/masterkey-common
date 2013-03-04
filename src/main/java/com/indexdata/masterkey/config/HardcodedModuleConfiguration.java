@@ -44,5 +44,16 @@ public class HardcodedModuleConfiguration implements  ModuleConfigurationGetter 
     }
     return defaultValue; 
   }
+  
+  public String getMandatory(String name) throws MissingMandatoryParameterException {
+    return moduleConfig.getMandatory(name);
+  }
+
+  @Override
+  public String getConfigFilePath() {
+    return null;    
+  }
+  
+  
 
 }

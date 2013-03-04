@@ -2,10 +2,11 @@ package com.indexdata.masterkey.pazpar2.client;
 
 import java.io.Serializable;
 
-import com.indexdata.masterkey.config.MissingMandatoryParameterException;
-import com.indexdata.masterkey.config.ModuleConfiguration;
-import com.indexdata.masterkey.pazpar2.client.exceptions.ProxyErrorException;
 import org.apache.log4j.Logger;
+
+import com.indexdata.masterkey.config.MissingMandatoryParameterException;
+import com.indexdata.masterkey.config.ModuleConfigurationGetter;
+import com.indexdata.masterkey.pazpar2.client.exceptions.ProxyErrorException;
 
 /**
  * Data object representing all configuration parameters for a Pazpar2 proxy client.
@@ -71,7 +72,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
   private static Logger logger = Logger.getLogger(Pazpar2ClientConfiguration.class);
 
 
-  public Pazpar2ClientConfiguration(ModuleConfiguration cfg) throws ProxyErrorException {
+  public Pazpar2ClientConfiguration(ModuleConfigurationGetter cfg) throws ProxyErrorException {
     if (cfg != null) {
       try {
         PAZPAR2_URL = cfg.getMandatory("PAZPAR2_URL");

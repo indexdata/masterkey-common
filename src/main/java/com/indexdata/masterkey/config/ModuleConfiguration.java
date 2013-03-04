@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-public class ModuleConfiguration implements Serializable {
+public class ModuleConfiguration implements ModuleConfigurationGetter, Serializable {
 
   private static final long serialVersionUID = -7649779517458494774L;
     private static Logger logger = Logger.getLogger(ModuleConfiguration.class);
