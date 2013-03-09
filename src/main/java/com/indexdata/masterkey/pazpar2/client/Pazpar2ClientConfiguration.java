@@ -28,6 +28,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
   public int STREAMBUFF_SIZE = 0;
   public String PAZPAR2_SERVICE_ID = null;
   public String PAZPAR2_SERVICE_XML = null;
+  public String PAZPAR2_SETTINGS_XML = null;
   public String XML_FILE_PATH = null;
   public String USE_OPAQUE_ID;
   
@@ -92,6 +93,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
         USE_TURBO_MARC = cfg.get("USE_TURBO_MARC");
         PAZPAR2_SERVICE_ID = cfg.get("PAZPAR2_SERVICE_ID");
         PAZPAR2_SERVICE_XML = cfg.get("PAZPAR2_SERVICE_XML");
+        PAZPAR2_SETTINGS_XML = cfg.get("PAZPAR2_SETTINGS_XML");
         XML_FILE_PATH = cfg.getConfigFilePath();
         USE_OPAQUE_ID = cfg.get("USE_OPAQUE_ID", "no");
 

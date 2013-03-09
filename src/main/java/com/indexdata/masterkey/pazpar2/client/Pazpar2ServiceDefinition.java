@@ -124,8 +124,8 @@ public class Pazpar2ServiceDefinition implements Serializable {
     } catch (IOException ioe) {
       logger.error("Could not read service definition XML for Pazpar2: " + ioe.
         getMessage());
-      new ProxyErrorException("Error reading service definition XML",
-        ProxyErrorException.ErrorCode.CONFIGURATION_ERROR);
+      throw new ProxyErrorException("Error reading service definition XML: " + ioe.getMessage(),
+                         ProxyErrorException.ErrorCode.CONFIGURATION_ERROR);
     } finally {
       if (d != null) {
         try {
