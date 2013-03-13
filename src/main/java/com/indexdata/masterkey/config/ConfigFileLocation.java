@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
  * Structure to hold all elements of the path leading to the config file,
  * including method for troubleshooting.
  */
-class ConfigFileLocation implements Serializable {
+public class ConfigFileLocation implements Serializable {
 
   private static final long serialVersionUID = 950891180639044889L;
     public static String MASTERKEY_ROOT_CONFIG_DIR;
@@ -48,14 +48,14 @@ class ConfigFileLocation implements Serializable {
 
     private void init(ServletContext context, String serverName, String configFileName) throws IOException {
         String rootConfigDir = context.getInitParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM);
+        checkMandatoryParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM, rootConfigDir);
         //look for sepcial paths that are relative to the servlet context
         if (rootConfigDir.startsWith("war://")) {
           MASTERKEY_ROOT_CONFIG_DIR = context.getRealPath(rootConfigDir.substring(6));
           logger.debug("MASTERKEY_ROOT_CONFIG is relative to servlet context, resolving as " + MASTERKEY_ROOT_CONFIG_DIR);
         } else {
           MASTERKEY_ROOT_CONFIG_DIR = rootConfigDir;
-        }
-        checkMandatoryParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM, MASTERKEY_ROOT_CONFIG_DIR);
+        }        
         this.componentDir = context.getInitParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM);
         checkMandatoryParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM, componentDir);
         if ( (configFileName != null) && ( !configFileName.isEmpty()) )
