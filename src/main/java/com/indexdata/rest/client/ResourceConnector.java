@@ -67,7 +67,7 @@ public class ResourceConnector<T> {
             } else {
                 throw new ResourceConnectionException("Cannot retrieve resource " + url.toString() + " - status code " + responseCode);
             }
-            Logger.getLogger(getClass()).debug("GET. Status" + responseCode +  "Location:" + conn.getHeaderField("Location"));
+            Logger.getLogger(getClass()).debug("GET " + url.toString() + ". Status: " + responseCode +  ". Location: " + conn.getHeaderField("Location"));
         } catch (JAXBException jaxbe) {
             throw new ResourceConnectionException("Get URL " + url.toString() + " failed: " + jaxbe.getMessage(), jaxbe);
         } catch (IOException ioe) {
@@ -103,7 +103,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot update resource " + url.toString() + " status code " + responseCode);
             }
-            Logger.getLogger(getClass()).debug("PUT. Status" + responseCode +  "Location:" + conn.getHeaderField("Location"));
+            Logger.getLogger(getClass()).debug("PUT " + url.toString() + ". Status: " + responseCode +  ". Location:" + conn.getHeaderField("Location"));
         } catch (JAXBException jaxbe) {
             throw new ResourceConnectionException("Put URL " + url.toString() + " failed: " + jaxbe.getMessage(), jaxbe);
         } catch (IOException ioe) {
@@ -131,7 +131,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot delete resource " + url.toString() + " - status code " + responseCode);
             }
-            Logger.getLogger(getClass()).debug("DELETE. Status" + responseCode +  "Location:" + conn.getHeaderField("Location"));
+            Logger.getLogger(getClass()).debug("DELETE "+ url.toString() + ". Status: " + responseCode +  ". Location: " + conn.getHeaderField("Location"));
         } catch (IOException ioe) {
             throw new ResourceConnectionException("Delete URL " + url.toString() + " failed: " + ioe.getMessage(), ioe);
         }
@@ -162,7 +162,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - status code " + responseCode);
             }        
-            Logger.getLogger(getClass()).debug("POST. Status: " + responseCode +  "Location:" + conn.getHeaderField("Location"));
+            Logger.getLogger(getClass()).debug("POST " + url.toString() + ". Status: " + responseCode +  ". Location: " + conn.getHeaderField("Location"));
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
             throw new ResourceConnectionException("Post URL " + url.toString() + " failed: " + ioe.getMessage(), ioe);
@@ -196,7 +196,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot create resource " + url.toString() + " - staus code " + responseCode);
             }
-            Logger.getLogger(getClass()).debug("POST Any. Status: " + responseCode +  "Location:" + conn.getHeaderField("Location"));
+            Logger.getLogger(getClass()).debug("POST Any " + url.toString() + ". Status: " + responseCode +  ". Location: " + conn.getHeaderField("Location"));
             return new URL(conn.getHeaderField("Location"));
         } catch (IOException ioe) {
             throw new ResourceConnectionException("PostAny URL " + url.toString() + " failed: " + ioe.getMessage(), ioe);
