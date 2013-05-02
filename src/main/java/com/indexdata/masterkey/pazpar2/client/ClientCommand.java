@@ -20,13 +20,11 @@ public class ClientCommand implements Serializable {
   private static Logger logger = Logger.getLogger(ClientCommand.class);
   public final static String CLIENT_WINDOW_ID_PARAMETER = "windowid";
   public final static String RECORD_FILTER_PARAMETER = "recordfilter";
-  public final static String RECORD_QUERY_PARAMETER = "recordquery";
-  public final static String BASE_RECORD_PARAMETER = "baserec";
+  public final static String RECORD_QUERY_PARAMETER = "recordquery";  
   public final static String TORUS_QUERY_PARAMETER = "torusquery";
   private String[] nonPz2Parameters = {
     CLIENT_WINDOW_ID_PARAMETER,
-    TORUS_QUERY_PARAMETER,
-    BASE_RECORD_PARAMETER,
+    TORUS_QUERY_PARAMETER,    
     RECORD_FILTER_PARAMETER,
     RECORD_QUERY_PARAMETER
   };
