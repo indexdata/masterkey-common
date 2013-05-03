@@ -798,9 +798,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
       throw new Pazpar2MalformedOutputException(se);
     } catch (IOException ioe) { //coming from sax parsing
       throw new Pazpar2MalformedOutputException(ioe);
-    } finally {
-      logger.error("Error processing record offset request, message passed on");
-    }
+    } 
     return doc;
   }
 
@@ -822,9 +820,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
       throw new Pazpar2MalformedOutputException(se);
     } catch (IOException ioe) { //coming from sax parsing
       throw new Pazpar2MalformedOutputException(ioe);
-    } finally {
-      logger.error("Error processing record offset request, message passed on");
-    }
+    } 
     return doc;
   }
 
