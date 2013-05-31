@@ -21,7 +21,7 @@ public class DateUtil {
   public static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
   
   public enum DateTimeFormat {
-    RFC, ISO
+    RFC, ISO, RFC_GMT
   }
 
   private static final ThreadLocal<DateFormat> rfcDateFormat =
@@ -29,6 +29,16 @@ public class DateUtil {
         @Override
         protected DateFormat initialValue() {
             DateFormat df = new SimpleDateFormat(RFC_DATE_FORMAT);
+            return df;
+        }
+    };
+  
+    private static final ThreadLocal<DateFormat> rfcDateFormatGMT =
+    new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            DateFormat df = new SimpleDateFormat(RFC_DATE_FORMAT);
+            df.setTimeZone(TimeZone.getTimeZone("GMT"));
             return df;
         }
     };
@@ -50,6 +60,7 @@ public class DateUtil {
   public static Date parse(String dateString, DateTimeFormat dtf) throws ParseException {
     switch (dtf) {
       case RFC: return rfcDateFormat.get().parse(dateString);
+      case RFC_GMT: return rfcDateFormatGMT.get().parse(dateString);
       case ISO: return ISOLikeDateParser.parse(dateString);
       default: throw new IllegalArgumentException("Unknown date format " + dtf);
     }
@@ -62,6 +73,7 @@ public class DateUtil {
   public static String serialize(Date date, DateTimeFormat dtf) throws ParseException {
     switch (dtf) {
       case RFC: return rfcDateFormat.get().format(date);
+      case RFC_GMT: return rfcDateFormatGMT.get().format(date);
       case ISO: return isoDateFormat.get().format(date);
       default: throw new IllegalArgumentException("Unknown date format " + dtf);
     }
