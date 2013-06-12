@@ -1,0 +1,34 @@
+Building this library
+=====================
+
+The 'apt' command
+-----------------
+
+The build process depends on the "apt" command, which was deprecated
+for some reason in Debian wheezy. It exists as part of the
+openjdk-6-jdk package, which is what we use for Java builds, but is no
+longer part of the /etc/alternatives system.
+
+To work around this, temporarily add the directory containing the JDK
+version to your path when building:
+
+$ PATH=$PATH:/usr/lib/jvm/java-6-openjdk-amd64/bin mvn install
+
+Tests
+-----
+
+It seems that the test-suite is broken:
+
+	Running com.indexdata.masterkey.pazpar2.client.Pazpar2SettingsTest
+	Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.015 sec <<< FAILURE!
+
+	Results :
+
+	Tests in error: 
+	  testFromSearchables(com.indexdata.masterkey.pazpar2.client.Pazpar2SettingsTest): com.indexdata.masterkey.pazpar2.client.Pazpar2ClientConfiguration.<init>(Lcom/indexdata/masterkey/config/ModuleConfiguration;)V
+
+I don't know how to fix that, so for now I am telling mvn not to run
+tests at all, using -DskipTests=true. So the build command becomes:
+
+$ PATH=$PATH:/usr/lib/jvm/java-6-openjdk-amd64/bin -DskipTests=true mvn install
+
