@@ -23,6 +23,8 @@ import com.indexdata.torus.Records;
 import com.indexdata.torus.layer.SearchableTypeLayer;
 import com.indexdata.utils.PerformanceLogger;
 import com.indexdata.utils.XmlUtils;
+import java.io.IOException;
+import java.io.StringReader;
 import org.w3c.dom.Node;
 
 /**
@@ -137,7 +139,14 @@ public class Pazpar2Settings {
     setSetting(id, "pz:name", l.getName(), excludeList);
     setSetting(id, "pz:xslt", l.getTransform(), excludeList);
     //fieldMap overrides xslt
-    if (l.getFieldMap() != null && !l.getFieldMap().isEmpty()) {
+    if (l.getLiteralTransform() != null && !l.getLiteralTransform().isEmpty()) {
+      try {
+        Document lT = XmlUtils.parse(new StringReader(l.getLiteralTransform()));
+        setXMLSetting(id, "pz:xslt", lT);
+      } catch (Exception ioe) {
+        logger.error("Cannot parse literalTransform", ioe);
+      }
+    } else if (l.getFieldMap() != null && !l.getFieldMap().isEmpty()) {
       try {
         FieldMapper mapper = new FieldMapper(l.getFieldMap());
         setXMLSetting(id, "pz:xslt", mapper.getStylesheet());
