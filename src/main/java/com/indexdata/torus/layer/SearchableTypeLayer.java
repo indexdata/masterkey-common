@@ -67,6 +67,16 @@ public class SearchableTypeLayer extends Layer {
   private String apduLog;
   private String maxRecords;
   private String placeHolds;
+  private String literalTransform;
+
+  public String getLiteralTransform() {
+    return literalTransform;
+  }
+
+  public void setLiteralTransform(String literalTransform) {
+    this.literalTransform = literalTransform;
+  }
+  
 
   public String getRecordEncoding() {
     return recordEncoding;
