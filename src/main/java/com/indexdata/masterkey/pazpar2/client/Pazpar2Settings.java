@@ -274,6 +274,18 @@ public class Pazpar2Settings {
       if (l.getCfProxy() != null) {
 	params.put("proxy", l.getCfProxy());
       }
+      //all others settings prefixed with cf_ are encoded too
+      if (l.getOtherElements() != null) {
+        for (Object obj : l.getOtherElements()) {
+          if (obj instanceof Element) {
+            Element element = (Element) obj;
+            if (element.getTagName().startsWith("cf_")) {
+              params.put(element.getTagName().substring(3), 
+                element.getTextContent());
+            }
+          }
+        }
+      }
       String sep = "?";
       for (Entry<String, String> e : params.entrySet()) {
 	try {
