@@ -290,9 +290,11 @@ public class Pazpar2Settings {
       for (Entry<String, String> e : params.entrySet()) {
 	try {
 	  zurl.append(sep);
-	  zurl.append(URLEncoder.encode(e.getKey(), "UTF-8"));
+	  zurl.append(URLEncoder.encode(e.getKey(), "UTF-8")
+            .replace("+", "%20"));
 	  zurl.append("=");
-	  zurl.append(URLEncoder.encode(e.getValue(), "UTF-8"));
+	  zurl.append(URLEncoder.encode(e.getValue(), "UTF-8")
+            .replace("+", "%20"));
 	  sep = "&";
 	} catch (UnsupportedEncodingException uee) {
 	  logger.warn("Cannot encode CF parameter (" + e.getKey() + "=" + e.getValue() + ", "
