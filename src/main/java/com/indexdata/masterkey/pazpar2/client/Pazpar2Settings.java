@@ -109,15 +109,18 @@ public class Pazpar2Settings {
       if (hostPortRegEx.matcher(l.getZurl()).matches()) {
         urlBuilder.append("/");
       }
-      //append RDP params
-      String extraPath = encodeRichDatabaseParameters("targetmap", l.getOtherElements());
-      if (extraPath != null) {
-        urlBuilder.append(",").append(extraPath);
-        logger.debug("Zurl appended with Rich Database Parameters: " + urlBuilder.toString());
-      }
       //append CF params, select appropriate authentication
       isCf = checkAndAppendCfParams(l, urlBuilder);
       auth = isCf ? l.getCfAuth() : l.getAuthentication();
+      //append RDP params
+      if (!isCf) {
+        String extraPath = encodeRichDatabaseParameters("targetmap", 
+          l.getOtherElements());  
+        if (extraPath != null) {
+          urlBuilder.append(",").append(extraPath);
+          logger.debug("Zurl appended with Rich Database Parameters: " + urlBuilder.toString());
+        }
+      }
       url = urlBuilder.toString();
     }
 
