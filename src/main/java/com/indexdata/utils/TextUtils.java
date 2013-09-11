@@ -71,15 +71,20 @@ public class TextUtils {
     br.close();
     os.write(sb.toString().getBytes());
   }
-
+  
   public static String readStream(InputStream stream) throws IOException {
+    return readStream(stream, "\n");
+  }
+
+  public static String readStream(InputStream stream, String newLineChar) throws IOException {
     BufferedReader br = new BufferedReader(new InputStreamReader(stream));
     StringBuilder sb = new StringBuilder();
     String line;
+    String sep = "";
     while ((line = br.readLine()) != null) {
-      sb.append(line).append("\n");
+      sb.append(sep).append(line);
+      sep = newLineChar;
     }
-
     br.close();
     return sb.toString();
   }
