@@ -43,9 +43,9 @@ import org.w3c.dom.Node;
  */
 public class Pazpar2Settings {
   //avoid re-parssing
-  private static class Setting {
-    String string;
-    Document xml;
+  protected static class Setting {
+    protected String string;
+    protected Document xml;
     Setting(Document xml) {
       this.xml = xml;
       this.string = "[XML encoded]"; //possibly serialize the XML here
@@ -53,8 +53,21 @@ public class Pazpar2Settings {
     Setting(String string) {
       this.string = string;
     }
+    public void setString(String string) {
+      this.string = string;
+    }
+    public void setXml(Document xml) {
+      this.xml = xml;
+      this.string = "[XML encoded]";
+    }
+    public String getString() {
+      return string;
+    }
+    public Document getXml() {
+      return xml;
+    }
   }
-  private Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
+  protected Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
   private static Logger logger = Logger.getLogger(Pazpar2Settings.class);
   private Pazpar2ClientConfiguration cfg;
   Pattern hostPortRegEx = Pattern.compile(".*:[0-9]*$");
@@ -99,7 +112,7 @@ public class Pazpar2Settings {
    * 
    * @param record target setting record
    */
-  public void loadSearchable(SearchableTypeLayer l) {
+  public String loadSearchable(SearchableTypeLayer l) {
     //build url
     String url = null, auth = null;
     boolean isCf = false;
@@ -134,7 +147,7 @@ public class Pazpar2Settings {
     if (id == null || id.isEmpty()) {
       logger.warn("Ignoring target specified in the configuration due to missing ID "
         + "("+l.getId()+") or URL ("+l.getZurl()+")");
-      return;
+      return null;
     }
     List<String> excludeList = new LinkedList<String>();
     setSetting(id, "pz:authentication", auth, excludeList);
@@ -143,6 +156,7 @@ public class Pazpar2Settings {
     setSetting(id, "pz:xslt", l.getTransform(), excludeList);
     //fieldMap overrides xslt
     if (l.getLiteralTransform() != null && !l.getLiteralTransform().isEmpty()) {
+      logger.debug("Setting literalTransform to pz:xslt: " + l.getLiteralTransform());
       try {
         Document lT = XmlUtils.parse(new StringReader(l.getLiteralTransform()));
         setXMLSetting(id, "pz:xslt", lT);
@@ -253,7 +267,8 @@ public class Pazpar2Settings {
 
     /* Now set all other pz_<name> as pz:<name> */
     setPzSettings(id, l.getOtherElements(), excludeList);
-
+    
+    return id;
   }
 
   /*
@@ -359,6 +374,11 @@ public class Pazpar2Settings {
       settings.put(targetId, setts);
     }
     setts.put(key, new Setting(value));
+    if (logger.isDebugEnabled())
+        logger.debug(new StringBuffer("setting on ")
+            .append(targetId).append(": ").append(key)
+            .append(":").append(value).toString());
+
     return true;
   }
 
