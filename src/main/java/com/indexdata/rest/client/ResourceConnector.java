@@ -15,6 +15,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 
 import com.indexdata.utils.PerformanceLogger;
+import com.indexdata.utils.TextUtils;
 
 /**
  * 
@@ -115,8 +116,8 @@ public class ResourceConnector<T> {
         try {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("DELETE");
-
             int responseCode = conn.getResponseCode();
+            //executes the request
             switch (responseCode) {
                 case 200:   //OK
                 case 201:   //Created
@@ -126,6 +127,9 @@ public class ResourceConnector<T> {
                 case 205:   //Reset
                 case 206:   //Partial
                     break;
+                case 400:
+                  String resp = TextUtils.readStream(conn.getErrorStream());
+                  throw new ResourceConnectionException(400, resp);
                 case 405:
                     throw new ResourceConnectionException("Cannot delete resource " + url.toString() + " - HTTP method not allowed (405)");
                 default:
