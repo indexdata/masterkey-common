@@ -34,6 +34,7 @@ public class SearchableTypeLayer extends Layer {
   private String cclMapJournalTitle;
   private String piggyback;
   private String authentication;
+  private String authenticationMode;
   private String urlRecipe;
   private String serviceProvider;
   private String categories;
@@ -230,6 +231,15 @@ public class SearchableTypeLayer extends Layer {
   public void setAuthentication(String authentication) {
     this.authentication = authentication;
   }
+  
+  public String getAuthenticationMode() {
+    return authenticationMode;
+  }
+
+  public void setAuthenticationMode(String authenticationMode) {
+    this.authenticationMode = authenticationMode;
+  }
+
 
   public String getUrlRecipe() {
     return urlRecipe;

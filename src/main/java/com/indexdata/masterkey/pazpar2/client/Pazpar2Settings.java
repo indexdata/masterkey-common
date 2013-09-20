@@ -151,6 +151,7 @@ public class Pazpar2Settings {
     }
     List<String> excludeList = new LinkedList<String>();
     setSetting(id, "pz:authentication", auth, excludeList);
+    setSetting(id, "pz:authenticationMode", l.getAuthenticationMode(), excludeList);
     setSetting(id, "pz:url", url, excludeList);
     setSetting(id, "pz:name", l.getName(), excludeList);
     setSetting(id, "pz:xslt", l.getTransform(), excludeList);
