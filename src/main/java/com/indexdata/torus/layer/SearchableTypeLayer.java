@@ -69,6 +69,7 @@ public class SearchableTypeLayer extends Layer {
   private String maxRecords;
   private String placeHolds;
   private String literalTransform;
+  private String contentConnector;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -456,6 +457,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setPlaceHolds(String placeHolds) {
     this.placeHolds = placeHolds;
+  }
+
+  public String getContentConnector() {
+    return contentConnector;
+  }
+
+  public void setContentConnector(String contentConnector) {
+    this.contentConnector = contentConnector;
   }
   
 }
