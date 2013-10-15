@@ -266,6 +266,8 @@ public class Pazpar2Settings {
     setSetting(id, "full_text_target", l.getFullTextTarget(), "NO", excludeList);
     setSetting(id, "place_holds", l.getPlaceHolds(), "no", excludeList);
     setSetting(id, "contentConnector",l.getContentConnector(),excludeList);
+    setSetting(id, "contentAuthentication",l.getContentAuthentication(),excludeList);
+    setSetting(id, "contentProxy",l.getContentProxy(),excludeList);
 
     /* Now set all other pz_<name> as pz:<name> */
     setPzSettings(id, l.getOtherElements(), excludeList);
