@@ -70,6 +70,8 @@ public class SearchableTypeLayer extends Layer {
   private String placeHolds;
   private String literalTransform;
   private String contentConnector;
+  private String contentAuthentication;
+  private String contentProxy;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -465,6 +467,22 @@ public class SearchableTypeLayer extends Layer {
 
   public void setContentConnector(String contentConnector) {
     this.contentConnector = contentConnector;
+  }
+  
+  public String getContentAuthentication() {
+    return contentAuthentication;
+  }
+
+  public void setContentAuthentication(String contentAuthentication) {
+    this.contentAuthentication = contentAuthentication;
+  }
+
+  public String getContentProxy() {
+    return contentProxy;
+  }
+
+  public void setContentProxy(String contentProxy) {
+    this.contentProxy = contentProxy;
   }
   
 }
