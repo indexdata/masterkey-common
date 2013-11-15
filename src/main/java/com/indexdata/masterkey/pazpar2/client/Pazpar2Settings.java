@@ -297,6 +297,12 @@ public class Pazpar2Settings {
       if (l.getCfProxy() != null) {
 	params.put("proxy", l.getCfProxy());
       }
+      if (l.getContentConnector()!= null) {
+        // If there is a content connector, switch of
+        // proxyfication in connector, let SP write the 
+        // p-file and proxify the URLs.
+        params.put("nocproxy","1");
+      }
       //all others settings prefixed with cf_ are encoded too
       if (l.getOtherElements() != null) {
         for (Object obj : l.getOtherElements()) {
