@@ -5,6 +5,7 @@
  */
 package com.indexdata.masterkey.pazpar2.client;
 
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -17,15 +18,13 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.indexdata.torus.Record;
 import com.indexdata.torus.Records;
 import com.indexdata.torus.layer.SearchableTypeLayer;
 import com.indexdata.utils.PerformanceLogger;
 import com.indexdata.utils.XmlUtils;
-import java.io.IOException;
-import java.io.StringReader;
-import org.w3c.dom.Node;
 
 /**
  * Manages Pazpar2Settings
