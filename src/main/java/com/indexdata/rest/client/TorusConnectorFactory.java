@@ -7,6 +7,7 @@
 package com.indexdata.rest.client;
 
 import com.indexdata.utils.TextUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,6 +18,7 @@ import java.net.URLEncoder;
  * @author jakub
  */
 public class TorusConnectorFactory {
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public static ResourceConnector getConnector(String torusURL, String prefix, String identityId, String queryParams, Class type) throws MalformedURLException {
     return new ResourceConnector(new URL(TorusConnectorFactory.getTorusURL(
       torusURL, prefix, identityId, queryParams)), type);
