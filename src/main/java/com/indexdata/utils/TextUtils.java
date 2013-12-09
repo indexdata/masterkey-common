@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,6 +115,19 @@ public class TextUtils {
         }
     }
     return map;
+  }
+  
+  public static String serializeParams(Map<String, String> recordParams) 
+    throws UnsupportedEncodingException {
+    StringBuilder sb = new StringBuilder();
+    String sep = "";
+    for (Map.Entry<String,String> kv : recordParams.entrySet()) {
+      sb.append(sep);
+      sb.append(URLEncoder.encode(kv.getKey(), "UTF-8")).append("=")
+        .append(URLEncoder.encode(kv.getValue(), "UTF-8"));
+      sep = "&";
+    }
+    return sb.toString();
   }
 
 }
