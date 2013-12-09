@@ -93,6 +93,7 @@ public class CronLine {
         Formatter f = new Formatter();
         f.format("%d %d %d %d %d", min, hr, mday, mon, wday);
         CronLine c = new CronLine(f.toString());
+        f.close();
         return c;        
     }
 

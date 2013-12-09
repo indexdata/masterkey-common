@@ -34,6 +34,7 @@ public class SearchableTypeLayer extends Layer {
   private String cclMapJournalTitle;
   private String piggyback;
   private String authentication;
+  private String authenticationMode;
   private String urlRecipe;
   private String serviceProvider;
   private String categories;
@@ -68,6 +69,10 @@ public class SearchableTypeLayer extends Layer {
   private String maxRecords;
   private String placeHolds;
   private String literalTransform;
+  private String contentConnector;
+  private String contentAuthentication;
+  private String contentProxy;
+  private String udb;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -230,6 +235,15 @@ public class SearchableTypeLayer extends Layer {
   public void setAuthentication(String authentication) {
     this.authentication = authentication;
   }
+  
+  public String getAuthenticationMode() {
+    return authenticationMode;
+  }
+
+  public void setAuthenticationMode(String authenticationMode) {
+    this.authenticationMode = authenticationMode;
+  }
+
 
   public String getUrlRecipe() {
     return urlRecipe;
@@ -447,5 +461,36 @@ public class SearchableTypeLayer extends Layer {
   public void setPlaceHolds(String placeHolds) {
     this.placeHolds = placeHolds;
   }
+
+  public String getContentConnector() {
+    return contentConnector;
+  }
+
+  public void setContentConnector(String contentConnector) {
+    this.contentConnector = contentConnector;
+  }
   
+  public String getContentAuthentication() {
+    return contentAuthentication;
+  }
+
+  public void setContentAuthentication(String contentAuthentication) {
+    this.contentAuthentication = contentAuthentication;
+  }
+
+  public String getContentProxy() {
+    return contentProxy;
+  }
+
+  public void setContentProxy(String contentProxy) {
+    this.contentProxy = contentProxy;
+  }
+
+  public String getUdb() {
+    return udb;
+  }
+
+  public void setUdb(String udb) {
+    this.udb = udb;
+  }
 }

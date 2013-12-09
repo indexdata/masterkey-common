@@ -15,6 +15,7 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Iterator;
 import java.util.Properties;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -249,6 +250,7 @@ public class XmlUtils {
       return sourceDocument.lookupPrefix(namespaceURI);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Iterator getPrefixes(String namespaceURI) {
       // not implemented yet

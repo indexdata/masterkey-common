@@ -1,14 +1,14 @@
 digraph callgraph {
      fontname="verdana";
      node [fontname="verdana"];
-     label="Process Architechture";
+     label="System Architecture";
      subgraph cluster_legend {
      	      label="Legend"
 	      Data[shape="circle", fontsize="9"];
 	      UI;
 	      Process[shape="box"];
      }
-     CF_Builder[label="CF Builder"];
+     CF_Builder[label="Connector Builder"];
      masterkey[label="MasterKey"];
      masterkey -> serviceProxy[label="PP2 protocol", fontname="verdana"];
      serviceProxy[label="Service\nProxy", shape=box];
@@ -21,7 +21,7 @@ digraph callgraph {
      TargetAdmin[label="MK2\nConsole"];
      TargetAdmin -> Torus[label="TWSP"];
      Torus -> Searchables;
-     Searchables[shape=circle, label="data"]];
+     Searchables[shape=circle, label="data"];
      Torus -> harvester:T4[label="TWSP"];
      Torus -> IRspyToroid[label="TWSP"];
      IRspyToroid -> Zebra[label="Z39.50"];
@@ -31,24 +31,28 @@ digraph callgraph {
      IRSpy_DB[label="data", shape=circle];
      IRSpy -> Zebra[label="Z39.50"];
      pazpar2 -> metaProxy[label="SRU/\nZ39.50"];
-     metaProxy[label="Metaproxy\n(optional)", shape="box"];
-     metaProxy -> cfz[label="SRU/\nZ39.50"];
+     metaProxy[label="{Metaproxy|ZOOM}", shape="record"];
+     metaProxy -> cfz[label="Z39.50"];
      metaProxy -> sruTarget[label="SRU"];
      metaProxy -> zTarget[label="Z39.50"];
+     metaProxy -> PrimoGW;
      zTarget[label="Z39.50\n Target", shape="box"];
      zTarget -> zData1;
      sruTarget -> zData3;
      cfz[shape="record", label="{cfz | cfengine}"];
      cfz -> Anything;
+     PrimoGW[shape="record", label="{GFS |<z3> PrimoGW}"];
      zData1[shape="circle", label="data"];
      zData3[shape="circle", label="data"];
+     primo[shape="record", label="Primo/Central"];
+     PrimoGW -> primo
      zTarget[shape="box"];
      sruTarget[label="SRU\nTarget", shape="box"];
      pazpar2[label="{Pazpar2|ZOOM}", shape="record"];
      metaProxy -> localIndex1[label="Z39.50"];
      localIndex1 -> Anything3;
      localIndex1[shape="record", label="{GFS |<z2> zebra2}"];
-     pazpar2 -> localIndex2[label="SOLR"];
+     metaProxy -> localIndex2[label="SOLR"];
      localIndex2[shape="record", label="{SOLR|Lucene}"];
      localIndex2 -> Anything4;
 
@@ -57,20 +61,20 @@ digraph callgraph {
      
      harvester[shape="record", label="Harvester|<T4> Torus"];
      harvester -> localIndex2;
-     cfRepo[label="CF\nRepo", shape=circle];
+     cfRepo[label="Connector\nRepo", shape=circle];
      cfz -> cfRepo;
      CF_Builder -> cfRepo;
      subgraph ui_rank {
 	rank=same; masterkey; TargetAdmin; CF_Builder; harvesterAdmin; IRSpy;
      	}
      subgraph {
-		rank = same; localIndex1; localIndex2; zTarget; Zebra; 
+		rank = same; localIndex1; localIndex2; zTarget; Zebra; PrimoGW;
      	}
      Anything[label="data", shape=circle];
      Anything3[label="data",shape=circle];
      Anything4[label="data",shape=circle];
      subgraph {
-		rank = same; Anything; Anything3; zData1; zData3; Anything4;
+		rank = same; Anything; Anything3; zData1; zData3; Anything4; primo;
 	}
 
 }

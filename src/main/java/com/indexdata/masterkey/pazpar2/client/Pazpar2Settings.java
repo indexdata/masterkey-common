@@ -5,6 +5,7 @@
  */
 package com.indexdata.masterkey.pazpar2.client;
 
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -17,15 +18,13 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.indexdata.torus.Record;
 import com.indexdata.torus.Records;
 import com.indexdata.torus.layer.SearchableTypeLayer;
 import com.indexdata.utils.PerformanceLogger;
 import com.indexdata.utils.XmlUtils;
-import java.io.IOException;
-import java.io.StringReader;
-import org.w3c.dom.Node;
 
 /**
  * Manages Pazpar2Settings
@@ -43,9 +42,9 @@ import org.w3c.dom.Node;
  */
 public class Pazpar2Settings {
   //avoid re-parssing
-  private static class Setting {
-    String string;
-    Document xml;
+  protected static class Setting {
+    protected String string;
+    protected Document xml;
     Setting(Document xml) {
       this.xml = xml;
       this.string = "[XML encoded]"; //possibly serialize the XML here
@@ -53,8 +52,21 @@ public class Pazpar2Settings {
     Setting(String string) {
       this.string = string;
     }
+    public void setString(String string) {
+      this.string = string;
+    }
+    public void setXml(Document xml) {
+      this.xml = xml;
+      this.string = "[XML encoded]";
+    }
+    public String getString() {
+      return string;
+    }
+    public Document getXml() {
+      return xml;
+    }
   }
-  private Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
+  protected Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
   private static Logger logger = Logger.getLogger(Pazpar2Settings.class);
   private Pazpar2ClientConfiguration cfg;
   Pattern hostPortRegEx = Pattern.compile(".*:[0-9]*$");
@@ -99,7 +111,7 @@ public class Pazpar2Settings {
    * 
    * @param record target setting record
    */
-  public void loadSearchable(SearchableTypeLayer l) {
+  public String loadSearchable(SearchableTypeLayer l) {
     //build url
     String url = null, auth = null;
     boolean isCf = false;
@@ -134,15 +146,17 @@ public class Pazpar2Settings {
     if (id == null || id.isEmpty()) {
       logger.warn("Ignoring target specified in the configuration due to missing ID "
         + "("+l.getId()+") or URL ("+l.getZurl()+")");
-      return;
+      return null;
     }
     List<String> excludeList = new LinkedList<String>();
     setSetting(id, "pz:authentication", auth, excludeList);
+    setSetting(id, "pz:authentication_mode", l.getAuthenticationMode(), excludeList);
     setSetting(id, "pz:url", url, excludeList);
     setSetting(id, "pz:name", l.getName(), excludeList);
     setSetting(id, "pz:xslt", l.getTransform(), excludeList);
     //fieldMap overrides xslt
     if (l.getLiteralTransform() != null && !l.getLiteralTransform().isEmpty()) {
+      logger.debug("Setting literalTransform to pz:xslt: " + l.getLiteralTransform());
       try {
         Document lT = XmlUtils.parse(new StringReader(l.getLiteralTransform()));
         setXMLSetting(id, "pz:xslt", lT);
@@ -250,10 +264,14 @@ public class Pazpar2Settings {
     setSetting(id, "secondary_request_syntax", l.getSecondaryRequestSyntax(), null, excludeList);
     setSetting(id, "full_text_target", l.getFullTextTarget(), "NO", excludeList);
     setSetting(id, "place_holds", l.getPlaceHolds(), "no", excludeList);
+    setSetting(id, "contentConnector",l.getContentConnector(),excludeList);
+    setSetting(id, "contentAuthentication",l.getContentAuthentication(),excludeList);
+    setSetting(id, "contentProxy",l.getContentProxy(),excludeList);
 
     /* Now set all other pz_<name> as pz:<name> */
     setPzSettings(id, l.getOtherElements(), excludeList);
-
+    
+    return id;
   }
 
   /*
@@ -277,6 +295,12 @@ public class Pazpar2Settings {
       }
       if (l.getCfProxy() != null) {
 	params.put("proxy", l.getCfProxy());
+      }
+      if (l.getContentConnector()!= null) {
+        // If there is a content connector, switch of
+        // proxyfication in connector, let SP write the 
+        // p-file and proxify the URLs.
+        params.put("nocproxy","1");
       }
       //all others settings prefixed with cf_ are encoded too
       if (l.getOtherElements() != null) {
@@ -359,6 +383,11 @@ public class Pazpar2Settings {
       settings.put(targetId, setts);
     }
     setts.put(key, new Setting(value));
+    if (logger.isDebugEnabled())
+        logger.debug(new StringBuffer("setting on ")
+            .append(targetId).append(": ").append(key)
+            .append(":").append(value).toString());
+
     return true;
   }
 
