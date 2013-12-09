@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -87,6 +91,29 @@ public class TextUtils {
     }
     br.close();
     return sb.toString();
+  }
+  
+  public static Map<String, String> parseQueryString(String queryString) 
+    throws UnsupportedEncodingException {
+    String[] pairs = queryString.split("&");
+    Map<String,String> map = new HashMap<String, String>(pairs.length);
+    for (String pair : pairs) {
+        int eq = pair.indexOf("=");
+        if (eq < 0) {
+            // key with no value
+            map.put(URLDecoder.decode(pair, "UTF-8"), "");
+        } else {
+            // key=value
+            String key = URLDecoder.decode(pair.substring(0, eq), "UTF-8");
+            if (eq+1 < pair.length()) {
+              String value = URLDecoder.decode(pair.substring(eq + 1), "UTF-8");
+              map.put(key, value);
+            } else {
+              map.put(key, "");
+            }
+        }
+    }
+    return map;
   }
 
 }
