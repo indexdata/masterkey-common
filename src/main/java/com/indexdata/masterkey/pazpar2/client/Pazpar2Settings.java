@@ -296,7 +296,7 @@ public class Pazpar2Settings {
       if (l.getCfProxy() != null) {
 	params.put("proxy", l.getCfProxy());
       }
-      if (l.getContentConnector()!= null) {
+      if (l.getContentConnector()!= null && !l.getContentConnector().isEmpty()) {
         // If there is a content connector, switch of
         // proxyfication in connector, let SP write the 
         // p-file and proxify the URLs.
