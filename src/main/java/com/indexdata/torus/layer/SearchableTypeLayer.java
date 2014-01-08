@@ -73,6 +73,7 @@ public class SearchableTypeLayer extends Layer {
   private String contentAuthentication;
   private String contentProxy;
   private String udb;
+  private String openAccess;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -493,4 +494,13 @@ public class SearchableTypeLayer extends Layer {
   public void setUdb(String udb) {
     this.udb = udb;
   }
+
+  public String getOpenAccess() {
+    return openAccess;
+  }
+
+  public void setOpenAccess(String openAccess) {
+    this.openAccess = openAccess;
+  }
+  
 }
