@@ -81,7 +81,6 @@ public class SearchableTypeLayer extends Layer {
   private String metaData;
   private String originalUrl;
 
-  @XmlAnyElement(lax=true)
   private List<DynamicElement> elements;
   
   public String getLiteralTransform() {
@@ -528,4 +527,13 @@ public class SearchableTypeLayer extends Layer {
     this.metaData = metaData;
   }
   
+  @XmlAnyElement
+  public List<DynamicElement> getDynamicElements() {
+      return elements;
+  }
+
+  public void setParameters(List<DynamicElement> elements) {
+      this.elements = elements;
+  }
+  	
 }
