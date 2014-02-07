@@ -52,7 +52,7 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
           return null;
       }
 
-      // 1. Build the JAXBElement to wrap the instance of Parameter.
+      // 1. Build the JAXBElement to wrap the instance of DynamicElement.
       QName rootElement = new QName(dynamicElement.getName());
       Object value = dynamicElement.getValue();
       Class<?> type = value.getClass();
@@ -85,7 +85,7 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
       @SuppressWarnings("rawtypes")
       JAXBElement jaxbElement = unmarshaller.unmarshal(source, type);
 
-      // 3. Build the instance of Parameter
+      // 3. Build the instance of Element
       DynamicElement dynamicElement = new DynamicElement();
       dynamicElement.setName(element.getLocalName());
       dynamicElement.setValue(jaxbElement.getValue());
