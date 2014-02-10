@@ -10,7 +10,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
@@ -68,10 +70,15 @@ public class SearchableTypeLayerTest {
     doc.getDocumentElement().appendChild(layer);
     XmlUtils.appendTextNode(layer, "cclmap_au", "1=author");
     XmlUtils.appendTextNode(layer, "cclmap_term", "1=text");
-    XmlUtils.appendTextNode(layer, "facetmap_author", "author");
-    //XmlUtils.appendTextNode(layer, "limitmap_author", "rpn: @attr 1=author @attr 6=3");
+    String values[][] = {{ "facetmap_author", "author" },
+			 {"limitmap_author", "rpn: @attr 1=author @attr 6=3"}};
+    Map<String, String> testValues = new HashMap<String, String>();
+    for (String[] keyValue : values) {
+      XmlUtils.appendTextNode(layer, keyValue[0], keyValue[1]);
+      testValues.put(keyValue[0], keyValue[1]);
+    }
     XmlUtils.appendTextNode(layer, "categories", "id_openaccess");
-    //XmlUtils.appendTextNode(layer, "categories", "id_other");
+    XmlUtils.appendTextNode(layer, "categories", "id_other");
     try {
       Properties prop = new Properties();
       prop.setProperty("indent", "YES");
@@ -94,10 +101,11 @@ public class SearchableTypeLayerTest {
     assertEquals("1=author", stl.getCclMapAu());
     assertEquals("1=text",   stl.getCclMapTerm());
     
-    Collection<DynamicElement> facetmap_author = stl.getDynamicElements();
-    assertTrue("Wrong count: " + facetmap_author.size(), facetmap_author.size() == 1);
-    for (DynamicElement  element:facetmap_author) {
-      assertTrue("Wrong facetmap (Author)", "author".equals(element.getValue()));
+    Collection<DynamicElement> dynamicElements = stl.getDynamicElements();
+    assertTrue("Wrong count: " + dynamicElements.size(), dynamicElements.size() == testValues.size());
+    for (DynamicElement  element :dynamicElements) {
+      String value = testValues.get(element.getName());
+      assertTrue("Value differs for " + element.getName(), element.getValue().equals(value));
     }
   }
 
