@@ -5,11 +5,8 @@
  */
 package com.indexdata.torus.layer;
 
-import java.util.List;
-
 import com.indexdata.torus.Layer;
 
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -78,11 +75,7 @@ public class SearchableTypeLayer extends Layer {
   private String contentProxy;
   private String udb;
   private String openAccess;
-  private String metaData;
-  private String originalUrl;
 
-  private List<DynamicElement> elements;
-  
   public String getLiteralTransform() {
     return literalTransform;
   }
@@ -509,31 +502,6 @@ public class SearchableTypeLayer extends Layer {
 
   public void setOpenAccess(String openAccess) {
     this.openAccess = openAccess;
-  }
-
-  public String getOriginalUrl() {
-    return originalUrl;
-  }
-
-  public void setOriginalUrl(String originalUrl) {
-    this.originalUrl = originalUrl;
-  }
-
-  public String getMetaData() {
-    return metaData;
-  }
-
-  public void setMetaData(String metaData) {
-    this.metaData = metaData;
-  }
-  
-  @XmlAnyElement
-  public List<DynamicElement> getDynamicElements() {
-      return elements;
-  }
-
-  public void setParameters(List<DynamicElement> elements) {
-      this.elements = elements;
   }
   	
 }
