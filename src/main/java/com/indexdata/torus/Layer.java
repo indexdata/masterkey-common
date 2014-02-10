@@ -22,6 +22,7 @@ public abstract class Layer {
     private String id;
     private String layerName;
     private List<Object> otherElements;
+    @XmlAnyElement
     private List<DynamicElement> elements;
 
     
