@@ -8,6 +8,7 @@ package com.indexdata.masterkey.pazpar2.client;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.w3c.dom.Node;
 
 import com.indexdata.torus.Record;
 import com.indexdata.torus.Records;
+import com.indexdata.torus.layer.DynamicElement;
 import com.indexdata.torus.layer.SearchableTypeLayer;
 import com.indexdata.utils.PerformanceLogger;
 import com.indexdata.utils.XmlUtils;
@@ -126,8 +128,7 @@ public class Pazpar2Settings {
       auth = isCf ? l.getCfAuth() : l.getAuthentication();
       //append RDP params
       if (!isCf) {
-        String extraPath = encodeRichDatabaseParameters("targetmap", 
-          l.getOtherElements());  
+        String extraPath = encodeRichDatabaseParameters("targetmap",  l.getDynamicElements());  
         if (extraPath != null) {
           urlBuilder.append(",").append(extraPath);
           logger.debug("Zurl appended with Rich Database Parameters: " + urlBuilder.toString());
@@ -202,7 +203,7 @@ public class Pazpar2Settings {
       }
     }
 
-    setPrefixedSettings(id, "cclmap", l.getOtherElements());
+    setPrefixedSettings(id, "cclmap", l.getDynamicElements());
     //the following are the default that we support, the key is configurable
     //through SP config
     setSetting(id, "pz:cclmap:"+cfg.CCLMAP_TERM_KEY,
@@ -226,15 +227,15 @@ public class Pazpar2Settings {
     if (!"term".equals(cfg.CCLMAP_TERM_KEY))
       setSetting(id, "pz:cclmap:term", l.getCclMapTerm(), cfg.CCLMAP_TERM, excludeList);
 
-    setPrefixedSettings(id, "facetmap", l.getOtherElements());
+    setPrefixedSettings(id, "facetmap", l.getDynamicElements());
 
     /*
      * Values: Attribute list or cclmap reference for how to query when
      * limiting a field
      */
-    setPrefixedSettings(id, "limitmap", l.getOtherElements());
+    setPrefixedSettings(id, "limitmap", l.getDynamicElements());
 
-    setPrefixedSettings(id, "sortmap", l.getOtherElements());
+    setPrefixedSettings(id, "sortmap", l.getDynamicElements());
 
     setSetting(id, "pz:sru", l.getSRU(), excludeList);
     setSetting(id, "pz:sru_version", l.getSruVersion(), excludeList);
@@ -269,7 +270,7 @@ public class Pazpar2Settings {
     setSetting(id, "contentProxy",l.getContentProxy(),excludeList);
 
     /* Now set all other pz_<name> as pz:<name> */
-    setPzSettings(id, l.getOtherElements(), excludeList);
+    setPzSettings(id, l.getDynamicElements(), excludeList);
     
     return id;
   }
@@ -303,15 +304,12 @@ public class Pazpar2Settings {
         params.put("nocproxy","1");
       }
       //all others settings prefixed with cf_ are encoded too
-      if (l.getOtherElements() != null) {
-        for (Object obj : l.getOtherElements()) {
-          if (obj instanceof Element) {
-            Element element = (Element) obj;
-            if (element.getTagName().startsWith("cf_")) {
-              params.put(element.getTagName().substring(3), 
-                element.getTextContent());
-            }
-          }
+      if (l.getDynamicElements() != null) {
+        for (DynamicElement element: l.getDynamicElements()) {
+          if (element.getName().startsWith("cf_")) {
+            params.put(element.getName().substring(3), 
+        	element.getValue().toString());
+          }	
         }
       }
       String sep = "?";
@@ -336,25 +334,24 @@ public class Pazpar2Settings {
     }
   }
 
-  private String encodeRichDatabaseParameters(String mapPrefix, List<Object> otherElements) {
+  private String encodeRichDatabaseParameters(String mapPrefix, Collection<DynamicElement> otherElements) {
     if (otherElements == null) return null;
     StringBuffer richDatabaseParameters = new StringBuffer("");
-    for (Object obj : otherElements) {
-      if (obj instanceof Element) {
-	Element element = (Element) obj;
-	if (element.getTagName().startsWith(mapPrefix + "_")) {
-	  String parameterName = element.getTagName().substring(mapPrefix.length() + 1);
-	  // logger.trace("Parameter for " + mapPrefix + ": " + parameterName + " Value: " + element.getTextContent());
-	  if (richDatabaseParameters.length() > 0)
-	    richDatabaseParameters.append("&");
-	  try {
-	    richDatabaseParameters.append(URLEncoder.encode(parameterName, "UTF-8"));
-	    richDatabaseParameters.append("=");
-	    richDatabaseParameters.append(URLEncoder.encode(element.getTextContent(), "UTF-8"));
-	  } catch (UnsupportedEncodingException uee) {
-	    logger.warn("Cannot encode CF parameter (" + parameterName + "="
-		+ element.getTextContent() + ", " + uee.getMessage());
-	  }
+    for (DynamicElement element : otherElements) {
+      if (element.getName().startsWith(mapPrefix + "_")) {
+	String parameterName = element.getName().substring(mapPrefix.length() + 1);
+	// logger.trace("Parameter for " + mapPrefix + ": " + parameterName +
+	// " Value: " + element.getTextContent());
+	if (richDatabaseParameters.length() > 0)
+	  richDatabaseParameters.append("&");
+	try {
+	  richDatabaseParameters.append(URLEncoder.encode(parameterName, "UTF-8"));
+	  richDatabaseParameters.append("=");
+	  // TODO Should use the unmarshall on getValue()
+	  richDatabaseParameters.append(URLEncoder.encode(element.getValue().toString(), "UTF-8"));
+	} catch (UnsupportedEncodingException uee) {
+	  logger.warn("Cannot encode CF parameter (" + parameterName + "="
+	      + element.getValue().toString() + ", " + uee.getMessage());
 	}
       }
     }
@@ -448,15 +445,12 @@ public class Pazpar2Settings {
   /**
    * setPrefixedSetttings: set a value of maps based on prefix
    */
-  protected void setPrefixedSettings(String targetId, String mapPrefix, List<Object> elements) {
+  protected void setPrefixedSettings(String targetId, String mapPrefix, Collection<DynamicElement> elements) {
     if (elements == null) return;
-    for (Object obj : elements) {
-      if (obj instanceof Element) {
-	Element element = (Element) obj;
-	if (element.getTagName().startsWith(mapPrefix + "_")) {
-	  String pzName = "pz:" + element.getTagName().replace("_", ":");
-	  setSetting(targetId, pzName, element.getTextContent(), null);
-	}
+    for (DynamicElement element : elements) {
+      if (element.getName().startsWith(mapPrefix + "_")) {
+	String pzName = "pz:" + element.getName().replace("_", ":");
+	setSetting(targetId, pzName, element.getValue().toString(), null);
       }
     }
   }
@@ -464,24 +458,21 @@ public class Pazpar2Settings {
   /**
    * setPrefixedSetttings: set a value of maps based on prefix
    */
-  protected void setPzSettings(String targetId, List<Object> elements, List<String> excludes) {
-    if (elements == null) return;
-    for (Object obj : elements) {
-      if (obj instanceof Element) {
-	Element element = (Element) obj;
-	if (element.getTagName().startsWith("pz_")) {
-	  String pzName = element.getTagName().replaceFirst("pz_", "pz:");
-	  if (!excludes.contains(pzName))
-	    setSetting(targetId, pzName, element.getTextContent(), null); 
-	  else {
-	    logger.warn("Ignored " + pzName + "=" + element.getTextContent());
-	  }
+  protected void setPzSettings(String targetId, Collection<DynamicElement> elements,
+      Collection<String> excludes) {
+    if (elements == null)
+      return;
+    for (DynamicElement element : elements) {
+      if (element.getName().startsWith("pz_")) {
+	String pzName = element.getName().replaceFirst("pz_", "pz:");
+	if (!excludes.contains(pzName))
+	  setSetting(targetId, pzName, element.getValue().toString(), null);
+	else {
+	  logger.warn("Ignored " + pzName + "=" + element.getValue().toString());
 	}
       }
     }
-  }
-
-  
+  }  
   
   public String encode()
       throws UnsupportedEncodingException {
