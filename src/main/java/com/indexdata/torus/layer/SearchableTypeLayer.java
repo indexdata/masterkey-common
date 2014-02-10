@@ -5,13 +5,10 @@
  */
 package com.indexdata.torus.layer;
 
-import java.util.List;
-
-import com.indexdata.torus.Layer;
-
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.indexdata.torus.Layer;
 
 /**
  * A "definition" of the searchable type.
@@ -81,8 +78,6 @@ public class SearchableTypeLayer extends Layer {
   private String metaData;
   private String originalUrl;
 
-  private List<DynamicElement> elements;
-  
   public String getLiteralTransform() {
     return literalTransform;
   }
@@ -526,14 +521,4 @@ public class SearchableTypeLayer extends Layer {
   public void setMetaData(String metaData) {
     this.metaData = metaData;
   }
-  
-  @XmlAnyElement
-  public List<DynamicElement> getDynamicElements() {
-      return elements;
-  }
-
-  public void setParameters(List<DynamicElement> elements) {
-      this.elements = elements;
-  }
-  	
 }
