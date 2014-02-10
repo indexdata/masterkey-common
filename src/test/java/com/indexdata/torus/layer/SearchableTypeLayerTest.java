@@ -5,22 +5,17 @@
  */
 package com.indexdata.torus.layer;
 
-import com.indexdata.torus.Layer;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.List;
-
-import com.indexdata.torus.Record;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
-import com.indexdata.utils.XmlUtils;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.TransformerException;
 
 import org.junit.After;
@@ -28,8 +23,12 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import static org.junit.Assert.*;
+import com.indexdata.torus.Layer;
+import com.indexdata.torus.Record;
+import com.indexdata.utils.XmlUtils;
 
 /**
  *
@@ -44,6 +43,7 @@ public class SearchableTypeLayerTest {
   @BeforeClass
   public static void setUpClass() throws Exception {
     jaxbCtx = JAXBContext.newInstance("com.indexdata.torus.layer:com.indexdata.torus");
+    //DynamicElement.class, Layer.class, Record.class, Records.class, CategoryTypeLayer.class, IdentityTypeLayer.class, SearchableTypeLayer.class
   }
 
   @AfterClass
@@ -56,40 +56,6 @@ public class SearchableTypeLayerTest {
 
   @After
   public void tearDown() {
-  }
-
-
-  /**
-   * Tests unmarshalling of identity records containing 'searchablesRealm'
-   * and 'categoriesRealm' fields
-   */
-  @Test
-  public void testNewFormIdentityLayer() {
-    Document doc = XmlUtils.newDoc("record");
-    doc.getDocumentElement().setAttribute("type", "identity");
-    Element layer = doc.createElement("layer");
-    layer.setAttribute("name", "override");
-    layer.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:type", "identityTypeLayer");
-    doc.getDocumentElement().appendChild(layer);
-    XmlUtils.appendTextNode(layer, "displayName", "Test Identity");
-    XmlUtils.appendTextNode(layer, "searchablesRealm", "my_library-searchables");
-    XmlUtils.appendTextNode(layer, "categoriesRealm", "my_library-categories");
-    XmlUtils.appendTextNode(layer, "userName", "user");
-    XmlUtils.appendTextNode(layer, "password", "pass");
-    Record rec = null;
-    try {
-       Unmarshaller unmarshall = jaxbCtx.createUnmarshaller();
-       unmarshall.setAdapter(new DynamicElementAdapter(jaxbCtx));
-       rec = (Record) unmarshall.unmarshal(doc);
-      
-    } catch (JAXBException ex) {
-      fail("Unmarshalling failed: " + ex.getMessage());
-    }
-    List<Layer> layers = rec.getLayers();
-    IdentityTypeLayer itl = (IdentityTypeLayer) layers.get(0);
-    assertEquals(null, itl.getIdentityId());
-    assertEquals("my_library-searchables", itl.getSearchablesRealm());
-    assertEquals("my_library-categories", itl.getCategoriesRealm());
   }
 
   @Test
@@ -107,15 +73,18 @@ public class SearchableTypeLayerTest {
     XmlUtils.appendTextNode(layer, "categories", "id_openaccess");
     //XmlUtils.appendTextNode(layer, "categories", "id_other");
     try {
-      XmlUtils.serialize(doc, System.out);
+      Properties prop = new Properties();
+      prop.setProperty("indent", "YES");
+      XmlUtils.serialize(doc, System.out, prop);
     } catch (TransformerException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
     Record rec = null;
     try {
+      DynamicElementAdapter adapter = new DynamicElementAdapter(jaxbCtx);
       Unmarshaller unmarshall = jaxbCtx.createUnmarshaller();
-      unmarshall.setAdapter(new DynamicElementAdapter(jaxbCtx));
+      unmarshall.setAdapter(adapter);
       rec = (Record) unmarshall.unmarshal(doc);
     } catch (JAXBException ex) {
       fail("Unmarshalling failed: " + ex.getMessage());
@@ -125,17 +94,6 @@ public class SearchableTypeLayerTest {
     assertEquals("1=author", stl.getCclMapAu());
     assertEquals("1=text",   stl.getCclMapTerm());
     
-/*
-    List<Object> otherElements  = stl.getOtherElements();
-    assertTrue("Wrong count: " + otherElements.size(), otherElements.size() > 0);
-    for (Object obj: otherElements) {
-      if (obj instanceof Element) {
-	Element element = (Element) obj;
-	System.out.print(element.getNodeName() + ":" + element.getTextContent() + "\n"); 
-      }
-    }
- */
-
     Collection<DynamicElement> facetmap_author = stl.getDynamicElements();
     assertTrue("Wrong count: " + facetmap_author.size(), facetmap_author.size() == 1);
     for (DynamicElement  element:facetmap_author) {
@@ -143,36 +101,4 @@ public class SearchableTypeLayerTest {
     }
   }
 
-  /**
-   * Tests unmarshalling of identity records containing both 'identityId' AND
-   * 'searchablesRealm', 'categoriesRealm' fields (*Realm fields take precedence)
-   */
-  @Test
-  public void testBothIdentityLayer() {
-    Document doc = XmlUtils.newDoc("record");
-    doc.getDocumentElement().setAttribute("type", "identity");
-    Element layer = doc.createElement("layer");
-    layer.setAttribute("name", "override");
-    layer.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:type", "identityTypeLayer");
-    doc.getDocumentElement().appendChild(layer);
-    XmlUtils.appendTextNode(layer, "displayName", "Test Identity");
-    XmlUtils.appendTextNode(layer, "displayName", "Test Identity");
-    XmlUtils.appendTextNode(layer, "identityId", "my_library");
-    XmlUtils.appendTextNode(layer, "searchablesRealm", "my_library-searchables");
-    XmlUtils.appendTextNode(layer, "categoriesRealm", "my_library-categories");
-    XmlUtils.appendTextNode(layer, "userName", "user");
-    XmlUtils.appendTextNode(layer, "password", "pass");
-    Record rec = null;
-    try {
-      rec =
-        (Record) jaxbCtx.createUnmarshaller().unmarshal(doc);
-    } catch (JAXBException ex) {
-      fail("Unmarshalling failed: " + ex.getMessage());
-    }
-    List<Layer> layers = rec.getLayers();
-    IdentityTypeLayer itl = (IdentityTypeLayer) layers.get(0);
-    assertEquals("my_library", itl.getIdentityId());
-    assertEquals("my_library-searchables", itl.getSearchablesRealm());
-    assertEquals("my_library-categories", itl.getCategoriesRealm());
-  }
 }
