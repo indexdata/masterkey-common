@@ -69,7 +69,6 @@ public abstract class Layer {
         this.otherElements = otherElements;
     } 
 
-    @XmlAnyElement
     public List<DynamicElement> getDynamicElements() {
         return elements;
     }
