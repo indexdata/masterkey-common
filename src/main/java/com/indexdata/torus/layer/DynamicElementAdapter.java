@@ -51,7 +51,6 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
       if (null == dynamicElement) {
           return null;
       }
-
       // 1. Build the JAXBElement to wrap the instance of DynamicElement.
       QName rootElement = new QName(dynamicElement.getName());
       Object value = dynamicElement.getValue();
@@ -66,7 +65,8 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
       Element element = document.getDocumentElement();
 
       // 3.  Set the type attribute based on the value's type.
-      element.setAttribute("type", type.getName());
+      if (! type.getName().equals("java.lang.String"))
+	element.setAttribute("type", type.getName());
       return element;
   }
 
@@ -77,7 +77,9 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
       }
 
       // 1. Determine the values type from the type attribute.
-      Class<?> type = classLoader.loadClass(element.getAttribute("type"));
+      Class<?> type = String.class;
+      if (element.getAttribute("type") != null)
+	type = classLoader.loadClass(element.getAttribute("type"));
 
       // 2. Unmarshal the element based on the value's type.
       DOMSource source = new DOMSource(element);
