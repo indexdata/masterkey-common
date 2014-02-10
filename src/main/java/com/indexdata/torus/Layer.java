@@ -25,6 +25,7 @@ public abstract class Layer {
     private String id;
     private String layerName;
     private List<Object> otherElements;
+    @XmlAnyElement
     private List<DynamicElement> elements;
         
     public Layer() {
@@ -78,7 +79,6 @@ public abstract class Layer {
         this.otherElements = otherElements;
     }
 
-    @XmlAnyElement
     public Collection<DynamicElement> getDynamicElements() {
         return elements;
     }
