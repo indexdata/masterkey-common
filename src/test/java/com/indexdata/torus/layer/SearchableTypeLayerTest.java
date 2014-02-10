@@ -13,6 +13,7 @@ import java.util.List;
 import com.indexdata.torus.Record;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
@@ -77,8 +78,10 @@ public class SearchableTypeLayerTest {
     XmlUtils.appendTextNode(layer, "password", "pass");
     Record rec = null;
     try {
-      rec =
-        (Record) jaxbCtx.createUnmarshaller().unmarshal(doc);
+       Unmarshaller unmarshall = jaxbCtx.createUnmarshaller();
+       unmarshall.setAdapter(new DynamicElementAdapter(jaxbCtx));
+       rec = (Record) unmarshall.unmarshal(doc);
+      
     } catch (JAXBException ex) {
       fail("Unmarshalling failed: " + ex.getMessage());
     }
@@ -111,8 +114,9 @@ public class SearchableTypeLayerTest {
     }
     Record rec = null;
     try {
-      rec =
-        (Record) jaxbCtx.createUnmarshaller().unmarshal(doc);
+      Unmarshaller unmarshall = jaxbCtx.createUnmarshaller();
+      unmarshall.setAdapter(new DynamicElementAdapter(jaxbCtx));
+      rec = (Record) unmarshall.unmarshal(doc);
     } catch (JAXBException ex) {
       fail("Unmarshalling failed: " + ex.getMessage());
     }
@@ -120,8 +124,19 @@ public class SearchableTypeLayerTest {
     SearchableTypeLayer stl = (SearchableTypeLayer) layers.get(0);
     assertEquals("1=author", stl.getCclMapAu());
     assertEquals("1=text",   stl.getCclMapTerm());
+    
+/*
+    List<Object> otherElements  = stl.getOtherElements();
+    assertTrue("Wrong count: " + otherElements.size(), otherElements.size() > 0);
+    for (Object obj: otherElements) {
+      if (obj instanceof Element) {
+	Element element = (Element) obj;
+	System.out.print(element.getNodeName() + ":" + element.getTextContent() + "\n"); 
+      }
+    }
+ */
 
-    Collection<DynamicElement> facetmap_author = stl.getElement("facetmap_author");
+    Collection<DynamicElement> facetmap_author = stl.getDynamicElements();
     assertTrue("Wrong count: " + facetmap_author.size(), facetmap_author.size() == 1);
     for (DynamicElement  element:facetmap_author) {
       assertTrue("Wrong facetmap (Author)", "author".equals(element.getValue()));
