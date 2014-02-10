@@ -13,6 +13,15 @@ public class DynamicElement {
       return name;
   }
 
+  public DynamicElement() {
+    
+  }
+    
+  public DynamicElement(String name, Object value) {
+    this.name = name;
+    this.value = value;
+  }
+  
   public void setName(String name) {
       this.name = name;
   }
