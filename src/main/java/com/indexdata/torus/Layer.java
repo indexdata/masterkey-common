@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.indexdata.torus.layer.DynamicElement;
+
 /**
  * Represents a single abstract layer within a record.
  * @author jakub
@@ -20,7 +22,9 @@ public abstract class Layer {
     private String id;
     private String layerName;
     private List<Object> otherElements;
-        
+    private List<DynamicElement> elements;
+
+    
     public Layer() {
     }
 
@@ -55,12 +59,22 @@ public abstract class Layer {
      * of this class.
      * @return a list of Elements or JAXBElements objects
      */
-    @XmlAnyElement
+    
     public List<Object> getOtherElements() {
         return otherElements;
     }
 
     public void setOtherElements(List<Object> otherElements) {
         this.otherElements = otherElements;
-    }    
+    } 
+
+    @XmlAnyElement
+    public List<DynamicElement> getDynamicElements() {
+        return elements;
+    }
+
+    public void setParameters(List<DynamicElement> elements) {
+        this.elements = elements;
+    }
+
 }
