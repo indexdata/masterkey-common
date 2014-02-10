@@ -6,7 +6,9 @@
 
 package com.indexdata.torus;
 
+import java.util.Collection;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -23,7 +25,7 @@ public abstract class Layer {
     private String layerName;
     private List<Object> otherElements;
     @XmlAnyElement
-    private List<DynamicElement> elements;
+    private Collection<DynamicElement> elements;
 
     
     public Layer() {
@@ -61,15 +63,17 @@ public abstract class Layer {
      * @return a list of Elements or JAXBElements objects
      */
     
+    @Deprecated
     public List<Object> getOtherElements() {
         return otherElements;
     }
 
+    @Deprecated
     public void setOtherElements(List<Object> otherElements) {
         this.otherElements = otherElements;
     } 
 
-    public List<DynamicElement> getDynamicElements() {
+    public Collection<DynamicElement> getDynamicElements() {
         return elements;
     }
 
