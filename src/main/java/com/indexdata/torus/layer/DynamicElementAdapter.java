@@ -77,8 +77,9 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
       }
 
       // 1. Determine the values type from the type attribute.
-      Class<?> type = String.class;
-      if (element.getAttribute("type") != null)
+      Class<?> type = String.class; 
+      String typeString = element.getAttribute("type");
+      if (typeString != null && ! "".equals(typeString)) 
 	type = classLoader.loadClass(element.getAttribute("type"));
 
       // 2. Unmarshal the element based on the value's type.

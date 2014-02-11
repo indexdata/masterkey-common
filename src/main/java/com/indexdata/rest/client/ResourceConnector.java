@@ -104,7 +104,7 @@ public class ResourceConnector<T> {
                 default:
                     throw new ResourceConnectionException("Cannot update resource " + url.toString() + " status code " + responseCode);
             }
-            Logger.getLogger(getClass()).debug("PUT " + url.toString() + ". Status: " + responseCode +  ". Location:" + conn.getHeaderField("Location"));
+            Logger.getLogger(getClass()).debug("PUT " + url.toString() + ". Status: " + responseCode +  ". Location: " + conn.getHeaderField("Location"));
         } catch (JAXBException jaxbe) {
             throw new ResourceConnectionException("Put URL " + url.toString() + " failed: " + jaxbe.getMessage(), jaxbe);
         } catch (IOException ioe) {

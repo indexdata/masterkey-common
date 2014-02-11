@@ -5,10 +5,9 @@
  */
 package com.indexdata.torus.layer;
 
-import com.indexdata.torus.Layer;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.indexdata.torus.Layer;
 
 /**
  * A "definition" of the searchable type.
@@ -503,5 +502,5 @@ public class SearchableTypeLayer extends Layer {
   public void setOpenAccess(String openAccess) {
     this.openAccess = openAccess;
   }
-  	
+
 }

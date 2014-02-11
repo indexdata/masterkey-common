@@ -26,8 +26,8 @@ public abstract class Layer {
     private String layerName;
     private List<Object> otherElements;
     @XmlAnyElement
-    private List<DynamicElement> elements;
-        
+    private Collection<DynamicElement> elements;
+
     public Layer() {
     }
 
@@ -65,6 +65,7 @@ public abstract class Layer {
      * of this class.
      * @return a list of Elements or JAXBElements objects
      */
+
     @Deprecated
     public List<Object> getOtherElements() {
         return otherElements;
