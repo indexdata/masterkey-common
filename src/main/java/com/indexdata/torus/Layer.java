@@ -10,11 +10,15 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.w3c.dom.Element;
+
 import com.indexdata.torus.layer.DynamicElement;
+import com.indexdata.torus.layer.DynamicElementAdapter;
 
 /**
  * Represents a single abstract layer within a record.
@@ -24,7 +28,6 @@ import com.indexdata.torus.layer.DynamicElement;
 public abstract class Layer {
     private String id;
     private String layerName;
-    private List<Object> otherElements;
     @XmlAnyElement
     private List<DynamicElement> elements;
 
@@ -68,16 +71,40 @@ public abstract class Layer {
 
     @Deprecated
     public List<Object> getOtherElements() {
-        return otherElements;
+        DynamicElementAdapter adapter = new DynamicElementAdapter();
+        List<Object> elementList = new LinkedList<Object>();
+        for (DynamicElement dynamicElement : elements) {
+          try {
+	    elementList.add(adapter.marshal(dynamicElement));
+	  } catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	  }
+        }
+      	return elementList;
     }
 
     /**
      * Use DynamicsElements or set/add Element
      * @param otherElements
      */
+    @SuppressWarnings("rawtypes")
     @Deprecated
     public void setOtherElements(List<Object> otherElements) {
-        this.otherElements = otherElements;
+      DynamicElementAdapter adapter = new DynamicElementAdapter();
+      List<DynamicElement> dynamicElements = new LinkedList<DynamicElement>();
+      for (Object object : otherElements) {
+        try {
+          if (object instanceof Element)
+            dynamicElements.add(adapter.unmarshal((Element) object));
+          else if (object instanceof JAXBElement)
+            dynamicElements.add(adapter.unmarshal((JAXBElement) object));
+	  } catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	  }
+      }
+      this.elements = dynamicElements;
     }
 
     public Collection<DynamicElement> getDynamicElements() {
