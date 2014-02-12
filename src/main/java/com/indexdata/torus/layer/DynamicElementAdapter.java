@@ -75,7 +75,6 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
       if (null == element) {
           return null;
       }
-
       // 1. Determine the values type from the type attribute.
       Class<?> type = String.class; 
       String typeString = element.getAttribute("type");
@@ -87,12 +86,19 @@ public class DynamicElementAdapter extends XmlAdapter<Element, DynamicElement> {
       Unmarshaller unmarshaller = getJAXBContext(type).createUnmarshaller();
       @SuppressWarnings("rawtypes")
       JAXBElement jaxbElement = unmarshaller.unmarshal(source, type);
-
-      // 3. Build the instance of Element
-      DynamicElement dynamicElement = new DynamicElement();
-      dynamicElement.setName(element.getLocalName());
-      dynamicElement.setValue(jaxbElement.getValue());
-      return dynamicElement;
+      // 3. see below
+      return unmarshal(jaxbElement);
   }
+  
+  @SuppressWarnings("rawtypes")
+  public DynamicElement unmarshal(JAXBElement jaxbElement) throws Exception {
+    // 3. Build the instance of Element
+    DynamicElement dynamicElement = new DynamicElement();
+    dynamicElement.setName(jaxbElement.getName().getLocalPart());
+    dynamicElement.setValue(jaxbElement.getValue());
+    return dynamicElement;
+    
+  }
+
 
 }
