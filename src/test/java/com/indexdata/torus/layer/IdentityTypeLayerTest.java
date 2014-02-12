@@ -5,20 +5,28 @@
  */
 package com.indexdata.torus.layer;
 
-import com.indexdata.torus.Layer;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
-import com.indexdata.torus.Record;
-import javax.xml.bind.JAXBException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-import com.indexdata.utils.XmlUtils;
+
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.transform.TransformerException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.cedarsoftware.util.DeepEquals;
+import com.indexdata.torus.Layer;
+import com.indexdata.torus.Record;
+import com.indexdata.utils.XmlUtils;
 
 /**
  *
@@ -138,5 +146,31 @@ public class IdentityTypeLayerTest {
     assertEquals("my_library", itl.getIdentityId());
     assertEquals("my_library-searchables", itl.getSearchablesRealm());
     assertEquals("my_library-categories", itl.getCategoriesRealm());
-  }
+    
+    Document node = XmlUtils.newDoc();
+    try {
+        jaxbCtx.createMarshaller().marshal(rec, node);
+        XmlUtils.serialize(doc, System.out);
+    } catch (JAXBException ex) {
+      fail("Unmarshalling failed: " + ex.getMessage());
+    } catch (TransformerException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    Record newRec = null;
+    try {
+      newRec =
+        (Record) jaxbCtx.createUnmarshaller().unmarshal(node);
+    } catch (JAXBException ex) {
+      fail("Unmarshalling failed: " + ex.getMessage());
+    }
+    assertTrue("Failed to compare records", DeepEquals.deepEquals(rec, newRec));
+    layers.add(new IdentityTypeLayer());
+    assertTrue("Failed to differ records", !DeepEquals.deepEquals(rec, newRec));
+    layers.remove(1);
+    itl.setIdentityId("other_library");
+    assertTrue("Failed to differ records", !DeepEquals.deepEquals(rec, newRec));
+    itl.setIdentityId("my_library");
+    assertTrue("Failed to compare records", DeepEquals.deepEquals(rec, newRec));
+    }
 }
