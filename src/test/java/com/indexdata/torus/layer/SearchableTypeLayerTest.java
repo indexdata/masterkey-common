@@ -33,6 +33,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import com.cedarsoftware.util.DeepEquals;
 import com.indexdata.torus.Layer;
 import com.indexdata.torus.Record;
 import com.indexdata.utils.XmlUtils;
@@ -103,17 +104,7 @@ public class SearchableTypeLayerTest {
     } catch (JAXBException ex) {
       fail("Unmarshalling failed: " + ex.getMessage());
     }
-    List<Layer> layers = rec.getLayers();
-    SearchableTypeLayer stl = (SearchableTypeLayer) layers.get(0);
-    assertEquals("1=author", stl.getCclMapAu());
-    assertEquals("1=text",   stl.getCclMapTerm());
-    
-    Collection<DynamicElement> dynamicElements = stl.getDynamicElements();
-    assertTrue("Wrong count: " + dynamicElements.size(), dynamicElements.size() == testValues.size());
-    for (DynamicElement  element :dynamicElements) {
-      String value = testValues.get(element.getName());
-      assertTrue("Value differs for " + element.getName(), element.getValue().equals(value));
-    }
+    verifyLayer(testValues, rec);
     
     DynamicElementAdapter adapter = new DynamicElementAdapter(jaxbCtx);
     Marshaller marshall = jaxbCtx.createMarshaller();
@@ -127,6 +118,7 @@ public class SearchableTypeLayerTest {
       Document marshalledDoc = XmlUtils.parse(new StringReader(marshalledXml));
       Unmarshaller unmarshall = jaxbCtx.createUnmarshaller();
       newRec = (Record) unmarshall.unmarshal(marshalledDoc);
+      assertTrue(newRec != null);
     } catch (JAXBException ex) {
       fail("Unmarshalling failed: " + ex.getMessage());
     } catch (SAXException e) {
@@ -136,7 +128,23 @@ public class SearchableTypeLayerTest {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    assertTrue("Records did not compare", rec.equals(newRec));
+    verifyLayer(testValues, newRec);
+    assertTrue("Failed to compare records", DeepEquals.deepEquals(rec, newRec));
+
+  }
+
+  private void verifyLayer(Map<String, String> testValues, Record rec) {
+    List<Layer> layers = rec.getLayers();
+    SearchableTypeLayer stl = (SearchableTypeLayer) layers.get(0);
+    assertEquals("1=author", stl.getCclMapAu());
+    assertEquals("1=text",   stl.getCclMapTerm());
+    
+    Collection<DynamicElement> dynamicElements = stl.getDynamicElements();
+    assertTrue("Wrong count: " + dynamicElements.size(), dynamicElements.size() == testValues.size());
+    for (DynamicElement  element :dynamicElements) {
+      String value = testValues.get(element.getName());
+      assertTrue("Value differs for " + element.getName(), element.getValue().equals(value));
+    }
   }
 
 }
