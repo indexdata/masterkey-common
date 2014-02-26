@@ -12,7 +12,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,18 +37,25 @@ import com.indexdata.torus.Layer;
 import com.indexdata.torus.Record;
 import com.indexdata.utils.XmlUtils;
 
+import static java.lang.System.out;
+
 /**
  *
  * @author Dennis
  */
 public class SearchableTypeLayerTest {
   private static JAXBContext jaxbCtx;
+  private static Properties xmlPrintingProps;
+  private Document testDoc;
+  private Map<String, String> testValues;
 
   public SearchableTypeLayerTest() {
   }
 
   @BeforeClass
   public static void setUpClass() throws Exception {
+    xmlPrintingProps = new Properties();
+    xmlPrintingProps.setProperty("indent", "YES");
     jaxbCtx = JAXBContext.newInstance("com.indexdata.torus.layer:com.indexdata.torus");
     //DynamicElement.class, Layer.class, Record.class, Records.class, CategoryTypeLayer.class, IdentityTypeLayer.class, SearchableTypeLayer.class
   }
@@ -60,6 +66,29 @@ public class SearchableTypeLayerTest {
 
   @Before
   public void setUp() {
+    //set up test doc
+    testDoc = XmlUtils.newDoc("record");
+    testDoc.getDocumentElement().setAttribute("type", "searchable");
+    Element layer = testDoc.createElement("layer");
+    layer.setAttribute("name", "override");
+    layer.
+      setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:type",
+      "searchableTypeLayer");
+    testDoc.getDocumentElement().appendChild(layer);
+    XmlUtils.appendTextNode(layer, "cclmap_au", "1=author");
+    XmlUtils.appendTextNode(layer, "cclmap_term", "1=text");
+    //dynamic values
+    String values[][] = {
+      {"facetmap_author", "author"},
+      {"limitmap_author", "rpn: @attr 1=author @attr 6=3"}
+    };
+    testValues = new HashMap<String, String>();
+    for (String[] keyValue : values) {
+      XmlUtils.appendTextNode(layer, keyValue[0], keyValue[1]);
+      testValues.put(keyValue[0], keyValue[1]);
+    }
+    XmlUtils.appendTextNode(layer, "categories", "id_openaccess");
+    XmlUtils.appendTextNode(layer, "categories", "id_other");
   }
 
   @After
@@ -67,70 +96,49 @@ public class SearchableTypeLayerTest {
   }
 
   @Test
-  public void testSearchableLayer() throws JAXBException {
-    Document doc = XmlUtils.newDoc("record");
-    doc.getDocumentElement().setAttribute("type", "searchable");
-    Element layer = doc.createElement("layer");
-    layer.setAttribute("name", "override");
-    layer.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:type", "searchableTypeLayer");
-    doc.getDocumentElement().appendChild(layer);
-    XmlUtils.appendTextNode(layer, "cclmap_au", "1=author");
-    XmlUtils.appendTextNode(layer, "cclmap_term", "1=text");
-    String values[][] = {{ "facetmap_author", "author" },
-			 {"limitmap_author", "rpn: @attr 1=author @attr 6=3"}};
-    Map<String, String> testValues = new HashMap<String, String>();
-    for (String[] keyValue : values) {
-      XmlUtils.appendTextNode(layer, keyValue[0], keyValue[1]);
-      testValues.put(keyValue[0], keyValue[1]);
-    }
-    XmlUtils.appendTextNode(layer, "categories", "id_openaccess");
-    XmlUtils.appendTextNode(layer, "categories", "id_other");
-    Properties prop = new Properties();
-    prop.setProperty("indent", "YES");
-    String testXml = null;
-    try {
-      StringWriter writer = new StringWriter();
-      XmlUtils.serialize(doc, writer, prop);
-      testXml = writer.getBuffer().toString();
-      System.out.println(testXml);
-    } catch (TransformerException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  public void testSearchableLayerUn_marshall() {
+    out.println("test doc:");
+    printDoc(testDoc);
+    
+    //unmarshall
     Record rec = null;
     try {
       Unmarshaller unmarshall = jaxbCtx.createUnmarshaller();
-      rec = (Record) unmarshall.unmarshal(doc);
+      rec = (Record) unmarshall.unmarshal(testDoc);
     } catch (JAXBException ex) {
       fail("Unmarshalling failed: " + ex.getMessage());
+    }  
+    
+    //marshall
+    String marshalledXml = null;
+    try {
+      Marshaller marshall = jaxbCtx.createMarshaller();
+      marshall.setAdapter(new KeyValueAdapter());
+      marshall.setProperty("jaxb.formatted.output", true);
+      StringWriter result = new StringWriter();
+      marshall.marshal((Object) rec, result);
+      marshalledXml = result.toString();
+    } catch (JAXBException ex) {
+      fail("Marshalling failed: " + ex.getMessage());
     }
+    out.println("test doc after umarshal/marshal:");
+    out.println(marshalledXml);
+    
     verifyLayer(testValues, rec);
     
-    DynamicElementAdapter adapter = new DynamicElementAdapter(jaxbCtx);
-    Marshaller marshall = jaxbCtx.createMarshaller();
-    marshall.setAdapter(adapter);
-    marshall.setProperty("jaxb.formatted.output", true);
-    StringWriter result = new StringWriter();
-    marshall.marshal((Object)rec, result);
-    String marshalledXml = result.getBuffer().toString();
+    //unmarshall again
     Record newRec = null;
     try {
       Document marshalledDoc = XmlUtils.parse(new StringReader(marshalledXml));
       Unmarshaller unmarshall = jaxbCtx.createUnmarshaller();
       newRec = (Record) unmarshall.unmarshal(marshalledDoc);
       assertTrue(newRec != null);
-    } catch (JAXBException ex) {
+    } catch (Exception ex) {
       fail("Unmarshalling failed: " + ex.getMessage());
-    } catch (SAXException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
     verifyLayer(testValues, newRec);
+    
     assertTrue("Failed to compare records", DeepEquals.deepEquals(rec, newRec));
-
   }
 
   private void verifyLayer(Map<String, String> testValues, Record rec) {
@@ -139,11 +147,25 @@ public class SearchableTypeLayerTest {
     assertEquals("1=author", stl.getCclMapAu());
     assertEquals("1=text",   stl.getCclMapTerm());
     
-    Collection<DynamicElement> dynamicElements = stl.getDynamicElements();
+    List<KeyValue> dynamicElements = stl.getDynamicElements();
     assertTrue("Wrong count: " + dynamicElements.size(), dynamicElements.size() == testValues.size());
-    for (DynamicElement  element :dynamicElements) {
-      String value = testValues.get(element.getName());
-      assertTrue("Value differs for " + element.getName(), element.getValue().equals(value));
+    
+    for (KeyValue  element : dynamicElements) {
+      String expectedValue = testValues.get(element.getName());
+      assertEquals("check '"+element.getName()+"' "+expectedValue+" ?= "+element.getValue(),
+        expectedValue, element.getValue());
+    }
+  }
+
+  private void printDoc(Document doc) {
+    String testXml;
+    try {
+      StringWriter writer = new StringWriter();
+      XmlUtils.serialize(doc, writer, xmlPrintingProps);
+      testXml = writer.getBuffer().toString();
+      out.println(testXml);
+    } catch (TransformerException e) {
+      fail("can't print the test doc "+e.getMessage());
     }
   }
 

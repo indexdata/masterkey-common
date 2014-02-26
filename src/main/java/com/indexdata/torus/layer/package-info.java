@@ -1,6 +1,6 @@
 
 @XmlJavaTypeAdapters({
-    @XmlJavaTypeAdapter(value=com.indexdata.torus.layer.DynamicElementAdapter.class, type=com.indexdata.torus.layer.DynamicElement.class)
+    @XmlJavaTypeAdapter(value=com.indexdata.torus.layer.KeyValueAdapter.class, type=com.indexdata.torus.layer.KeyValue.class)
 })
 package com.indexdata.torus.layer;
  
