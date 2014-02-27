@@ -31,6 +31,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
   public String PAZPAR2_SETTINGS_XML = null;
   public String XML_FILE_PATH = null;
   public String USE_OPAQUE_ID;
+  public String CF_ENGINE_ADDRESS = "";
   
   //map values
   public final String CCLMAP_TERM;
@@ -96,6 +97,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
         PAZPAR2_SETTINGS_XML = cfg.get("PAZPAR2_SETTINGS_XML");
         XML_FILE_PATH = cfg.getConfigFilePath();
         USE_OPAQUE_ID = cfg.get("USE_OPAQUE_ID", "no");
+        CF_ENGINE_ADDRESS = cfg.get("CF_ENGINE_ADDRESS");
 
         CCLMAP_TERM = cfg.get("CCLMAP_TERM", CCLMAP_TERM_FB);
         CCLMAP_SU = cfg.get("CCLMAP_SU", CCLMAP_SU_FB);

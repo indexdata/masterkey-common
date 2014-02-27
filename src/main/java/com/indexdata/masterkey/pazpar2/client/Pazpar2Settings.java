@@ -282,7 +282,12 @@ public class Pazpar2Settings {
    */
   private boolean checkAndAppendCfParams(SearchableTypeLayer l, StringBuffer zurl) {
     if (l.getCfAuth() != null && !l.getCfAuth().isEmpty()) {
-      // this is a CF target, build the DB name
+      // this is a CF target
+      if (cfg.CF_ENGINE_ADDRESS != null && cfg.CF_ENGINE_ADDRESS.length()>0) {
+        // apply CF engine url override
+        zurl.replace(0, zurl.indexOf("/"), cfg.CF_ENGINE_ADDRESS);
+      }
+      // build the DB name
       Map<String, String> params = new HashMap<String, String>();
       if (l.getAuthentication() != null) {
 	String[] auths = l.getAuthentication().split("/");
