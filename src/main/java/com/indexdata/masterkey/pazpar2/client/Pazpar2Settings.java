@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 
 import com.indexdata.torus.Record;
 import com.indexdata.torus.Records;
-import com.indexdata.torus.layer.DynamicElement;
+import com.indexdata.torus.layer.KeyValue;
 import com.indexdata.torus.layer.SearchableTypeLayer;
 import com.indexdata.utils.PerformanceLogger;
 import com.indexdata.utils.XmlUtils;
@@ -310,7 +310,7 @@ public class Pazpar2Settings {
       }
       //all others settings prefixed with cf_ are encoded too
       if (l.getDynamicElements() != null) {
-        for (DynamicElement element: l.getDynamicElements()) {
+        for (KeyValue element: l.getDynamicElements()) {
           if (element.getName().startsWith("cf_")) {
             params.put(element.getName().substring(3), 
         	element.getValue().toString());
@@ -339,10 +339,10 @@ public class Pazpar2Settings {
     }
   }
 
-  private String encodeRichDatabaseParameters(String mapPrefix, Collection<DynamicElement> otherElements) {
+  private String encodeRichDatabaseParameters(String mapPrefix, Collection<KeyValue> otherElements) {
     if (otherElements == null) return null;
     StringBuffer richDatabaseParameters = new StringBuffer("");
-    for (DynamicElement element : otherElements) {
+    for (KeyValue element : otherElements) {
       if (element.getName().startsWith(mapPrefix + "_")) {
 	String parameterName = element.getName().substring(mapPrefix.length() + 1);
 	// logger.trace("Parameter for " + mapPrefix + ": " + parameterName +
@@ -450,9 +450,9 @@ public class Pazpar2Settings {
   /**
    * setPrefixedSetttings: set a value of maps based on prefix
    */
-  protected void setPrefixedSettings(String targetId, String mapPrefix, Collection<DynamicElement> elements) {
+  protected void setPrefixedSettings(String targetId, String mapPrefix, Collection<KeyValue> elements) {
     if (elements == null) return;
-    for (DynamicElement element : elements) {
+    for (KeyValue element : elements) {
       if (element.getName().startsWith(mapPrefix + "_")) {
 	String pzName = "pz:" + element.getName().replace("_", ":");
 	setSetting(targetId, pzName, element.getValue().toString(), null);
@@ -463,11 +463,11 @@ public class Pazpar2Settings {
   /**
    * setPrefixedSetttings: set a value of maps based on prefix
    */
-  protected void setPzSettings(String targetId, Collection<DynamicElement> elements,
+  protected void setPzSettings(String targetId, Collection<KeyValue> elements,
       Collection<String> excludes) {
     if (elements == null)
       return;
-    for (DynamicElement element : elements) {
+    for (KeyValue element : elements) {
       if (element.getName().startsWith("pz_")) {
 	String pzName = element.getName().replaceFirst("pz_", "pz:");
 	if (!excludes.contains(pzName))
