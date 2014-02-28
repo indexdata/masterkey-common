@@ -121,7 +121,7 @@
     <dependency>
      <groupId>com.indexdata.annotations.processor</groupId>
      <artifactId>jaxb-index-generator</artifactId>
-     <version>0.0.1-SNAPSHOT</version>
+     <version>0.0.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
