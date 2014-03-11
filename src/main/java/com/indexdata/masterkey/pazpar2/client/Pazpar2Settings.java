@@ -251,6 +251,7 @@ public class Pazpar2Settings {
     setSetting(id, "pz:pqf_prefix", l.getPqfPrefix(), excludeList);
     setSetting(id, "pz:piggyback", l.getPiggyback(), excludeList);
     setSetting(id, "pz:maxrecs", l.getMaxRecords(), excludeList);
+    setSetting(id, "pz:extendrecs", l.getExtendRecords(), excludeList);
     setSetting(id, "pz:extra_args", l.getExtraArgs(), excludeList);
     setSetting(id, "pz:query_syntax", l.getQuerySyntax(), excludeList);
     if (!isCf) setSetting(id, "pz:zproxy", l.getCfProxy(), excludeList);
@@ -424,14 +425,14 @@ public class Pazpar2Settings {
           && !setts.get(key).string.isEmpty()))
           return false;
       } else {
-	setts = new HashMap<String, Setting>();
-	settings.put(targetId, setts);
-	if (excludeList != null)
-	  excludeList.add(key);
+        setts = new HashMap<String, Setting>();
+        settings.put(targetId, setts);
+        if (excludeList != null)
+          excludeList.add(key);
       }
       if (logger.isDebugEnabled())
-	logger.debug(new StringBuffer("setting on ").append(targetId).append(": ").append(key)
-	    .append(":").append(val).toString());
+        logger.debug(new StringBuffer("setting on ").append(targetId).append(": ").append(key)
+            .append(":").append(val).toString());
       setts.put(key, new Setting(val));
       return true;
     }

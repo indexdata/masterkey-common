@@ -67,6 +67,7 @@ public class SearchableTypeLayer extends Layer {
   // APDU log file name
   private String apduLog;
   private String maxRecords;
+  private String extendRecords;
   private String placeHolds;
   private String literalTransform;
   private String contentConnector;
@@ -421,6 +422,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setMaxRecords(String maxRecords) {
     this.maxRecords = maxRecords;
+  }
+
+  public String getExtendRecords() {
+    return extendRecords;
+  }
+
+  public void setExtendRecords(String extendRecords) {
+    this.extendRecords = extendRecords;
   }
 
   public String getTermlistUseTermFactor() {
