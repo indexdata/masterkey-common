@@ -258,6 +258,7 @@ public class Pazpar2Settings {
 
     setSetting(id, "url_recipe", l.getUrlRecipe(), excludeList);
     setSetting(id, "category", l.getCategories(), excludeList);
+    setSetting(id, "content_level", l.getContentLevel(), excludeList);
     setSetting(id, "medium", l.getMedium(), excludeList);
     setSetting(id, "comment", l.getComment(), excludeList);
     setSetting(id, "explode", l.getExplode(), excludeList);
