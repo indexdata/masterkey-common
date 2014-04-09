@@ -38,6 +38,7 @@ public class SearchableTypeLayer extends Layer {
   private String urlRecipe;
   private String serviceProvider;
   private String categories;
+  private String contentLevel;
   private String medium;
   private String fullTextTarget;
   private String comment;
@@ -270,6 +271,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setCategories(String categories) {
     this.categories = categories;
+  }
+
+  public String getContentLevel() {
+    return contentLevel;
+  }
+
+  public void setContentLevel(String contentLevel) {
+    this.contentLevel = contentLevel;
   }
 
   public String getMedium() {
