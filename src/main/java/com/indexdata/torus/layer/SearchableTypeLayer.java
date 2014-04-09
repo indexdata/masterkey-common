@@ -75,6 +75,7 @@ public class SearchableTypeLayer extends Layer {
   private String contentProxy;
   private String udb;
   private String openAccess;
+  private String sortStrategy;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -510,6 +511,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setOpenAccess(String openAccess) {
     this.openAccess = openAccess;
+  }
+
+  public String getSortStrategy() {
+    return sortStrategy;
+  }
+
+  public void setSortStrategy(String sortStrategy) {
+    this.sortStrategy = sortStrategy;
   }
 
 }
