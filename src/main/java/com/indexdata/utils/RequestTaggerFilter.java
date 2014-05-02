@@ -14,7 +14,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import org.apache.log4j.MDC;
+import org.slf4j.MDC;
 
 /**
  *
