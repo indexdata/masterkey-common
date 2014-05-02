@@ -3,7 +3,7 @@
   <groupId>com.indexdata</groupId>
   <artifactId>masterkey-common</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.26-SNAPSHOT</version>
+  <version>0.1.26</version>
   <name>masterkey-common</name>
   <url>http://www.indexdata.com</url>
   <build>
@@ -202,7 +202,7 @@
   <scm>
     <connection>scm:git:ssh://git.indexdata.com:222/home/git/private/masterkey-common</connection>
     <url>http://gitid.indexdata.com/?p=masterkey-common.git</url>
-    <tag>HEAD</tag>
+    <tag>v0.1.26</tag>
   </scm>
   <repositories>
     <repository>
