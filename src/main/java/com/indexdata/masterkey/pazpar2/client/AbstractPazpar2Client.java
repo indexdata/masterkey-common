@@ -288,7 +288,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
     Pazpar2IOException, IOException,
     Pazpar2ErrorException {
     HttpResponse response = request(command.getPz2queryString());
-    logger.debug("Completed Pazpar2 request: " + command.getPz2queryString());
+    logger.debug("Completed Pazpar2 request on session ["+ getSessionId() +"]: " + command.getPz2queryString());
     pipeStream(response.body, os);
     cacheResults(command.getCommand(), os, response.contentType);
     return response;
