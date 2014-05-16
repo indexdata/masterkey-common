@@ -235,7 +235,8 @@ public class Pazpar2Settings {
      */
     setPrefixedSettings(id, "limitmap", l.getDynamicElements());
 
-    setPrefixedSettings(id, "sortmap", l.getDynamicElements());
+    setPrefixedSettings(id, "sortmap", l.getDynamicElements(), 
+      l.getSortStrategy() != null ? l.getSortStrategy() + ":" : null);
 
     setSetting(id, "pz:sru", l.getSRU(), excludeList);
     setSetting(id, "pz:sru_version", l.getSruVersion(), excludeList);
@@ -458,15 +459,24 @@ public class Pazpar2Settings {
     Setting s = targetSetts.get(key);
     return s != null ? s.string : null;
   }
+  
+  protected void setPrefixedSettings(String targetId, String mapPrefix, 
+    Collection<KeyValue> elements) {
+    setPrefixedSettings(targetId, mapPrefix, elements, null);
+  }
 
   /**
    * setPrefixedSetttings: set a value of maps based on prefix
    */
-  protected void setPrefixedSettings(String targetId, String mapPrefix, Collection<KeyValue> elements) {
+  protected void setPrefixedSettings(String targetId, String mapPrefix, 
+    Collection<KeyValue> elements, 
+    String pz2SettingPrefix) {
     if (elements == null) return;
     for (KeyValue element : elements) {
       if (element.getName().startsWith(mapPrefix + "_")) {
 	String pzName = "pz:" + element.getName().replace("_", ":");
+        if (pz2SettingPrefix != null)
+          pzName = pz2SettingPrefix + pzName;
 	setSetting(targetId, pzName, element.getValue().toString(), null);
       }
     }

@@ -77,6 +77,7 @@ public class SearchableTypeLayer extends Layer {
   private String udb;
   private String openAccess;
   private String aceHitsThreshold;
+  private String sortStrategy;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -528,6 +529,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setAceHitsThreshold(String aceHitsThreshold) {
     this.aceHitsThreshold = aceHitsThreshold;
+  }
+
+  public String getSortStrategy() {
+    return sortStrategy;
+  }
+
+  public void setSortStrategy(String sortStrategy) {
+    this.sortStrategy = sortStrategy;
   }
 
 }
