@@ -76,6 +76,7 @@ public class SearchableTypeLayer extends Layer {
   private String contentProxy;
   private String udb;
   private String openAccess;
+  private String aceHitsThreshold;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -519,6 +520,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setOpenAccess(String openAccess) {
     this.openAccess = openAccess;
+  }
+
+  public String getAceHitsThreshold() {
+    return aceHitsThreshold;
+  }
+
+  public void setAceHitsThreshold(String aceHitsThreshold) {
+    this.aceHitsThreshold = aceHitsThreshold;
   }
 
 }
