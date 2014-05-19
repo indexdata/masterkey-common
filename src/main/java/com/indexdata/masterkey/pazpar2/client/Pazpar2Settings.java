@@ -271,6 +271,7 @@ public class Pazpar2Settings {
     setSetting(id, "contentConnector",l.getContentConnector(),excludeList);
     setSetting(id, "contentAuthentication",l.getContentAuthentication(),excludeList);
     setSetting(id, "contentProxy",l.getContentProxy(),excludeList);
+    setSetting(id, "aceHitsThreshold", l.getAceHitsThreshold(), excludeList);
 
     /* Now set all other pz_<name> as pz:<name> */
     setPzSettings(id, l.getDynamicElements(), excludeList);
@@ -293,11 +294,20 @@ public class Pazpar2Settings {
       // build the DB name
       Map<String, String> params = new HashMap<String, String>();
       if (l.getAuthentication() != null) {
-	String[] auths = l.getAuthentication().split("/");
-	if (auths.length > 1) {
-	  params.put("user", auths[0]);
-	  params.put("password", auths[1]);
-	}
+        String[] auths = l.getAuthentication().split("/");
+        if (auths.length == 1 && auths[0].length()>0) {
+          // single token pattern
+          params.put("user", auths[0]);
+          params.put("password", "N/A");
+        } else if (auths.length == 2) {
+          // regular un/pw pattern
+          params.put("user", auths[0]);
+          params.put("password", auths[1]);
+        } else if (auths.length > 2) {
+          // apparently not a un/pw pattern, forward as one token as is
+          params.put("user", l.getAuthentication());
+          params.put("password", "N/A");
+        }
       }
       if (l.getCfSubDB() != null) {
 	params.put("subdatabase", l.getCfSubDB());
