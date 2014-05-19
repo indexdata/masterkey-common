@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE document SYSTEM "/does/not/exists/file.dtd">
+<!-- the document body starts here-->
+<document>
+  <tag>value</tag>
+  <tag2>value2</tag2>
+</document>
