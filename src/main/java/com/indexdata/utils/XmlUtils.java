@@ -15,12 +15,13 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Iterator;
 import java.util.Properties;
-
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -32,13 +33,16 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Some XML helper methods to hide DOM complexity. Uses thread local variables
@@ -47,6 +51,8 @@ import org.xml.sax.SAXException;
  * @author jakub
  */
 public class XmlUtils {
+  private static final Logger logger = Logger.getLogger("com.indexdata.masterkey");
+  
   private static final ThreadLocal<DocumentBuilder> builderLocal =
     new ThreadLocal<DocumentBuilder>() {
       @Override
@@ -55,12 +61,24 @@ public class XmlUtils {
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
           factory.setIgnoringElementContentWhitespace(true);
           factory.setNamespaceAware(true);
+          //turn off DTD validation and external entities
+          factory.setValidating(false);
+          try {
+            factory.setFeature("http://xml.org/sax/features/validation", false);
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+          } catch (ParserConfigurationException pce) {
+            logger.warn("Error setting parser feature", pce);
+          }
           return factory.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
           throw new Error(pce);
         }
       }
     };
+  
   private static final ThreadLocal<Transformer> transformerLocal =
     new ThreadLocal<Transformer>() {
       @Override
@@ -69,9 +87,37 @@ public class XmlUtils {
           return TransformerFactory.newInstance().newTransformer();
         } catch (TransformerConfigurationException tce) {
           throw new Error(tce);
-        }
       }
-    };
+    }
+  };
+  
+  private static final ThreadLocal<SAXParser> saxLocal = 
+    new ThreadLocal<SAXParser>() {
+    @Override
+    protected SAXParser initialValue() {
+      try {
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        factory.setValidating(false);
+        try {
+          factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
+          factory.setFeature("http://xml.org/sax/features/validation", false);
+          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+          factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+          factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        } catch (Exception e) {
+          logger.warn("Error setting parser feature", e);
+        }
+        SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+        return parser;
+      } catch (ParserConfigurationException pce) {
+        throw new Error(pce);
+      } catch (SAXException se) {
+        throw new Error(se);
+      }        
+    }    
+  };
 
   private XmlUtils() {
   }
@@ -103,6 +149,16 @@ public class XmlUtils {
 
   public static Document parse(File file) throws SAXException, IOException {
     return builderLocal.get().parse(file);
+  }
+  
+  public static void read(InputSource is, DefaultHandler dh) throws SAXException, IOException {
+    saxLocal.get().parse(is, dh);
+  }
+  
+  public static void read(InputSource is, ContentHandler ch) throws SAXException, IOException {
+    XMLReader reader = saxLocal.get().getXMLReader();
+    reader.setContentHandler(ch);
+    reader.parse(is);
   }
 
   public static void serialize(Node doc, OutputStream dest) throws
