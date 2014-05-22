@@ -1,0 +1,8 @@
+<root xmlns="http://www.indexdata.com/ns" 
+  xmlns:bar="http://www.indexdata.com/ns2">
+  <bar:tag>I'm in ns2 namespace with prefix bar</bar:tag>
+  <tag2 xmlns="http://www.indexdata.com/ns3">
+    Hello, I'm in ns3 namesppace with no prefix
+  </tag2>
+  <tag3>Hello, I am in the default namespace</tag3>
+</root>
