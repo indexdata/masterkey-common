@@ -111,17 +111,22 @@ public class XmlUtils {
     protected final Map<String,NSElementType> elementTypes = new HashMap<String, NSElementType>();
     
     public NSAwareSchema() {
-      elementType("<pcdata>", M_EMPTY, M_PCDATA, 0);
-      elementType("<root>", M_ROOT, M_EMPTY, 0);
+      declareElementType("<pcdata>", M_EMPTY, M_PCDATA, 0, true);
+      declareElementType("<root>", M_ROOT, M_EMPTY, 0, true);
+    }
+
+    private void declareElementType(String name, int model, int memberOf, int flags, boolean fromSchema) {
+      NSElementType e = new NSElementType(name, model, memberOf, flags);
+      elementTypes.put(name.toLowerCase(), e);
+      //we assume that the first declared type is the root type
+      if (!fromSchema && rootType == null) {
+        rootType = e;
+      }
     }
 
     @Override
     public void elementType(String name, int model, int memberOf, int flags) {
-      NSElementType e = new NSElementType(name, model, memberOf, flags);
-      elementTypes.put(name.toLowerCase(), e);
-      if (memberOf == M_ROOT) {
-        rootType = e;
-      }
+      declareElementType(name, model, memberOf, flags, false);
     }
 
     @Override
@@ -151,18 +156,19 @@ public class XmlUtils {
 
       @Override
       public String namespace(String name, boolean isAttr) {
+        String ns;
         int colon = name.indexOf(':');
         if (colon == -1) {
-          return isAttr ? "" : schema().getURI();
-        }
-        String prefix = name.substring(0, colon);
-        String ns;
-        if (prefix.equals("xml")) {
-          ns = XML_NS;
+          ns = isAttr ? "" : schema().getURI();
         } else {
-          ns = schema().namespaces.containsKey(prefix) 
-            ? schema().namespaces.get(prefix)
-            : schema().getURI();
+          String prefix = name.substring(0, colon);
+          if (prefix.equals("xml")) {
+            ns = XML_NS;
+          } else {
+            ns = schema().namespaces.containsKey(prefix) 
+              ? schema().namespaces.get(prefix)
+              : schema().getURI();
+          }
         }
         if (!isAttr) {//constructor call
           namespace = ns;
