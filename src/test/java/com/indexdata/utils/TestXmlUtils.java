@@ -2,6 +2,7 @@ package com.indexdata.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import org.ccil.cowan.tagsoup.Parser;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -38,8 +39,8 @@ public class TestXmlUtils {
   }
   
   private class NamespaceTestHandler implements ContentHandler {
-    private int prefixMapCount = 0;
-    private int elemCount = 0;
+    protected int prefixMapCount = 0;
+    protected int elemCount = 0;
 
     @Override
     public void setDocumentLocator(Locator locator) {
@@ -51,8 +52,8 @@ public class TestXmlUtils {
 
     @Override
     public void endDocument() throws SAXException {
-      assertEquals(3, prefixMapCount);
       assertEquals(4, elemCount);
+      assertEquals(3, prefixMapCount);
     }
 
     @Override
@@ -128,6 +129,8 @@ public class TestXmlUtils {
 
     @Override
     public void skippedEntity(String name) throws SAXException {
+      Parser p = new Parser();
+
     }
     
     
@@ -138,5 +141,44 @@ public class TestXmlUtils {
     InputStream testFile = this.getClass().getClassLoader()
     .getResourceAsStream("xml/namespaces.xml");
     XmlUtils.read(new InputSource(testFile), new NamespaceTestHandler());
+  }
+  
+  private class MalformedTestHandler extends NamespaceTestHandler {
+
+    @Override
+    public void startPrefixMapping(String prefix, String uri) throws
+      SAXException {
+      if (prefixMapCount == 0) {
+        //assertEquals("", prefix);
+        //assertEquals("", uri);
+      }
+      else if (prefixMapCount == 1) {
+        assertEquals("bar", prefix);
+        assertEquals("http://www.indexdata.com/ns2", uri);
+      }
+      else if (prefixMapCount == 2) {
+        assertEquals("", prefix);
+        assertEquals("http://www.indexdata.com/ns3", uri);
+      }
+      prefixMapCount++;
+    }
+    
+    
+  }
+  
+  @Test
+  public void testMalformedXML() throws SAXException, IOException {
+    InputStream testFile = this.getClass().getClassLoader()
+    .getResourceAsStream("xml/malformed.xml");
+    try {
+      XmlUtils.read(new InputSource(testFile), new NamespaceTestHandler());
+    } catch (SAXException se) {
+      //normal sax parser should fail
+      System.out.println("Failed parsing malformed XML" + se.getMessage());
+      testFile.close();
+    }
+    testFile = this.getClass().getClassLoader()
+    .getResourceAsStream("xml/malformed.xml");
+    XmlUtils.read(new InputSource(testFile), new MalformedTestHandler(), true);
   }
 }

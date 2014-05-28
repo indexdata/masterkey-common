@@ -13,7 +13,9 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -34,6 +36,9 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.apache.log4j.Logger;
+import org.ccil.cowan.tagsoup.AttributesImpl;
+import org.ccil.cowan.tagsoup.ElementType;
+import org.ccil.cowan.tagsoup.Schema;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,6 +46,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -95,33 +101,144 @@ public class XmlUtils {
     new ThreadLocal<SAXParser>() {
     @Override
     protected SAXParser initialValue() {
-      try {
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        factory.setValidating(false);
-        try {
-          factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
-          //the follwing commented-out features should not be used
-          //but are kept for information purposes
-          //factory.setFeature("http://xml.org/sax/features/namespaces", false); //raise startPrefixMapping for ns?
-          //factory.setFeature("http://xml.org/sax/features/namespace-prefixes", true); //include ns mappings in attrs
-          //factory.setFeature("http://xml.org/sax/features/xmlns-uris", true); //report ns uri for xmlns
-          factory.setFeature("http://xml.org/sax/features/validation", false);
-          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-          factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-          factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-          factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        } catch (Exception e) {
-          logger.warn("Error setting parser feature", e);
-        }
-        return factory.newSAXParser();
-      } catch (ParserConfigurationException pce) {
-        throw new Error(pce);
-      } catch (SAXException se) {
-        throw new Error(se);
-      }        
+      return createSAXParser(null); //default sax parser
     }    
   };
+  
+  private static class NSAwareSchema extends Schema {
+    protected NSElementType rootType;
+    protected final Map<String,String> namespaces = new HashMap<String,String>();
+    protected final Map<String,NSElementType> elementTypes = new HashMap<String, NSElementType>();
+    
+    public NSAwareSchema() {
+      elementType("<pcdata>", M_EMPTY, M_PCDATA, 0);
+      elementType("<root>", M_ROOT, M_EMPTY, 0);
+    }
+
+    @Override
+    public void elementType(String name, int model, int memberOf, int flags) {
+      NSElementType e = new NSElementType(name, model, memberOf, flags);
+      elementTypes.put(name.toLowerCase(), e);
+      if (memberOf == M_ROOT) {
+        rootType = e;
+      }
+    }
+
+    @Override
+    public ElementType getElementType(String name) {
+      return elementTypes.get(name);
+    }
+
+    @Override
+    public ElementType rootElementType() {
+      return rootType;
+    }
+
+    @Override
+    public String getURI() {
+      return rootType != null ? rootType.namespace : "";
+    }
+    
+    private class NSElementType extends ElementType {
+      protected String namespace;
+      public final static String XML_NS = "http://www.w3.org/XML/1998/namespace";
+
+      public NSElementType(String name, int model, int memberOf, int flags) {
+        //because of the incredibly awful design of the TagSoup super class
+        //we need to use the trick with nested classes
+        super(name, model, memberOf, flags, NSAwareSchema.this);
+      }
+
+      @Override
+      public String namespace(String name, boolean isAttr) {
+        int colon = name.indexOf(':');
+        if (colon == -1) {
+          return isAttr ? "" : schema().getURI();
+        }
+        String prefix = name.substring(0, colon);
+        String ns;
+        if (prefix.equals("xml")) {
+          ns = XML_NS;
+        } else {
+          ns = schema().namespaces.containsKey(prefix) 
+            ? schema().namespaces.get(prefix)
+            : schema().getURI();
+        }
+        if (!isAttr) {//constructor call
+          namespace = ns;
+        } 
+        return ns;
+      }
+
+      @Override
+      public void setAttribute(AttributesImpl atts, String name, String type, String value) {
+        if (name.equals("xmlns")) {
+          namespace = value;
+        } else if (name.startsWith("xmlns:")) {
+          int colon = name.indexOf(':');
+          String prefix = name.substring(colon+1);
+          schema().namespaces.put(prefix, value);
+        }
+        super.setAttribute(atts, name, type, value);
+      }
+
+      @Override
+      public String namespace() {
+        return namespace;
+      }
+
+      @Override
+      public NSAwareSchema schema() {
+        return NSAwareSchema.this;
+      }
+
+    }
+  }
+  
+
+  private static final ThreadLocal<SAXParser> tsLocal = 
+    new ThreadLocal<SAXParser>() {
+    @Override
+    protected SAXParser initialValue() {
+      SAXParser p = createSAXParser("org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl"); //tagsoup parser
+      try {
+        p.setProperty("http://www.ccil.org/~cowan/tagsoup/properties/schema", new NSAwareSchema());
+      } catch (Exception se) {
+        logger.warn("Cannot override tag soup schema", se);
+      }
+      return p;
+    }    
+  };
+  
+  private static SAXParser createSAXParser(String className) throws Error {
+    try {
+      SAXParserFactory factory = className == null 
+        ? SAXParserFactory.newInstance()
+        : SAXParserFactory.newInstance(className, null);
+      factory.setNamespaceAware(true);
+      factory.setValidating(false);
+      try {
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
+        //the follwing commented-out features should not be used
+        //but are kept for information purposes
+        //factory.setFeature("http://xml.org/sax/features/namespaces", false); //raise startPrefixMapping for ns?
+        //factory.setFeature("http://xml.org/sax/features/namespace-prefixes", true); //include ns mappings in attrs
+        //factory.setFeature("http://xml.org/sax/features/xmlns-uris", true); //report ns uri for xmlns
+        factory.setFeature("http://xml.org/sax/features/validation", false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      } catch (Exception e) {
+        logger.warn("Error setting parser feature", e);
+      }
+      return factory.newSAXParser();
+    } catch (ParserConfigurationException pce) {
+      throw new Error(pce);
+    } catch (SAXException se) {
+      throw new Error(se);
+    }
+}
 
   private XmlUtils() {
   }
@@ -161,6 +278,13 @@ public class XmlUtils {
   
   public static void read(InputSource is, ContentHandler ch) throws SAXException, IOException {
     XMLReader reader = saxLocal.get().getXMLReader();
+    reader.setContentHandler(ch);
+    reader.parse(is);
+  }
+  
+  public static void read(InputSource is, ContentHandler ch, boolean useTagSoup) throws SAXException, IOException {
+    ThreadLocal<SAXParser> localParser = useTagSoup ? tsLocal : saxLocal;
+    XMLReader reader = localParser.get().getXMLReader();
     reader.setContentHandler(ch);
     reader.parse(is);
   }
