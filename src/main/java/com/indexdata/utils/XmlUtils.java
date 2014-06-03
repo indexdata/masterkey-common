@@ -216,6 +216,14 @@ public class XmlUtils {
     }    
   };
   
+  private final static void setFeature(SAXParserFactory f, String feature, boolean value) {
+    try {
+      f.setFeature(feature, value);
+    } catch (Exception e) {
+      logger.warn("Error setting parser feature", e);
+    }
+  }
+  
   private static SAXParser createSAXParser(String className) throws Error {
     try {
       SAXParserFactory factory = className == null 
@@ -223,21 +231,17 @@ public class XmlUtils {
         : SAXParserFactory.newInstance(className, null);
       factory.setNamespaceAware(true);
       factory.setValidating(false);
-      try {
-        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
-        //the follwing commented-out features should not be used
-        //but are kept for information purposes
-        //factory.setFeature("http://xml.org/sax/features/namespaces", false); //raise startPrefixMapping for ns?
-        //factory.setFeature("http://xml.org/sax/features/namespace-prefixes", true); //include ns mappings in attrs
-        //factory.setFeature("http://xml.org/sax/features/xmlns-uris", true); //report ns uri for xmlns
-        factory.setFeature("http://xml.org/sax/features/validation", false);
-        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      } catch (Exception e) {
-        logger.warn("Error setting parser feature", e);
-      }
+      setFeature(factory, XMLConstants.FEATURE_SECURE_PROCESSING, false);
+      //the follwing commented-out features should not be used
+      //but are kept for information purposes
+      //setFeature("http://xml.org/sax/features/namespaces", false); //raise startPrefixMapping for ns?
+      //setFeature("http://xml.org/sax/features/namespace-prefixes", true); //include ns mappings in attrs
+      //setFeature("http://xml.org/sax/features/xmlns-uris", true); //report ns uri for xmlns
+      setFeature(factory, "http://xml.org/sax/features/validation", false);
+      setFeature(factory, "http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+      setFeature(factory, "http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      setFeature(factory, "http://xml.org/sax/features/external-general-entities", false);
+      setFeature(factory, "http://xml.org/sax/features/external-parameter-entities", false);
       return factory.newSAXParser();
     } catch (ParserConfigurationException pce) {
       throw new Error(pce);
