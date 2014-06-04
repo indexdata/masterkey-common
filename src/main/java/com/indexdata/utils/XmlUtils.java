@@ -59,6 +59,14 @@ import org.xml.sax.helpers.DefaultHandler;
 public class XmlUtils {
   private static final Logger logger = Logger.getLogger("com.indexdata.masterkey");
   
+   private static void setFeature(DocumentBuilderFactory f, String feature, boolean value) {
+    try {
+      f.setFeature(feature, value);
+    } catch (Exception e) {
+      logger.warn("Error setting parser feature: " + e.getMessage());
+    }
+  }
+  
   private static final ThreadLocal<DocumentBuilder> builderLocal =
     new ThreadLocal<DocumentBuilder>() {
       @Override
@@ -69,15 +77,11 @@ public class XmlUtils {
           factory.setNamespaceAware(true);
           //turn off DTD validation and external entities
           factory.setValidating(false);
-          try {
-            factory.setFeature("http://xml.org/sax/features/validation", false);
-            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-          } catch (ParserConfigurationException pce) {
-            logger.warn("Error setting parser feature", pce);
-          }
+          setFeature(factory, "http://xml.org/sax/features/validation", false);
+          setFeature(factory, "http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+          setFeature(factory, "http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+          setFeature(factory, "http://xml.org/sax/features/external-general-entities", false);
+          setFeature(factory, "http://xml.org/sax/features/external-parameter-entities", false);
           return factory.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
           throw new Error(pce);
@@ -220,7 +224,7 @@ public class XmlUtils {
     try {
       f.setFeature(feature, value);
     } catch (Exception e) {
-      logger.warn("Error setting parser feature", e);
+      logger.warn("Error setting parser feature: " + e.getMessage());
     }
   }
   
