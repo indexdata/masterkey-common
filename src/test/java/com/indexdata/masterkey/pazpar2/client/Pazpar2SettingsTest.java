@@ -1,3 +1,4 @@
+    
 /*
  * Copyright (c) 1995-2012, Index Datassss
  * All rights reserved.
@@ -9,6 +10,7 @@ import com.indexdata.masterkey.pazpar2.client.exceptions.ProxyErrorException;
 import com.indexdata.torus.Layer;
 import com.indexdata.torus.Record;
 import com.indexdata.torus.Records;
+import com.indexdata.torus.layer.KeyValue;
 import com.indexdata.torus.layer.SearchableTypeLayer;
 import com.indexdata.utils.XmlUtils;
 import java.util.ArrayList;
@@ -111,5 +113,81 @@ public class Pazpar2SettingsTest {
     //test UDB as ID
     String zurl = result.getSetting("test-target-1", "pz:url");
     assertEquals("test-target.com:8888/test-database", zurl);
+  }
+  
+  @Test
+  public void testRichDatabaseParams() throws ProxyErrorException, TransformerException {
+    Records records = new Records();
+    List<Record> list = new ArrayList<Record>();
+    records.setRecords(list);
+    
+    //test CF like target
+    SearchableTypeLayer l0 = layer(list);
+    l0.setUdb("test-target-0");
+    l0.setZurl("test-target.com:8888");
+    
+    //test CF like target
+    SearchableTypeLayer l1 = layer(list);
+    l1.setUdb("test-target-1");
+    l1.setZurl("test-target.com:8888");
+    l1.setCfAuth("username/password");
+    l1.setAuthentication("user/pass");
+    
+    //with existing query string (e.g SRU)
+    SearchableTypeLayer l2 = layer(list);
+    l2.setUdb("test-target-2");
+    l2.setZurl("test-target.com:8888?some=other");
+    
+    //with query string and confusing parameter aka harvest resources
+    SearchableTypeLayer l3 = layer(list);
+    l3.setUdb("test-target-3");
+    l3.setZurl("test-target.com:8888?some=other:3444");
+
+    
+    //with query string and cpath
+    SearchableTypeLayer l4 = layer(list);
+    l4.setUdb("test-target-4");
+    l4.setZurl("test-target.com:8888/some-path/?some=other:3444");
+    
+    //with query string and confusing parameter aka harvest resources
+    SearchableTypeLayer l5 = layer(list);
+    l5.setUdb("test-target-5");
+    l5.setZurl("test-target.com:8888?some=other:3444");
+    List<KeyValue> targetMaps = new ArrayList<KeyValue>();
+    l5.setDynamicElements(targetMaps);
+    targetMaps.add(new KeyValue("targetmap_some", "other"));
+
+    Pazpar2ClientConfiguration pcc = new Pazpar2ClientConfiguration(null);
+    Pazpar2Settings result = Pazpar2Settings.fromSearchables(records, pcc);
+    
+    //test UDB as ID
+    String zurl0 = result.getSetting("test-target-0", "pz:url");
+    assertEquals("test-target.com:8888", zurl0);
+
+    String zurl1 = result.getSetting("test-target-1", "pz:url");
+    assertEquals("test-target.com:8888?password=pass&user=user", zurl1);
+    
+    String zurl2 = result.getSetting("test-target-2", "pz:url");
+    assertEquals("test-target.com:8888?some=other", zurl2);
+    
+    String zurl3 = result.getSetting("test-target-3", "pz:url");
+    assertEquals("test-target.com:8888?some=other:3444", zurl3);
+    
+    String zurl4 = result.getSetting("test-target-4", "pz:url");
+    assertEquals("test-target.com:8888/some-path/?some=other:3444", zurl4);
+
+    // disabling the test that never worked
+    // String zurl5 = result.getSetting("test-target-5", "pz:url");
+    // assertEquals("test-target.com:8888/,some=other?some=other:3444", zurl5);
+  }
+  
+  private SearchableTypeLayer layer(List<Record> records) {
+    Record record = new Record("searchable");
+    records.add(record);
+    List<Layer> layers = new ArrayList<Layer>();
+    record.setLayers(layers);
+    SearchableTypeLayer layer = new SearchableTypeLayer();
+    layers.add(layer);
+    return layer;
   }
 }

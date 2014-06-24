@@ -71,7 +71,7 @@ public class Pazpar2Settings {
   protected Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
   private static Logger logger = Logger.getLogger(Pazpar2Settings.class);
   private Pazpar2ClientConfiguration cfg;
-  Pattern hostPortRegEx = Pattern.compile(".*:[0-9]*$");
+  Pattern hostPortRegEx = Pattern.compile("^[A-Za-z0-9\\-]+:[0-9]+$");
   protected Pazpar2Settings(Pazpar2ClientConfiguration cfg) {
     this.cfg = cfg;
   }
@@ -119,17 +119,18 @@ public class Pazpar2Settings {
     boolean isCf = false;
     if (l.getZurl() != null && !l.getZurl().isEmpty()) {   
       StringBuffer urlBuilder = new StringBuffer(l.getZurl());
-      // Ends with a port number, append a path
-      if (hostPortRegEx.matcher(l.getZurl()).matches()) {
-        urlBuilder.append("/");
-      }
       //append CF params, select appropriate authentication
       isCf = checkAndAppendCfParams(l, urlBuilder);
       auth = isCf ? l.getCfAuth() : l.getAuthentication();
       //append RDP params
+      //TODO we should align this with how the CF params are handled
+      //this is used in the DBC system to configure various gateways
       if (!isCf) {
         String extraPath = encodeRichDatabaseParameters("targetmap",  l.getDynamicElements());  
         if (extraPath != null) {
+          if (hostPortRegEx.matcher(l.getZurl()).matches()) {
+            urlBuilder.append("/");
+          }
           urlBuilder.append(",").append(extraPath);
           logger.debug("Zurl appended with Rich Database Parameters: " + urlBuilder.toString());
         }
@@ -286,7 +287,11 @@ public class Pazpar2Settings {
   private boolean checkAndAppendCfParams(SearchableTypeLayer l, StringBuffer zurl) {
     if (l.getCfAuth() != null && !l.getCfAuth().isEmpty()) {
       // this is a CF target
-      if (cfg.CF_ENGINE_ADDRESS != null && cfg.CF_ENGINE_ADDRESS.length()>0) {
+     // Ends with a port number, append a path
+      if (hostPortRegEx.matcher(l.getZurl()).matches()) {
+        zurl.append("/");
+      }
+      if (cfg.CF_ENGINE_ADDRESS != null && cfg.CF_ENGINE_ADDRESS.length() > 0) {
         // apply CF engine url override
         zurl.replace(0, zurl.indexOf("/"), cfg.CF_ENGINE_ADDRESS);
       }
