@@ -139,14 +139,13 @@ public class Pazpar2Settings {
 
     // we either use the above construct URL as the target identifier or the
     // explicit ID -- service proxy setting
-    String id = "yes".equalsIgnoreCase(cfg.USE_OPAQUE_ID)
-      && l.getId() != null && !l.getId().isEmpty()
-      ? l.getId()
-      : url;
-    
+    String id = "no".equalsIgnoreCase(cfg.USE_OPAQUE_ID)
+      ? url
+      : l.getUdb();
+        
     if (id == null || id.isEmpty()) {
-      logger.warn("Ignoring target specified in the configuration due to missing ID "
-        + "("+l.getId()+") or URL ("+l.getZurl()+")");
+      logger.warn("Ignoring target specified in the configuration due to missing UDB "
+        + "("+l.getUdb()+") or URL ("+l.getZurl()+")");
       return null;
     }
     List<String> excludeList = new LinkedList<String>();

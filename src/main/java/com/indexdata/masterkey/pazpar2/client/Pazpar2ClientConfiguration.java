@@ -130,7 +130,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
     } else {
       logger.error("ModuleConfiguration is null, the plugin will behave unstable");
       
-      USE_OPAQUE_ID = "no";
+      USE_OPAQUE_ID = "yes";
       
       CCLMAP_TERM = CCLMAP_TERM_FB;
       CCLMAP_SU = CCLMAP_SU_FB;
