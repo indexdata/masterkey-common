@@ -71,7 +71,7 @@ public class Pazpar2Settings {
   protected Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
   private static Logger logger = Logger.getLogger(Pazpar2Settings.class);
   private Pazpar2ClientConfiguration cfg;
-  Pattern hostPortRegEx = Pattern.compile("^[A-Za-z0-9\\-]+:[0-9]+$");
+  Pattern hostPortRegEx = Pattern.compile("^[A-Za-z0-9\\-.]+:[0-9]+$");
   protected Pazpar2Settings(Pazpar2ClientConfiguration cfg) {
     this.cfg = cfg;
   }

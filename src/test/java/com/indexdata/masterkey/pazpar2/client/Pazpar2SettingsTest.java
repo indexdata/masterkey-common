@@ -157,6 +157,14 @@ public class Pazpar2SettingsTest {
     l5.setDynamicElements(targetMaps);
     targetMaps.add(new KeyValue("targetmap_some", "other"));
 
+    //with query string and confusing parameter aka harvest resources
+    SearchableTypeLayer l6 = layer(list);
+    l6.setUdb("test-target-6");
+    l6.setZurl("test-target.com:8888");
+    List<KeyValue> targetMaps2 = new ArrayList<KeyValue>();
+    l6.setDynamicElements(targetMaps2);
+    targetMaps2.add(new KeyValue("targetmap_some", "other"));
+
     Pazpar2ClientConfiguration pcc = new Pazpar2ClientConfiguration(null);
     Pazpar2Settings result = Pazpar2Settings.fromSearchables(records, pcc);
     
@@ -165,7 +173,7 @@ public class Pazpar2SettingsTest {
     assertEquals("test-target.com:8888", zurl0);
 
     String zurl1 = result.getSetting("test-target-1", "pz:url");
-    assertEquals("test-target.com:8888?password=pass&user=user", zurl1);
+    assertEquals("test-target.com:8888/?password=pass&user=user", zurl1);
     
     String zurl2 = result.getSetting("test-target-2", "pz:url");
     assertEquals("test-target.com:8888?some=other", zurl2);
@@ -179,6 +187,9 @@ public class Pazpar2SettingsTest {
     // disabling the test that never worked
     // String zurl5 = result.getSetting("test-target-5", "pz:url");
     // assertEquals("test-target.com:8888/,some=other?some=other:3444", zurl5);
+    
+    String zurl6 = result.getSetting("test-target-6", "pz:url");
+    assertEquals("test-target.com:8888/,some=other", zurl6);
   }
   
   private SearchableTypeLayer layer(List<Record> records) {
