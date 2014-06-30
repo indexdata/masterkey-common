@@ -6,18 +6,19 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-public class TestCronLine extends TestCase {
-  
-  
+public class TestCronLine {
   SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
+  
+  @Test
   public void testCronLine() {
     
     String cronSchedule = "0 2 30 2 *";
 
     try {
-      Date next = testSchedule(cronSchedule, new Date());
+      Date next = matchingDate(cronSchedule, new Date());
       assertTrue("Passed invalid pattern to " + format.format(next), false);
     } catch (CronLineParseException clpe) {
 	assertTrue("Failed to get next schedule: " + clpe.getMessage(), true);
@@ -26,19 +27,19 @@ public class TestCronLine extends TestCase {
     try {
       cronSchedule = "* 2 15 2 *";
       Calendar cal = getCalendar(2014, 1, 15, 10, 0);
-      Date next = testSchedule(cronSchedule, cal.getTime());
+      Date next = matchingDate(cronSchedule, cal.getTime());
       cal.set(2014, 1, 15, 2, 0);
       assertTrue("Wrong result: " + format.format(next) + "!=" + format.format(cal.getTime()), next.equals(cal.getTime()));
 
       cronSchedule = "0 2 4 3 *";
       cal = getCalendar(2014, 1, 15, 10, 0);
-      next = testSchedule(cronSchedule, cal.getTime());
+      next = matchingDate(cronSchedule, cal.getTime());
       cal.set(2014, 2, 4, 2, 0);
       assertTrue("Wrong result: " + format.format(next) + "!=" + format.format(cal.getTime()), next.equals(cal.getTime()));
 
       cronSchedule = "0 2 * * 6";
       cal.setTime(new Date());
-      next = testSchedule(cronSchedule, cal.getTime());
+      next = matchingDate(cronSchedule, cal.getTime());
       Calendar result = getCalendar(2014, 1, 3, 10, 0);
       result.setTime(next);
       assertTrue("Wrong result: Expected 6 2 0 != " + result.get(Calendar.DAY_OF_WEEK) + " " + result.get(Calendar.HOUR) + " " + result.get(Calendar.MINUTE) , 
@@ -62,7 +63,8 @@ public class TestCronLine extends TestCase {
     cal.set(Calendar.MILLISECOND, 0);
     return cal;
   }
-  private Date testSchedule(String cronSchedule, Date offset) {
+  
+  private Date matchingDate(String cronSchedule, Date offset) {
     CronLine cronEntry = new CronLine(cronSchedule);
     Calendar someDate = new GregorianCalendar();
     //someDate.setLenient(false);
@@ -72,6 +74,18 @@ public class TestCronLine extends TestCase {
     Date next = cronEntry.nextMatchingDate(someDate.getTime());
     System.out.println("Date: " + format.format(next));
     return next;
+  }
+  
+  
+  @Test
+  public void testInvalidCronLine() {
+    String validLine = "1 2 15 2 0"; //dayofweek is [0,6];
+    try {
+      CronLine cronLine = new CronLine(validLine);
+    } catch (NumberFormatException nfe) {
+      //a valid line faails and it shouldn's
+      //on top of that cronLine throws wrong exception
+    }
   }
 
 }
