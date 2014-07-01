@@ -14,15 +14,16 @@ public class TestCronLine {
   
   @Test
   public void testCronLine() {
-    
-    String cronSchedule = "0 2 30 2 *";
-
+    String cronSchedule = null;
+    CronLineParseException e = null;
     try {
+      cronSchedule = "0 2 30 2 *"; //never occurs
       Date next = matchingDate(cronSchedule, new Date());
-      assertTrue("Passed invalid pattern to " + format.format(next), false);
     } catch (CronLineParseException clpe) {
-	assertTrue("Failed to get next schedule: " + clpe.getMessage(), true);
+      e = clpe;
     }
+    assertNotNull(e);
+    e = null;
 
     try {
       cronSchedule = "* 2 15 2 *";
@@ -47,10 +48,8 @@ public class TestCronLine {
 
       
     } catch (CronLineParseException clpe) {
-	assertTrue("Failed to get next schedule: " + clpe.getMessage(), true);
+	fail("Failed to get next schedule: " + clpe.getMessage());
     }
-
-    
     
     
   }
@@ -64,15 +63,11 @@ public class TestCronLine {
     return cal;
   }
   
-  private Date matchingDate(String cronSchedule, Date offset) {
+  private Date matchingDate(String cronSchedule, Date offset) throws CronLineParseException {
     CronLine cronEntry = new CronLine(cronSchedule);
     Calendar someDate = new GregorianCalendar();
-    //someDate.setLenient(false);
     someDate.setTime(offset);
-   
-    System.out.println("Start date: " + format.format(someDate.getTime()) + " Cron schedule: " + cronSchedule);
     Date next = cronEntry.nextMatchingDate(someDate.getTime());
-    System.out.println("Date: " + format.format(next));
     return next;
   }
   
@@ -82,10 +77,17 @@ public class TestCronLine {
     String validLine = "1 2 15 2 0"; //dayofweek is [0,6];
     try {
       CronLine cronLine = new CronLine(validLine);
-    } catch (NumberFormatException nfe) {
-      //a valid line faails and it shouldn's
-      //on top of that cronLine throws wrong exception
+    } catch (CronLineParseException nfe) {
+      fail(nfe.getMessage());
     }
+    String malformedLine = "1 2 15 2 7";
+    CronLineParseException e = null;
+    try {
+      CronLine cronLine = new CronLine(malformedLine);
+    } catch (CronLineParseException ex) {
+      e = ex;
+    }
+    assertNotNull(e);
   }
 
 }

@@ -10,7 +10,7 @@ package com.indexdata.utils;
  * Thrown if a specified string is a malformed Cron line.
  * @author jakub
  */
-public class CronLineParseException extends IllegalArgumentException {
+public class CronLineParseException extends Exception {
     /**
 	 * 
 	 */

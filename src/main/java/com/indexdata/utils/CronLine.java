@@ -35,119 +35,109 @@ public class CronLine {
     public final static int MONTHLY_PERIOD = 31 * 24 * 60;
     public final static int YEARLY_PERIOD = 12 * 31 * 24 * 60;
     private String[] fields;
-    private NumberPatternRange minute;
-    private NumberPatternRange hour; 
-    private NumberPatternRange day;
-    private NumberPatternRange month;
-    private NumberPatternRange weekday;
-    private final static int nfields = 5;
+    private final NumberPatternRange minute;
+    private final NumberPatternRange hour; 
+    private final NumberPatternRange day;
+    private final NumberPatternRange month;
+    private final NumberPatternRange weekday;
     private static Logger logger = Logger.getLogger("com.indexdata.masterkey.harvester");
     
-    class OutOfRangeException extends Exception {
-
-      /**
-       * 
-       */
-      private static final long serialVersionUID = -4343840725908094313L;
-      
-      
-    }
     class NumberPatternRange  {
-      int min;
-      int max; 
-      int current;
-      boolean isPattern;
+      private final int min;
+      private final int max; 
+      private int value = -1;
+      private final boolean isWildcard;
+      private final String label;
       
-      public NumberPatternRange(int min, int max, String strValue) { 
+      public NumberPatternRange(int min, int max, String strValue, String label) 
+        throws CronLineParseException { 
       	this.min = min;
       	this.max = max;
-      	isPattern = (strValue.equals("*") ? true : false);
-      	if (!isPattern)
-      	  this.current = Integer.parseInt(strValue);
-      	checkRange();
+        this.isWildcard = strValue.equals("*");
+        this.label = label;
+      	if (!isWildcard) {
+          try {
+            this.value = Integer.parseInt(strValue);
+          } catch (NumberFormatException nfe) {
+            throw new CronLineParseException("Malformed "+label+" value: " +strValue, nfe);
+          }
+        }
+      	validateRange();
       }
       
-      private void checkRange() {
-	if (!isPattern() && current < min || current > max)
-	  throw new NumberFormatException("Current value " + current + " out of Range: [" + min + ":" + max + "]");
+      private void validateRange() throws CronLineParseException {
+	if (!isWildcard() && value < min || value > max)
+	  throw new CronLineParseException(label + " value '" + value + "' out of range [" + min + ":" + max + "]");
       }
 
       /**
        * 
        */
       
-      public void set(int value) throws OutOfRangeException {
-	current = value;
-	checkRange();
+      public void set(int value) throws CronLineParseException {
+	this.value = value;
+	validateRange();
       }
 
       public void reset() {
-	  current = min;
+	  value = min;
       }
       
       /**
        * Increment the number, but reset if larger than max. 
        */
       public void inc() {
-	current++; 
-	if (current > max)
+	value++; 
+	if (value > max)
 	  reset();
       }
       
+      @Override
       public boolean equals(Object obj) {
 	if (this == obj)
 	  return true;
 	if (obj instanceof NumberPatternRange) {
 	  NumberPatternRange other  = (NumberPatternRange) obj;
-	  if (this.isPattern() || other.isPattern())
+	  if (this.isWildcard() || other.isWildcard())
 	    return true;
-	  if (this.current == other.current)
+	  if (this.value == other.value)
 	    return true;
 	}
 	return false;
       }
 
       public boolean equals(Integer value) {
-	if (this.isPattern())
+	if (this.isWildcard())
 	    return true;
-	  if (this.current == value)
-	    return true;
-	return false;
+	return this.value == value;
       }
 
-      public boolean isPattern() {
-	return isPattern;
+      public boolean isWildcard() {
+	return isWildcard;
       }
     }
     /**
      * Constructs a CronLine from a string representation of following format:
      * "%d %d %d %d %d" applied to minute, hour, day-of-month, month, day-of-week
      * @param line For example: "55 23 * * 1" which means every Tuesday 23:55
+     * @throws com.indexdata.utils.CronLineParseException
      */
-    public CronLine(String line) {
+    public CronLine(String line) throws CronLineParseException {
         
         if (line == null) {
-            throw new CronLineParseException("Supplied cron line is null");
+            throw new CronLineParseException("Cron line cannot be null");
         }
         fields = line.split(" +");
-       
-        // todo: throw an exception if not exactly 5 numerical fields!
-        if ((fields == null) || (fields.length != nfields)) {
-            throw new CronLineParseException("Supplied cron line '" + line + "' cannot be parsed.");
+        if ((fields == null) || (fields.length != 5)) {
+            throw new CronLineParseException("Malformed cron line: '" + line);
         }
 
-        minute = new NumberPatternRange(0, 59, fields[0]);
-        hour   = new NumberPatternRange(0, 23, fields[1]);
-        day    = new NumberPatternRange(1, 31, fields[2]);
-        month  = new NumberPatternRange(1, 12, fields[3]);
-        weekday = new NumberPatternRange(1, 7, fields[4]);
-        
-
-        if (!fields[0].equals("*") && (Integer.parseInt(fields[0]) < 0 || Integer.parseInt(fields[0]) > 59)) {
-            throw new CronLineParseException("Minutes must have value between 0 and 59.");
-        }
-        
-    } // Cronline constructor
+        minute = new NumberPatternRange(0, 59, fields[0], "MINUTE");
+        hour   = new NumberPatternRange(0, 23, fields[1], "HOUR");
+        day    = new NumberPatternRange(1, 31, fields[2], "DAY_OF_MONTH");
+        month  = new NumberPatternRange(1, 12, fields[3], "MONTH");
+        weekday = new NumberPatternRange(0, 6, fields[4], "DAY_OF_WEEK");    
+    }
 
     /**
      * Matches this cron line against the parameter and returns true if the param
@@ -170,21 +160,20 @@ public class CronLine {
     }
 
     /**
-     * Return a cron line that corresponds to current date and time.
+     * Return a cron line that corresponds to value date and time.
      * @return and instance of CronLine
      */
-    public static CronLine currentCronLine() {
+    public static CronLine currentCronLine() throws CronLineParseException {
         Calendar cal = new GregorianCalendar(); // defaults to now()
         return createCronLine(cal);
     }
     
-    public static CronLine createCronLine (Calendar cal) {
+    public static CronLine createCronLine(Calendar cal) throws CronLineParseException {
         int min = cal.get(Calendar.MINUTE);
         int hr = cal.get(Calendar.HOUR_OF_DAY);
         int mday = cal.get(Calendar.DAY_OF_MONTH);
         int mon = cal.get(Calendar.MONTH) + 1;  // JAN = 1
-
-        int wday = cal.get(Calendar.DAY_OF_WEEK) - 1; //SUN=0
+        int wday = cal.get(Calendar.DAY_OF_WEEK) - 1; //SUN = 0
         Formatter f = new Formatter();
         f.format("%d %d %d %d %d", min, hr, mday, mon, wday);
         CronLine c = new CronLine(f.toString());
@@ -303,7 +292,7 @@ public class CronLine {
         return cal.getTime();        
     }
     
-    public Date nextMatchingDate(Date date) {
+    public Date nextMatchingDate(Date date) throws CronLineParseException {
       Calendar next = new GregorianCalendar();
       next.setTimeZone(TimeZone.getTimeZone("UTC"));
       next.set(Calendar.SECOND, 0);
@@ -311,10 +300,10 @@ public class CronLine {
       next.setTime(date);
       int year = next.get(Calendar.YEAR);
       int count = 0; 
-      //System.out.println("Count: " + count + " Date: " + format.format(next.getTime()));
       while (true) {
         if (year + yearsToScan < next.get(Calendar.YEAR))
-          throw new CronLineParseException("Could not find matching day for \""+this.toString()+"\" within the next "+yearsToScan + " years. (" + count + ")");
+          throw new CronLineParseException("Could not find matching day for \""+this.toString()+"\" within the next "
+            +yearsToScan + " years. (" + count + ")");
 	count++; 
 
         if (!this.month.equals(next.get(Calendar.MONTH)+1)) {
