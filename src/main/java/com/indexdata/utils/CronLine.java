@@ -162,13 +162,14 @@ public class CronLine {
     /**
      * Return a cron line that corresponds to value date and time.
      * @return and instance of CronLine
+     * @throws com.indexdata.utils.CronLineParseException
      */
-    public static CronLine currentCronLine() throws CronLineParseException {
+    public static CronLine currentCronLine() {
         Calendar cal = new GregorianCalendar(); // defaults to now()
         return createCronLine(cal);
     }
     
-    public static CronLine createCronLine(Calendar cal) throws CronLineParseException {
+    public static CronLine createCronLine(Calendar cal) {
         int min = cal.get(Calendar.MINUTE);
         int hr = cal.get(Calendar.HOUR_OF_DAY);
         int mday = cal.get(Calendar.DAY_OF_MONTH);
@@ -176,9 +177,14 @@ public class CronLine {
         int wday = cal.get(Calendar.DAY_OF_WEEK) - 1; //SUN = 0
         Formatter f = new Formatter();
         f.format("%d %d %d %d %d", min, hr, mday, mon, wday);
-        CronLine c = new CronLine(f.toString());
-        f.close();
-        return c;        
+        try {
+          return new CronLine(f.toString());
+        } catch(CronLineParseException clpe) {
+          //we never get here so it's safe to remap as a non-checked exception
+          throw new IllegalStateException(clpe);
+        } finally { 
+          f.close();
+        }
     }
 
     @Override
