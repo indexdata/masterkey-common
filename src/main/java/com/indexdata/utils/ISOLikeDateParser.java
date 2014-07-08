@@ -19,14 +19,14 @@ import java.util.regex.Pattern;
 public class ISOLikeDateParser {
   private final static Pattern datePattern =
     Pattern.compile(
-    "^(\\d{4})(?:[-/.]?(\\d{2}))?(?:[-/.]?(\\d{2}))?(?:[T @](\\d{2}))?(?:[:.]?(\\d{2}))?(?:[:.]?(\\d{2}))?(Z|[+-]\\d{2}(?::?\\d{2})?)?$");
-  //1 - year, 2 - month, 3 - day, 4 - hour, 5 - min, 6 - secs, 7 - timezone
+    "^(\\d{4})(?:[-/.]?(\\d{2}))?(?:[-/.]?(\\d{2}))?(?:[T @](\\d{2}))?(?:[:.]?(\\d{2}))?(?:[:.]?(\\d{2}))?(?:[,]?(\\d{3}))?(Z|[+-]\\d{2}(?::?\\d{2})?)?$");
+  //1 - year, 2 - month, 3 - day, 4 - hour, 5 - min, 6 - secs, 7 - milisecs, 8 - timezone
 
   public static Date parse(String dateStr) throws ParseException {
     Matcher m = datePattern.matcher(dateStr);
     if (m.matches()) {
       //start with time zone
-      String tzs = m.group(7);
+      String tzs = m.group(8);
       TimeZone tz;
       if (tzs == null || tzs.equals("Z")) {
         tz = TimeZone.getTimeZone("GMT");
@@ -108,9 +108,19 @@ public class ISOLikeDateParser {
         }
       }
       c.set(Calendar.SECOND, si);
+      //msecs
+      int msi = 0;
+      String mss = m.group(7);
+      if (mss != null) {
+        msi = Integer.parseInt(mss);
+        if (msi < 0 || msi > 999) {
+          throw new ParseException("ISO milliseconds must be in  the range from 000 to 999, given "
+            + mss,
+            m.start(6));
+        }
+      }
+      c.set(Calendar.MILLISECOND, msi);
       //timezone handled as first item
-      //zero out other stuff
-      c.set(Calendar.MILLISECOND, 0);
       return c.getTime();
     }
     throw new ParseException("Unparsable ISO date format", 0);
