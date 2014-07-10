@@ -19,9 +19,10 @@ import java.util.TimeZone;
 public class DateUtil {
   public static final String RFC_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
   public static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+  public static final String ISO_EXT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss,SSS'Z'";
   
   public enum DateTimeFormat {
-    RFC, ISO, RFC_GMT
+    RFC, ISO, RFC_GMT, ISO_EXT
   }
 
   private static final ThreadLocal<DateFormat> rfcDateFormat =
@@ -52,6 +53,16 @@ public class DateUtil {
             return df;
         }
     };
+  
+  private static final ThreadLocal<DateFormat> isoExtDateFormat =
+    new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            DateFormat df = new SimpleDateFormat(ISO_EXT_DATE_FORMAT);
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return df;
+        }
+    };
 
   public static Date parse(String dateString) throws ParseException {
     return rfcDateFormat.get().parse(dateString);
@@ -62,6 +73,7 @@ public class DateUtil {
       case RFC: return rfcDateFormat.get().parse(dateString);
       case RFC_GMT: return rfcDateFormatGMT.get().parse(dateString);
       case ISO: return ISOLikeDateParser.parse(dateString);
+      case ISO_EXT: return ISOLikeDateParser.parse(dateString);
       default: throw new IllegalArgumentException("Unknown date format " + dtf);
     }
   }
@@ -75,6 +87,7 @@ public class DateUtil {
       case RFC: return rfcDateFormat.get().format(date);
       case RFC_GMT: return rfcDateFormatGMT.get().format(date);
       case ISO: return isoDateFormat.get().format(date);
+      case ISO_EXT: return isoExtDateFormat.get().format(date);
       default: throw new IllegalArgumentException("Unknown date format " + dtf);
     }
   }

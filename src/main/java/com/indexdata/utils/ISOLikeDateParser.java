@@ -21,17 +21,25 @@ public class ISOLikeDateParser {
     Pattern.compile(
     "^(\\d{4})(?:[-/.]?(\\d{2}))?(?:[-/.]?(\\d{2}))?(?:[T @](\\d{2}))?(?:[:.]?(\\d{2}))?(?:[:.]?(\\d{2}))?(?:[,]?(\\d{3}))?(Z|[+-]\\d{2}(?::?\\d{2})?)?$");
   //1 - year, 2 - month, 3 - day, 4 - hour, 5 - min, 6 - secs, 7 - milisecs, 8 - timezone
-
+  
   public static Date parse(String dateStr) throws ParseException {
+    return parse(dateStr, null);
+  }
+  
+  public static Date parse(String dateStr, TimeZone timezone) throws ParseException {
     Matcher m = datePattern.matcher(dateStr);
     if (m.matches()) {
       //start with time zone
-      String tzs = m.group(8);
       TimeZone tz;
-      if (tzs == null || tzs.equals("Z")) {
-        tz = TimeZone.getTimeZone("GMT");
+      if (timezone != null) {
+        tz = timezone;
       } else {
-        tz = TimeZone.getTimeZone("GMT" + tzs);
+        String tzs = m.group(8);
+        if (tzs == null || tzs.equals("Z")) {
+          tz = TimeZone.getTimeZone("GMT");
+        } else {
+          tz = TimeZone.getTimeZone("GMT" + tzs);
+        }
       }
       Calendar c = Calendar.getInstance(tz);
       //year
