@@ -71,7 +71,7 @@ public class Pazpar2Settings {
   protected Map<String, Map<String, Setting>> settings = new HashMap<String, Map<String, Setting>>();
   private static Logger logger = Logger.getLogger(Pazpar2Settings.class);
   private Pazpar2ClientConfiguration cfg;
-  Pattern hostPortRegEx = Pattern.compile("^[A-Za-z0-9\\-.]+:[0-9]+$");
+  Pattern hostOnly = Pattern.compile("^[A-Za-z0-9\\-.]+(:[0-9]+)?$");
   protected Pazpar2Settings(Pazpar2ClientConfiguration cfg) {
     this.cfg = cfg;
   }
@@ -128,7 +128,7 @@ public class Pazpar2Settings {
       if (!isCf) {
         String extraPath = encodeRichDatabaseParameters("targetmap",  l.getDynamicElements());  
         if (extraPath != null) {
-          if (hostPortRegEx.matcher(l.getZurl()).matches()) {
+          if (hostOnly.matcher(l.getZurl()).matches()) {
             urlBuilder.append("/");
           }
           urlBuilder.append(",").append(extraPath);
@@ -288,7 +288,7 @@ public class Pazpar2Settings {
     if (l.getCfAuth() != null && !l.getCfAuth().isEmpty()) {
       // this is a CF target
      // Ends with a port number, append a path
-      if (hostPortRegEx.matcher(l.getZurl()).matches()) {
+      if (hostOnly.matcher(l.getZurl()).matches()) {
         zurl.append("/");
       }
       if (cfg.CF_ENGINE_ADDRESS != null && cfg.CF_ENGINE_ADDRESS.length() > 0) {
