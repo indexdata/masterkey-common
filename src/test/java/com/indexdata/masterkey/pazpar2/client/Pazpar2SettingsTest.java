@@ -48,10 +48,10 @@ public class Pazpar2SettingsTest {
    * Test of fromSearchables method, of class Pazpar2Settings.
    */
   @Test
-  public void testFromSearchables() throws ProxyErrorException, TransformerException {
+  public void testFromSearchablesZurls() throws ProxyErrorException, TransformerException {
     Record record = new Record("searchable");
     SearchableTypeLayer layer = new SearchableTypeLayer();
-    layer.setUdb("test-target-1");
+    layer.setId("test-target-1");
     layer.setZurl("test-target.com:8888/test-database");
     layer.setElementSet(null);
     layer.setMaxRecords("");
@@ -69,6 +69,54 @@ public class Pazpar2SettingsTest {
     Records records = new Records();
     records.setRecords(list);
     Pazpar2ClientConfiguration pcc = new Pazpar2ClientConfiguration(null);
+    //target are indexed by zurl by default
+    Pazpar2Settings result = Pazpar2Settings.fromSearchables(records, pcc);
+    
+    //simple test
+    String id = "test-target.com:8888/test-database";
+    String zurl = result.getSetting(id, "pz:url");
+    assertEquals("test-target.com:8888/test-database", zurl);
+    //null setting without defaults
+    String elm = result.getSetting(id, "pz:elements");
+    assertEquals(null, elm);
+    //empty setting without defaults
+    String max = result.getSetting(id, "pz:maxrecs");
+    assertEquals(null, max);
+    //empty setting with defaults
+    String cclTi = result.getSetting(id, "pz:cclmap:ti");
+    assertEquals("u=4 s=al",cclTi);
+    //test fieldMap
+    String map = result.getSetting(id, "pz:xslt");
+    assertEquals("[XML encoded]", map);
+    
+    Document settings = result.toXml(null);
+    XmlUtils.serialize(settings, System.out);
+  }
+  
+  @Test
+  public void testFromSearchablesID() throws ProxyErrorException, TransformerException {
+    Record record = new Record("searchable");
+    SearchableTypeLayer layer = new SearchableTypeLayer();
+    layer.setId("test-target-1");
+    layer.setZurl("test-target.com:8888/test-database");
+    layer.setElementSet(null);
+    layer.setMaxRecords("");
+    layer.setCclMapTi("");
+    layer.setFieldMap(
+      "999$* jtitle\n" +
+      "999$ab jtitle-add\n" +
+      "100$abc author\n" + 
+      "245$!cd title\n");
+    List<Layer> layers = new ArrayList<Layer>();
+    layers.add(layer);
+    record.setLayers(layers);
+    List<Record> list = new ArrayList<Record>();
+    list.add(record);
+    Records records = new Records();
+    records.setRecords(list);
+    Pazpar2ClientConfiguration pcc = new Pazpar2ClientConfiguration(null);
+    //index targets by ID
+    pcc.USE_OPAQUE_ID = "yes";
     Pazpar2Settings result = Pazpar2Settings.fromSearchables(records, pcc);
     
     //simple test
@@ -95,6 +143,7 @@ public class Pazpar2SettingsTest {
   public void testUDBasID() throws ProxyErrorException, TransformerException {
     Record record = new Record("searchable");
     SearchableTypeLayer layer = new SearchableTypeLayer();
+    layer.setId("test-target-id-1");
     layer.setUdb("test-target-1");
     layer.setZurl("test-target.com:8888/test-database");
     layer.setElementSet(null);
@@ -108,9 +157,10 @@ public class Pazpar2SettingsTest {
     Records records = new Records();
     records.setRecords(list);
     Pazpar2ClientConfiguration pcc = new Pazpar2ClientConfiguration(null);
+    pcc.USE_OPAQUE_ID = "udb";
     Pazpar2Settings result = Pazpar2Settings.fromSearchables(records, pcc);
     
-    //test UDB as ID
+    //test that targets are indexed by UDB
     String zurl = result.getSetting("test-target-1", "pz:url");
     assertEquals("test-target.com:8888/test-database", zurl);
   }
@@ -166,6 +216,7 @@ public class Pazpar2SettingsTest {
     targetMaps2.add(new KeyValue("targetmap_some", "other"));
 
     Pazpar2ClientConfiguration pcc = new Pazpar2ClientConfiguration(null);
+    pcc.USE_OPAQUE_ID = "udb";
     Pazpar2Settings result = Pazpar2Settings.fromSearchables(records, pcc);
     
     //test UDB as ID
