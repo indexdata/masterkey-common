@@ -121,7 +121,7 @@ public class XmlUtils {
 
     private void declareElementType(String name, int model, int memberOf, int flags, boolean fromSchema) {
       NSElementType e = new NSElementType(name, model, memberOf, flags);
-      elementTypes.put(name.toLowerCase(), e);
+      elementTypes.put(name, e);
       //we assume that the first declared type is the root type
       if (!fromSchema && rootType == null) {
         rootType = e;
