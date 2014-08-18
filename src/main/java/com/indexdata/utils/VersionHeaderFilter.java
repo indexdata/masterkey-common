@@ -54,13 +54,21 @@ public class VersionHeaderFilter implements Filter {
     //environment
     environmentHeader = "localhost";
     try {
-      InetAddress.getLocalHost().getHostName();
+      environmentHeader = InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException uhe) {
       logger.warn("Cannot look up name of the localhost", uhe);
     }
+    //OS
     String osName = System.getProperty("os.name");
-    if (osName != null) {
-      environmentHeader += " (" + osName;
+    boolean openBracket = false;
+    if (osName != null && !osName.isEmpty()) {
+      if (!openBracket) {
+        environmentHeader += " (";
+        openBracket = true;
+      } else {
+        environmentHeader += "; ";
+      }
+      environmentHeader += osName;
       String osVersion = System.getProperty("os.version");
       if (osVersion != null) {
         environmentHeader += " " + osVersion;
@@ -69,8 +77,35 @@ public class VersionHeaderFilter implements Filter {
       if (osArch != null) {
         environmentHeader += "; " + osArch;
       }
-      environmentHeader += ")";
     }
+    //Java
+    String jvmName = System.getProperty("java.vendor");
+    if (jvmName != null && !jvmName.isEmpty()) {
+      if (!openBracket) {
+        environmentHeader += " (";
+        openBracket = true;
+      } else {
+        environmentHeader += "; ";
+      }
+      environmentHeader += jvmName;
+      String jvmVersion = System.getProperty("java.version");
+      if (jvmVersion != null) {
+        environmentHeader += " " + jvmVersion;
+      }
+    }
+    //server
+    String srvNameVersion = filterConfig.getServletContext().getServerInfo();
+    if (srvNameVersion != null && !srvNameVersion.isEmpty()) {
+      if (!openBracket) {
+        environmentHeader += " (";
+        openBracket = true;
+      } else {
+        environmentHeader += "; ";
+      }
+      environmentHeader += srvNameVersion;
+    }
+    if (openBracket)
+      environmentHeader += ")";
   }
 
   @Override
