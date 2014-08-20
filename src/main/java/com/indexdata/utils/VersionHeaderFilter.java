@@ -114,6 +114,7 @@ public class VersionHeaderFilter implements Filter {
     FilterChain chain) throws IOException, ServletException {
     ((HttpServletResponse) response).setHeader("X-MK-Component", versionHeader);
     ((HttpServletResponse) response).setHeader("X-MK-Environment", environmentHeader);
+    ((HttpServletResponse) response).setHeader("X-MK-Client-IP", request.getRemoteAddr());
     if (((HttpServletRequest) request).getHeader("X-Forwarded-For") != null) {
       ((HttpServletResponse) response).setHeader("X-MK-Forwarded-For", 
         ((HttpServletRequest) request).getHeader("X-Forwarded-For"));
