@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -224,37 +225,51 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
     } else {
       try {
         try {
-          logger.debug("Command [" + command.getCommand()
-            + "]. Last search was: ["
-            + pazpar2Session.getSearchQueryString() + "]");
+          logger.debug("Command [" + command.getCommand() + "]. Last search was: [" + pazpar2Session.getSearchQueryString() + "]");
           if (command.record() && !this.hasSearchCommand()) {
+            logger.info("Encountered record request on session without a current search. Will attempt to bootstrap a search.");
             bootstrapRecord(command);
           }
           return doCommand(command, os);
         } catch (Pazpar2InitException pz2ie) {
-          logger.info("Session is dead. Reinitializing before command "
-            + command.getCommand());
+          logger.info("Session is dead. Reinitializing before command " + command.getCommand());
           pazpar2Session.setSessionId(null);
           logger.debug(pz2ie);
           bootstrapSession(command);
-          logger.info("Relaying request (final): " + command.getPz2queryString()
-            + " on session ["
-            + pazpar2Session.getSessionId() + "]");
+          logger.info("Relaying request (final): " + command.getPz2queryString() + " on session [" + pazpar2Session.getSessionId() + "]");
           try {
             return doCommand(command, os);
           } catch (Pazpar2MissingRecordException pz2mre) {
-            logger.info(
-              "Reinitialized session has a previous search that is missing the requested record ");
+            logger.info("Reinitialized session has a previous search that is missing the requested record. Will attempt to bootstrap a search.");
             logger.debug(pz2mre);
             bootstrapRecord(command);
             return doCommand(command, os);
           }
         } catch (Pazpar2MissingRecordException pz2mre) {
-          logger.info(
-            "Record is missing. Search could be overwritten in Pazpar2, will attempt bootstrap of record from recordquery");
+          logger.info("Record is missing on current session. Will retry once and then while there are active clients.");
           logger.debug(pz2mre);
           bootstrapRecord(command);
-          return doCommand(command, os);
+          boolean recordMissing=true;
+          boolean activeClients = true;
+          HttpResponse recordResponse = null;
+          while (recordMissing && activeClients) {
+            try {
+              logger.debug("Requesting record again.");
+              recordResponse = doCommand(command, os);
+              recordMissing=false;
+            } catch (Pazpar2MissingRecordException e) {
+              logger.warn("The requested record still not found in pazpar2 result set.");
+              activeClients = Integer.parseInt(getResults("show").getElementsByTagName("activeclients").item(0).getTextContent())>0;
+              if (activeClients) {
+                logger.warn("There are still active clients. Trying to request the record again.");
+                doShow();
+              } else {
+                logger.error("No more active clients. Giving up on finding the requested record.");
+                throw e;
+              }
+            }
+          }
+          return recordResponse;
         }
       } catch (Pazpar2ErrorException erre) {
         logger.warn("Pazpar2 application error (" + erre.getAddInfo()
@@ -324,10 +339,10 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
     Pazpar2IOException, Pazpar2ErrorException,
     IOException {
     if (command.record()) {
-      logger.info("Running the search [" + command.getRecordQuery()
-        + "] to bring in records in Pazpar2 memory before record command + ["
-        + command.getPz2queryString() + "]");
       if (command.hasRecordQuery()) {
+        logger.info("Running the search [" + command.getRecordQuery()
+            + "] to bring in records in Pazpar2 memory before record command + ["
+            + command.getPz2queryString() + "]");
         this.setSearchCommand(new ClientCommand("search", command.
           getRecordQuery()));
         if (!sessionIsAlive()) {
