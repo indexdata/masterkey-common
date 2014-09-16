@@ -304,13 +304,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
    */
   private void doShow() throws IOException, Pazpar2ErrorException,
     Pazpar2IOException {
-    try {
-      Thread.sleep(1000); // Intended as grace period for Pazpar2 between search
-      // and record. Even necessary?
-    } catch (InterruptedException e) {
-      // do nothing
-    }
-    HttpResponse showResponse = request("command=show");
+    HttpResponse showResponse = request("command=show&block=1");
     OutputStream showOs = new ByteArrayOutputStream();
     pipeStream(showResponse.body, showOs);
     cacheResults("show", showOs, showResponse.contentType);
