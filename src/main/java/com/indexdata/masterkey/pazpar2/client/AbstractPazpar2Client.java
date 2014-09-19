@@ -246,6 +246,10 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
             return doCommand(command, os);
           }
         } catch (Pazpar2MissingRecordException pz2mre) {
+          if (!command.hasRecordQuery()) { 
+            logger.error("Record is missing on current session and no recordquery provided to bootstrap another " + pz2mre);
+            throw pz2mre;
+          } 
           logger.info("Record is missing on current session. Will retry once and then while there are active clients.");
           logger.debug(pz2mre);
           bootstrapRecord(command);
