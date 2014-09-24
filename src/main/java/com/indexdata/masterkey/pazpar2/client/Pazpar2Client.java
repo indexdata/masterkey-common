@@ -85,7 +85,7 @@ public interface Pazpar2Client {
     
     public long getTimeStamp(String command, int searchNumber);
     
-    
+    public void setTimeStamp(String command, int searchNumber);
     /**
      * Finds a 'hit' element by record ID from the latest 'show' results
      * @param recid

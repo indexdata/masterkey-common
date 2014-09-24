@@ -408,7 +408,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
    * 
    * @param command
    */
-  private void setTimeStamp(String command, int searchCount) {
+  public void setTimeStamp(String command, int searchCount) {
     long timeStamp = System.currentTimeMillis();
     if (commandTimeStamps != null) {
       if (commandTimeStamps.get(command + "-" + searchCount) == null) {
