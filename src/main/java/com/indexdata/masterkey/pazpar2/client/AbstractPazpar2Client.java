@@ -788,7 +788,7 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
       recordDoc.renameNode(importedHit, null, "record");
       recordDoc.appendChild(importedHit);
     } else {
-      logger.debug("Did not find hit for record id [" + recid + "]");
+      logger.warn("Did not find hit for record id [" + recid + "]");
     }
     return recordDoc;
   }
