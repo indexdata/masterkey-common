@@ -48,26 +48,91 @@ public class MasterkeyConfiguration implements Serializable {
 
     private static Logger logger = Logger.getLogger(MasterkeyConfiguration.class);
     private static ConcurrentHashMap<String,MasterkeyConfiguration> configLocationCache = new ConcurrentHashMap<String, MasterkeyConfiguration>();    
-    private boolean cacheConfigParams = true;           
-    private String contextKey = null;
-    private String hostName = null;
+    private final boolean cacheConfigParams;           
+    private final String contextKey;
+    private final String hostName;
 
     private ConcurrentHashMap<String,Properties> configParametersCache = new ConcurrentHashMap<String, Properties>();
-    private ConfigFileLocation configFileLocation = null;
+    private final ConfigFileLocation configFileLocation;
+    
+    //simplify singleton ceation
+    private interface MasterkeyConfigurationInstantiator {
+      MasterkeyConfiguration getInstance() throws IOException;
+      String getHashKey();
+    }
+    
+    //servlet
+    private static class ServletInstantiator implements MasterkeyConfigurationInstantiator {
+      private final ServletContext servletContext;          
+      private final String appId;
+      private final String hostName;
+      private final String configFileName;
+
+    public ServletInstantiator(ServletContext servletContext, String appId,
+      String hostName, String configFileName) {
+      this.servletContext = servletContext;
+      this.appId = appId;
+      this.hostName = hostName;
+      this.configFileName = configFileName;
+    }      
+      
+      @Override
+      public MasterkeyConfiguration getInstance() throws IOException {
+        return new MasterkeyConfiguration(servletContext, appId, hostName,
+          configFileName);
+      }
+
+    @Override
+    public String getHashKey() {
+      return appId + "/" + configFileName + "@"+hostName;
+    }
+      
+    }
+    
+    //unit tests
+    
+    private static class ManualInstantiator implements MasterkeyConfigurationInstantiator {
+      private final ConfigFileLocation cfl;
+      private final String appId;
+      private final String hostName;
+      private final boolean cacheConfig;
+
+    public ManualInstantiator(ConfigFileLocation cfl, String appId,
+      String hostName, boolean cacheConfig) {
+      this.cfl = cfl;
+      this.appId = appId;
+      this.hostName = hostName;
+      this.cacheConfig = cacheConfig;
+    }
+      
+    @Override
+    public MasterkeyConfiguration getInstance() throws IOException {
+      return new MasterkeyConfiguration(cfl, appId, hostName, cacheConfig);
+    }
+
+    @Override
+    public String getHashKey() {
+      return appId+"/"+cfl.getConfigFileBase().getFileName()+"@"+hostName;
+    }
+      
+    }
 
     private MasterkeyConfiguration(ServletContext servletContext, String appId,
-                String hostName, String configFilename)
+                String hostName, String configFileName)
             throws IOException {
-        initMasterkeyConfiguration(servletContext, appId, hostName, configFilename);
-
+        this(
+          new ConfigFileLocation(new ConfigFileBase(servletContext, configFileName), hostName),
+          appId,
+          hostName,
+          areConfigParamsCached(servletContext.getInitParameter(MASTERKEY_CONFIG_LIFE_TIME_PARAM))
+        );
     }
-    private void initMasterkeyConfiguration(ServletContext servletContext,
-                String appId, String hostName, String configFileName)
-            throws IOException {
-    	contextKey = appId + "@"+hostName;
-    	this.hostName = hostName;
-        cacheConfigParams = areConfigParamsCached(servletContext.getInitParameter(MASTERKEY_CONFIG_LIFE_TIME_PARAM));
-        configFileLocation = new ConfigFileLocation(servletContext, hostName, configFileName);
+    
+    private MasterkeyConfiguration(ConfigFileLocation cfl, String appId, String hostName, boolean cacheConfig) {
+      this.hostName = hostName;
+      contextKey = appId + "@" + hostName;
+      cacheConfigParams = cacheConfig;
+      configFileLocation = cfl;
     }
 
     private Logger getLogger() {
@@ -80,8 +145,8 @@ public class MasterkeyConfiguration implements Serializable {
      * @param servletContext Needed to pick up init parameters regarding the location of config files
      * @param hostName Used for resolving the path to config files.
      */
-    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String appId, String hostName) throws IOException {
-        return init(servletContext, appId, hostName, "");
+    public static MasterkeyConfiguration getInstance(ServletContext servletContext, String appId, String hostName) throws IOException {
+        return getInstance(servletContext, appId, hostName, "");
     }
     
     /**
@@ -97,29 +162,37 @@ public class MasterkeyConfiguration implements Serializable {
      * @param hostName       Used for resolving the path to config files.
      * @param configFileName Defined by components code.
      */
-    public static MasterkeyConfiguration getInstance (ServletContext servletContext, String appId, String hostName, String configFileName) throws IOException {
-        return init(servletContext, appId, hostName, configFileName);
-
+    public static MasterkeyConfiguration getInstance(ServletContext servletContext, String appId, String hostName, String configFileName) throws IOException {
+        if (configFileName == null)
+            configFileName = "";
+        return init(new ServletInstantiator(servletContext, appId, hostName,
+          configFileName));
+    }
+    
+    public static MasterkeyConfiguration getInstance(ConfigFileLocation cfl, String appId, String hostName, boolean cacheConfig) throws IOException {
+      return init(new ManualInstantiator(cfl, appId, hostName, cacheConfig));
     }
 
     /**
      * Creates a singleton MasterkeyConfiguration for each combination of component name and host name (and possibly config file name).
 	 */
-    private static MasterkeyConfiguration init (ServletContext servletContext, String appId, String hostName, String configFileName) throws IOException {
+    private static MasterkeyConfiguration init(MasterkeyConfigurationInstantiator instantiator) throws IOException {
         MasterkeyConfiguration cfg = null;
-        if (configFileName == null)
-            configFileName = "";
-        String cfgKey = appId + "/" + configFileName + "@"+hostName;
-        if (configLocationCache.containsKey(cfgKey)) {
-            cfg = (MasterkeyConfiguration) (configLocationCache.get(cfgKey));
-            cfg.getLogger().debug("Returning cached config location for '" + cfgKey + "': '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
+        if (configLocationCache.containsKey(instantiator.getHashKey())) {
+            cfg = (MasterkeyConfiguration) (configLocationCache.get(instantiator.getHashKey()));
+            cfg.getLogger().debug("Returning cached config location for '" 
+              + instantiator.getHashKey() 
+              + "': '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
         } else {            
-            cfg = new MasterkeyConfiguration(servletContext, appId, hostName, configFileName);
-            cfg.getLogger().debug("No previously cached config location reference found for '" + cfgKey + "'. Instantiating a new config location reference: '" + cfg.getConfigFileLocation().getConfigFilePath() + "'");
+            cfg = instantiator.getInstance();
+            cfg.getLogger().debug("No previously cached config location reference found for '" 
+              + instantiator.getHashKey() 
+              + "'. Instantiating a new config location reference: '" 
+              + cfg.getConfigFileLocation().getConfigFilePath() + "'");
             // Check that config file is readable, if not, analyze and throw exception
             cfg.getConfigFileLocation().evaluate();
             // The file location passed tests, store it
-            configLocationCache.put(cfgKey, cfg);
+            configLocationCache.put(instantiator.getHashKey(), cfg);
         }
         return cfg;
     }
@@ -154,7 +227,7 @@ public class MasterkeyConfiguration implements Serializable {
      * @return
      * @throws javax.servlet.ServletException
      */
-    private boolean areConfigParamsCached(String configLifeTime) {
+    private static boolean areConfigParamsCached(String configLifeTime) {
         boolean setting = true;
         if (configLifeTime == null || configLifeTime.length() == 0) {
             logger.warn(MASTERKEY_CONFIG_LIFE_TIME_PARAM + " init parameter not defined in deployment descriptor. Can be 'REQUEST' or 'SERVLET'. Defaulting to 'SERVLET'.");

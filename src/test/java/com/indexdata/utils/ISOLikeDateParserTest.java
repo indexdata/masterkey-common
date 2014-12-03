@@ -69,4 +69,15 @@ public class ISOLikeDateParserTest {
     assertEquals("Check parsing for "+date4Str, date4Exp, date4Out);
   }
   
+  @Test
+  public void testMiliPrecisionRange() throws ParseException {
+    final String lowStr = "2014-07-08 04:17:01,100";
+    final Date low = ISOLikeDateParser.parse(lowStr);
+    final String hiStr = "2014-07-08 04:17:01,549";
+    final Date hi = ISOLikeDateParser.parse(hiStr);
+    assertTrue("Checking inequality: "+hiStr + " > " +lowStr, hi.after(low));
+    assertTrue("Checking inequality: "+lowStr + " < " +hiStr, low.before(hi));
+    
+  }
+  
 }
