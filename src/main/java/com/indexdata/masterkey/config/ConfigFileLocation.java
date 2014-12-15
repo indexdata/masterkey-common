@@ -14,77 +14,31 @@ import org.apache.log4j.Logger;
  * including method for troubleshooting.
  */
 public class ConfigFileLocation implements Serializable {
-
-  private static final long serialVersionUID = 950891180639044889L;
-    public static String MASTERKEY_ROOT_CONFIG_DIR;
-    public static final String MASTERKEY_ROOT_CONFIG_DIR_PARAM = "MASTERKEY_ROOT_CONFIG_DIR";
-    public static final String MASTERKEY_COMPONENT_CONFIG_DIR_PARAM = "MASTERKEY_COMPONENT_CONFIG_DIR";
-    public static final String MASTERKEY_CONFIG_FILE_NAME_PARAM = "MASTERKEY_CONFIG_FILE_NAME";
-    public static final String DOMAIN_CONFIG_DIR_PROPERTY_NAME = "CONFIG_DIR";
-    public static final String DOMAIN_CONFIG_FILE_POSTFIX = "_confd";
-    private String componentDir = null;
-    private String fileName = null;
-    private String serverName = null;
-    private String configDirForServerName = null;
-    private String domainMappingFileName = null;
-    Properties domainConfigMappingProperties = null;
     private static Logger logger = Logger.getLogger(ConfigFileLocation.class);
 
-    /**
-     *
-     * @param context
-     * @param serverName Used for resolving the config directory
-     * @param configFileName optionally overriding the (base) name of the config file.
-     * @throws javax.servlet.IOException If any of three basic context params are missing
-     */
-    public ConfigFileLocation(ServletContext context, String serverName)
-            throws IOException {
-        init(context, serverName,"");
-    }
-    public ConfigFileLocation(ServletContext context, String serverName, String configFileName)
-            throws IOException {
-        init(context, serverName,configFileName);
+  private static final long serialVersionUID = 950891180639044889L;
+    public static final String DOMAIN_CONFIG_DIR_PROPERTY_NAME = "CONFIG_DIR";
+
+    private final ConfigFileBase cfb;
+    private final String serverName;
+    private final String configDirForServerName;
+    private final String domainMappingFileName;
+    Properties domainConfigMappingProperties = null;
+
+
+    public ConfigFileLocation(ConfigFileBase cfb, String serverName) throws IOException {
+        this.cfb = cfb;
+        this.serverName = serverName;
+        this.domainMappingFileName = serverName + ConfigFileBase.DOMAIN_CONFIG_FILE_POSTFIX;
+        this.configDirForServerName = getConfigDirForServerName(cfb.getComponentDir(), domainMappingFileName);
     }
 
-    private void init(ServletContext context, String serverName, String configFileName) throws IOException {
-        String rootConfigDir = context.getInitParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM);
-        checkMandatoryParameter(MASTERKEY_ROOT_CONFIG_DIR_PARAM, rootConfigDir);
-        //look for sepcial paths that are relative to the servlet context
-        if (rootConfigDir.startsWith("war://")) {
-          MASTERKEY_ROOT_CONFIG_DIR = context.getRealPath(rootConfigDir.substring(6));
-          logger.debug("MASTERKEY_ROOT_CONFIG is relative to servlet context, resolving as " + MASTERKEY_ROOT_CONFIG_DIR);
-        } else {
-          MASTERKEY_ROOT_CONFIG_DIR = rootConfigDir;
-        }        
-        this.componentDir = context.getInitParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM);
-        checkMandatoryParameter(MASTERKEY_COMPONENT_CONFIG_DIR_PARAM, componentDir);
-        if ( (configFileName != null) && ( !configFileName.isEmpty()) )
-            this.fileName = configFileName;
-        else
-            this.fileName = context.getInitParameter(MASTERKEY_CONFIG_FILE_NAME_PARAM);
-        checkMandatoryParameter(MASTERKEY_CONFIG_FILE_NAME_PARAM, fileName);
-        this.serverName = serverName;
-        this.domainMappingFileName = serverName + DOMAIN_CONFIG_FILE_POSTFIX;
-        this.configDirForServerName = getConfigDirForServerName(componentDir, domainMappingFileName);
-    }
     /**
      * Gets the full path to the configuration file, excluding the file itself
      * @return String representing the path
      */
     String getConfigDir() {
-        return MASTERKEY_ROOT_CONFIG_DIR + componentDir + "/conf.d" + configDirForServerName;
-    }
-
-    /**
-     * Gets the root directory for the component, excluding the host specific subdirectory
-     * @return
-     */
-    private String getComponentDir() {
-        return MASTERKEY_ROOT_CONFIG_DIR + componentDir;
-    }
-
-    private String getComponentConfDDir() {
-        return MASTERKEY_ROOT_CONFIG_DIR + componentDir + "/conf.d";
+        return cfb.getComponentDirPath() + "/conf.d" + configDirForServerName;
     }
 
     /**
@@ -92,7 +46,11 @@ public class ConfigFileLocation implements Serializable {
      * @return
      */
     public String getConfigFilePath() {
-        return getConfigDir() + "/" + fileName;
+        return getConfigDir() + "/" + cfb.getFileName();
+    }
+    
+    public ConfigFileBase getConfigFileBase() {
+      return cfb;
     }
 
     /**
@@ -106,41 +64,50 @@ public class ConfigFileLocation implements Serializable {
         File configFile = new File(getConfigFilePath());
         if (!configFile.exists()) {
             logger.fatal("Masterkey configuration file not found at: '" + getConfigFilePath() + "'. Will troubleshoot. See the following log statements.");
-            File rootDirFile = new File(MASTERKEY_ROOT_CONFIG_DIR);
+            File rootDirFile = new File(cfb.getMasterkeyRootConfigDir());
             if (!rootDirFile.exists()) {
-                logger.error("Masterkey root config directory not found: '" + MASTERKEY_ROOT_CONFIG_DIR + "'");
-                throw new IOException("Masterkey root config directory not found: " + MASTERKEY_ROOT_CONFIG_DIR);
+                logger.error("Masterkey root config directory not found: '" + cfb.getMasterkeyRootConfigDir() + "'");
+                throw new IOException("Masterkey root config directory not found: " + cfb.getMasterkeyRootConfigDir());
             } else {
-                logger.info("Masterkey root config directory was found: '" + MASTERKEY_ROOT_CONFIG_DIR + "'");
+                logger.info("Masterkey root config directory was found: '" + cfb.getMasterkeyRootConfigDir() + "'");
             }
-            File componentDirFile = new File(getComponentDir());
+            File componentDirFile = new File(cfb.getComponentDirPath());
             if (!componentDirFile.exists()) {
-                logger.error("Masterkey component config directory '" + componentDir + "' not found in '" + MASTERKEY_ROOT_CONFIG_DIR + "'. Please check web.xml and compare with file system.");
-                throw new IOException("Masterkey component config directory '" + componentDir + "' not found in '" + MASTERKEY_COMPONENT_CONFIG_DIR_PARAM + "'");
+                logger.error("Masterkey component config directory '" + cfb.getComponentDir() + "' not found in '" + cfb.getMasterkeyRootConfigDir() + "'. Please check web.xml and compare with file system.");
+                throw new IOException("Masterkey component config directory '" + cfb.getComponentDir() + "' not found in '" + cfb.getMasterkeyRootConfigDir() + "'");
             } else {
-                logger.info("Masterkey component config directory was found: '" + getComponentDir() + "'");
+                logger.info("Masterkey component config directory was found: '" + cfb.getComponentDirPath() + "'");
             }
-            File confdDirFile = new File(getComponentConfDDir());
+            File confdDirFile = new File(cfb.getComponentConfDDirPath());
             if (!confdDirFile.exists()) {
-                logger.error("The component directory '" + getComponentDir() + "' must contain a directory named 'conf.d'");
-                throw new IOException("Directory 'conf.d' was not found in masterkey component config directory '" + getComponentDir() + "'");
+                logger.error("The component directory '" + cfb.getComponentDir() + "' must contain a directory named 'conf.d'");
+                throw new IOException("Directory 'conf.d' was not found in masterkey component config directory '" + cfb.getComponentDir() + "'");
             } else {
-                logger.info("Masterkey component 'conf.d' directory was found: '" + getComponentConfDDir() + "'");
+                logger.info("Masterkey component 'conf.d' directory was found: '" + cfb.getComponentConfDDirPath() + "'");
             }
             File configDirFile = new File(getConfigDir());
             if (!configDirFile.exists()) {
                 if (configDirForServerName != null || configDirForServerName.length() > 0) {
-                    logger.error("The directory '" + configDirForServerName + "' was not found in '" + getComponentConfDDir() + " '" + configDirForServerName + "' is configured for '" + serverName + "' in '" + getComponentDir() + "/" + serverName + "'" + " Please check the file '" + serverName + "' and compare with the file system.");
-                    throw new IOException("Directory '" + configDirForServerName + "' was not found in '" + getComponentConfDDir());
+                    logger.error("The directory '" + configDirForServerName 
+                      + "' was not found in '" + cfb.getComponentConfDDirPath() 
+                      + " '" + configDirForServerName + "' is configured for '" 
+                      + serverName + "' in '" + cfb.getComponentDirPath() + "/" 
+                      + serverName + "'" + " Please check the file '" 
+                      + serverName + "' and compare with the file system.");
+                    throw new IOException("Directory '" + configDirForServerName 
+                      + "' was not found in '" + cfb.getComponentConfDDirPath());
                 } else {
-                    logger.warn("Configuration directory not resolved for host name " + serverName);
-
+                    logger.warn("Configuration directory not resolved for host name " 
+                      + serverName);
                 }
             } else {
-                logger.info("Masterkey config directory was found: '" + getConfigDir() + "'");
+                logger.info("Masterkey config directory was found: '" 
+                  + getConfigDir() + "'");
             }
-            logger.error("Configuration file '" + fileName + "' was not found in '" + getConfigDir() + ". Please check web.xml and the filesystem.");
-            throw new IOException("Configuration file '" + fileName + "' was not found in '" + getConfigDir());
+            logger.error("Configuration file '" + cfb.getFileName() 
+              + "' was not found in '" + getConfigDir() + ". Please check web.xml and the filesystem.");
+            throw new IOException("Configuration file '" 
+              + cfb.getFileName() + "' was not found in '" + getConfigDir());
         }
     }
 
@@ -183,26 +150,16 @@ public class ConfigFileLocation implements Serializable {
         if (domainConfigMappingProperties == null) {
             domainConfigMappingProperties = new Properties();
             try {
-            	FileInputStream fis = new FileInputStream(MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + domainMappingFileName);
+            	FileInputStream fis = new FileInputStream(cfb.getMasterkeyRootConfigDir() + componentConfigDirectory + "/" + domainMappingFileName);
                 domainConfigMappingProperties.load(fis);
                 fis.close();
             } catch (IOException ioe) {
             	domainConfigMappingProperties = null;
-                logger.warn(ioe + "Could not load domain-to-config mapping file " + MASTERKEY_ROOT_CONFIG_DIR + componentConfigDirectory + "/" + domainMappingFileName + ".");
+                logger.warn(ioe + "Could not load domain-to-config mapping file " + cfb.getMasterkeyRootConfigDir() + componentConfigDirectory + "/" + domainMappingFileName + ".");
             }
         }
         return domainConfigMappingProperties;
     }
 
-    /**
-     * Convenience method for checking the existence of a given init parameter in web.xml
-     * @param name
-     * @param value
-     */
-    private void checkMandatoryParameter(String name, String value) throws IOException {
-        if (value == null || value.length() == 0 || value.equals("null")) {
-            logger.error("Init parameter " + name + " missing in deployment descriptor (web.xml)");
-            throw new IOException("Init parameter " + name + " missing in deployment descriptor");
-        }
-    }
+
 }
