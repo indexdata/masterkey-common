@@ -814,6 +814,29 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
     } 
     return doc;
   }
+  
+  /* (non-Javadoc)
+   * @see com.indexdata.masterkey.pazpar2.proxy.Pazpar2Client#recordRequest(java.lang.String, int)
+   */
+  @Override
+  public Document recordRequest(String recid, int offset, String syntax) throws
+    Pazpar2ErrorException, Pazpar2IOException {
+    Document doc = null;
+    try {
+      String queryString = "command=record&id=" + URLEncoder.encode(recid,
+        "UTF-8") + "&offset=" + offset + "&syntax=" + syntax;
+      HttpResponse response = request(queryString);
+      doc = XmlUtils.parse(response.body);
+    } catch (UnsupportedEncodingException uee) {
+      throw new RuntimeException(uee);
+    } catch (SAXException se) {
+      throw new Pazpar2MalformedOutputException(se);
+    } catch (IOException ioe) { //coming from sax parsing
+      throw new Pazpar2MalformedOutputException(ioe);
+    } 
+    return doc;
+  }
+
 
   /* (non-Javadoc)
    * @see com.indexdata.masterkey.pazpar2.proxy.Pazpar2Client#recordRequest(java.lang.String)

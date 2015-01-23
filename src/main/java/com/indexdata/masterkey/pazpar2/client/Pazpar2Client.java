@@ -128,12 +128,28 @@ public interface Pazpar2Client {
      * This is for 'embedded' pazpar2 requests by other plug-ins than Relay and
      * independently of the main pazpar2 session. It will not update the state of the pazpar2 client object.   
      * 
-     * @param queryString
+     * @param recid pz2 record id
+     * @param offset pz2 offset parameter
      * @return pazpar2's response as a Document
      * @throws StandardServiceException on Pazpar2 errors or parsing errors.
      */
     public Document recordRequest (String recid, int offset) throws Pazpar2ErrorException, Pazpar2IOException;
 
+    /**
+     * Makes a non-managed/transient pazpar2 record offset request.
+     * 
+     * This is for 'embedded' pazpar2 requests by other plug-ins than Relay and
+     * independently of the main pazpar2 session. It will not update the state of the pazpar2 client object.   
+     * 
+     * @param recid pz2 record id
+     * @param offset pz2 offset parameter
+     * @param syntax pz2 syntax parameter
+     * @return pazpar2's response as a Document
+     * @throws StandardServiceException on Pazpar2 errors or parsing errors.
+     */
+    public Document recordRequest (String recid, int offset, String syntax) throws Pazpar2ErrorException, Pazpar2IOException;
+
+    
     /**
      * Makes a non-managed/transient pazpar2 record request.
      * 
