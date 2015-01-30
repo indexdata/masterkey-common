@@ -44,7 +44,7 @@ import com.indexdata.utils.XmlUtils;
  */
 public class Pazpar2Settings {
   //avoid re-parssing
-  protected static class Setting {
+  public static class Setting {
     protected String string;
     protected Document xml;
     Setting(Document xml) {
@@ -74,6 +74,10 @@ public class Pazpar2Settings {
   Pattern hostOnly = Pattern.compile("^[A-Za-z0-9\\-.]+(:[0-9]+)?$");
   protected Pazpar2Settings(Pazpar2ClientConfiguration cfg) {
     this.cfg = cfg;
+  }
+  
+  public Map<String, Map<String, Setting>> getSettings() {
+    return settings;
   }
   
   public static Pazpar2Settings fromSearchables(Records records, Pazpar2ClientConfiguration cfg) {
