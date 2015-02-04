@@ -6,16 +6,15 @@
 
 package com.indexdata.rest.client;
 
+import com.indexdata.utils.PerformanceLogger;
+import com.indexdata.utils.TextUtils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-
 import org.apache.log4j.Logger;
-
-import com.indexdata.utils.PerformanceLogger;
-import com.indexdata.utils.TextUtils;
 
 /**
  * 
@@ -55,7 +54,7 @@ public class ResourceConnector<T> {
     }
 
     @SuppressWarnings("unchecked")
-	public T get() throws ResourceConnectionException {
+    public T get() throws ResourceConnectionException {
     	long start = PerformanceLogger.start();
         Object obj = null;
         try {        
@@ -65,6 +64,33 @@ public class ResourceConnector<T> {
             if (responseCode == 200) {            
                 JAXBContext context = getJAXBContext();
                 obj = context.createUnmarshaller().unmarshal(conn.getInputStream());                
+            } else {
+                throw new ResourceConnectionException("Cannot retrieve resource " + url.toString() + " - status code " + responseCode);
+            }
+            Logger.getLogger(getClass()).debug("GET " + url.toString() + ". Status: " + responseCode +  ". Location: " + conn.getHeaderField("Location"));
+        } catch (JAXBException jaxbe) {
+            throw new ResourceConnectionException("Get URL " + url.toString() + " failed: " + jaxbe.getMessage(), jaxbe);
+        } catch (IOException ioe) {
+            throw new ResourceConnectionException("Get URL " + url.toString() + " failed: " + ioe.getMessage(), ioe);
+        }
+        PerformanceLogger.finish("TORUS",url.getPath()+"?"+url.getQuery(),start);
+        return (T) obj;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public T getIfModified(Date modifiedSince) throws ResourceConnectionException {
+    	long start = PerformanceLogger.start();
+        Object obj = null;
+        try {        
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setIfModifiedSince(modifiedSince.getTime());
+            int responseCode = conn.getResponseCode();        
+            if (responseCode == 200) {            
+                JAXBContext context = getJAXBContext();
+                obj = context.createUnmarshaller().unmarshal(conn.getInputStream());
+            } else if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
+              return null;
             } else {
                 throw new ResourceConnectionException("Cannot retrieve resource " + url.toString() + " - status code " + responseCode);
             }

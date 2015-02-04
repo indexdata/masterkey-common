@@ -12,9 +12,12 @@ import com.indexdata.rest.client.ResourceConnectionException;
 import com.indexdata.rest.client.ResourceConnector;
 import com.indexdata.rest.client.TorusConnectorFactory;
 import com.indexdata.torus.Records;
+import com.indexdata.utils.CacheEntry;
+import com.indexdata.utils.LRUCache;
 import com.indexdata.utils.PerformanceLogger;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import org.apache.log4j.Logger;
 
 /**
@@ -27,6 +30,7 @@ public class Pazpar2ClientTorus extends AbstractPazpar2Client {
   private static Logger logger = Logger.getLogger(Pazpar2ClientTorus.class);
   private Pazpar2Settings targetSettings = null;
   private String realm = null;
+  private LRUCache<String, CacheEntry> targetCache;
 
   /**
    * Instantiates MODE 2 client
@@ -95,7 +99,7 @@ public class Pazpar2ClientTorus extends AbstractPazpar2Client {
     sendInit(true);
     long startTime = PerformanceLogger.start(" >SETTS", "Target Settings");
     if (targetSettings == null) {
-      logger.info("Fetching target settings from the torus...");
+      logger.info("Fetching target settings...");
       Records targetProfiles =  fetchTargetProfiles();
       targetSettings = Pazpar2Settings.fromSearchables(targetProfiles, cfg);
     }
@@ -123,6 +127,21 @@ public class Pazpar2ClientTorus extends AbstractPazpar2Client {
       : pazpar2Session.getSearchCommand().getTorusParams();
     String torusURI = TorusConnectorFactory.getTorusURL(cfg.TORUS_BASEURL, 
       "searchable", realm, torusParams);
+    Date lastModified = null;
+    Records cachedRecords = null;
+    if (targetCache != null) { 
+      logger.info("Inspecting cache for target settings...");
+      CacheEntry e = targetCache.get(torusURI);
+      if (e != null) {
+        try {
+          lastModified = e.getTimestamp();
+          cachedRecords = (Records) e.getPayload();
+          logger.info("Found cached target settings, timestamp: " + lastModified);
+        } catch (ClassCastException cce) {
+          logger.error("Target cache payload is wrong, ignoring", cce);
+        }
+      }
+    }
     logger.info("Loading target settings from the torus at " + torusURI);
     Records records = null;
     try {
@@ -131,7 +150,26 @@ public class Pazpar2ClientTorus extends AbstractPazpar2Client {
 	  + "...");
       ResourceConnector<Records> torusConn = new ResourceConnector<Records>(torusUrl,
 	  "com.indexdata.torus.layer" + ":com.indexdata.torus");
-      records = (Records) torusConn.get();
+      if (lastModified != null && cachedRecords != null) {
+        records = (Records) torusConn.getIfModified(lastModified);
+        if (records == null) { //not-modified
+          logger.info("Target settings were not modified since "+lastModified);
+          records = cachedRecords;
+        } else { //modified
+          if (targetCache != null) {
+            logger.info("Target settings were modified, new values will be cached");
+            //todo use server timestamp
+            targetCache.put(torusURI, new CacheEntry(new Date(), records));
+          }
+        }
+      } else {
+        records = (Records) torusConn.get();
+        if (records != null && targetCache != null) {
+            logger.info("Target settings were modified, new values will be cached");
+            //todo use server timestamp
+            targetCache.put(torusURI, new CacheEntry(new Date(), records));
+          }
+      }
       if (records == null || records.getRecords() == null) {
 	logger.debug("Got no resources to search from Torus");
 	throw new ProxyErrorException("No search targets retrieved from the torus",
@@ -173,5 +211,14 @@ public class Pazpar2ClientTorus extends AbstractPazpar2Client {
     client.init();
     return client;
   }
+
+  public LRUCache<String, CacheEntry> getTargetCache() {
+    return targetCache;
+  }
+
+  public void setTargetCache(LRUCache<String, CacheEntry> targetCache) {
+    this.targetCache = targetCache;
+  }
+ 
   
 }
