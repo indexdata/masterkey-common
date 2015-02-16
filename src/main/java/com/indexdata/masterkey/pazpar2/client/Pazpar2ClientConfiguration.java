@@ -32,6 +32,8 @@ public class Pazpar2ClientConfiguration implements Serializable {
   public String XML_FILE_PATH = null;
   public String USE_OPAQUE_ID;
   public String CF_ENGINE_ADDRESS = "";
+  //
+  public final String CACHE_LISTENER;
   
   //map values
   public final String CCLMAP_TERM;
@@ -98,6 +100,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
         XML_FILE_PATH = cfg.getConfigFilePath();
         USE_OPAQUE_ID = cfg.get("USE_OPAQUE_ID", "no");
         CF_ENGINE_ADDRESS = cfg.get("CF_ENGINE_ADDRESS");
+        CACHE_LISTENER = cfg.get("CACHE_LISTENER");
 
         CCLMAP_TERM = cfg.get("CCLMAP_TERM", CCLMAP_TERM_FB);
         CCLMAP_SU = cfg.get("CCLMAP_SU", CCLMAP_SU_FB);
@@ -131,6 +134,7 @@ public class Pazpar2ClientConfiguration implements Serializable {
       logger.error("ModuleConfiguration is null, the plugin will behave unstable");
       
       USE_OPAQUE_ID = "no";
+      CACHE_LISTENER = "";
       
       CCLMAP_TERM = CCLMAP_TERM_FB;
       CCLMAP_SU = CCLMAP_SU_FB;
