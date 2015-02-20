@@ -60,6 +60,7 @@ public class ResourceConnector<T> {
         Object obj = null;
         try {        
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            new BasicAuth().setCredentials(conn);
             conn.setRequestMethod("GET");
             int responseCode = conn.getResponseCode();        
             if (responseCode == 200) {            
@@ -144,6 +145,7 @@ public class ResourceConnector<T> {
     public URL post(T t) throws ResourceConnectionException {
         try {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            new BasicAuth().setCredentials(conn);
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", mimeType);
             conn.setRequestMethod("POST");
@@ -178,6 +180,7 @@ public class ResourceConnector<T> {
     public URL postAny(Object obj) throws ResourceConnectionException {
         try {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            new BasicAuth().setCredentials(conn);
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", mimeType);
             conn.setRequestMethod("POST");
