@@ -10,9 +10,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
 import javax.servlet.ServletContext;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -24,6 +25,7 @@ public class ConfigFileBase {
   public static final String MASTERKEY_COMPONENT_CONFIG_DIR_PARAM = "MASTERKEY_COMPONENT_CONFIG_DIR";
   public static final String MASTERKEY_CONFIG_FILE_NAME_PARAM = "MASTERKEY_CONFIG_FILE_NAME";
   public static final String DOMAIN_CONFIG_FILE_POSTFIX = "_confd";
+  public static final String DUMMY_HOSTNAME = "*"; // Used for triggering fall-back properties lookup
   
   private final String masterkeyRootConfigDir;
   private final String componentDir;

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
 import org.apache.log4j.Logger;
 
 /**
@@ -61,54 +60,66 @@ public class ConfigFileLocation implements Serializable {
      * @throws javax.servlet.IOException
      */
     public void evaluate() throws IOException {
-        File configFile = new File(getConfigFilePath());
-        if (!configFile.exists()) {
-            logger.fatal("Masterkey configuration file not found at: '" + getConfigFilePath() + "'. Will troubleshoot. See the following log statements.");
-            File rootDirFile = new File(cfb.getMasterkeyRootConfigDir());
-            if (!rootDirFile.exists()) {
-                logger.error("Masterkey root config directory not found: '" + cfb.getMasterkeyRootConfigDir() + "'");
-                throw new IOException("Masterkey root config directory not found: " + cfb.getMasterkeyRootConfigDir());
-            } else {
-                logger.info("Masterkey root config directory was found: '" + cfb.getMasterkeyRootConfigDir() + "'");
-            }
-            File componentDirFile = new File(cfb.getComponentDirPath());
-            if (!componentDirFile.exists()) {
-                logger.error("Masterkey component config directory '" + cfb.getComponentDir() + "' not found in '" + cfb.getMasterkeyRootConfigDir() + "'. Please check web.xml and compare with file system.");
-                throw new IOException("Masterkey component config directory '" + cfb.getComponentDir() + "' not found in '" + cfb.getMasterkeyRootConfigDir() + "'");
-            } else {
-                logger.info("Masterkey component config directory was found: '" + cfb.getComponentDirPath() + "'");
-            }
-            File confdDirFile = new File(cfb.getComponentConfDDirPath());
-            if (!confdDirFile.exists()) {
-                logger.error("The component directory '" + cfb.getComponentDir() + "' must contain a directory named 'conf.d'");
-                throw new IOException("Directory 'conf.d' was not found in masterkey component config directory '" + cfb.getComponentDir() + "'");
-            } else {
-                logger.info("Masterkey component 'conf.d' directory was found: '" + cfb.getComponentConfDDirPath() + "'");
-            }
-            File configDirFile = new File(getConfigDir());
-            if (!configDirFile.exists()) {
-                if (configDirForServerName != null || configDirForServerName.length() > 0) {
-                    logger.error("The directory '" + configDirForServerName 
-                      + "' was not found in '" + cfb.getComponentConfDDirPath() 
-                      + " '" + configDirForServerName + "' is configured for '" 
-                      + serverName + "' in '" + cfb.getComponentDirPath() + "/" 
-                      + serverName + "'" + " Please check the file '" 
-                      + serverName + "' and compare with the file system.");
-                    throw new IOException("Directory '" + configDirForServerName 
-                      + "' was not found in '" + cfb.getComponentConfDDirPath());
-                } else {
-                    logger.warn("Configuration directory not resolved for host name " 
-                      + serverName);
-                }
-            } else {
-                logger.info("Masterkey config directory was found: '" 
-                  + getConfigDir() + "'");
-            }
-            logger.error("Configuration file '" + cfb.getFileName() 
-              + "' was not found in '" + getConfigDir() + ". Please check web.xml and the filesystem.");
-            throw new IOException("Configuration file '" 
-              + cfb.getFileName() + "' was not found in '" + getConfigDir());
+      File configFile = new File(getConfigFilePath());
+      if (!configFile.exists()) {
+        if (serverName.equals(ConfigFileBase.DUMMY_HOSTNAME)) {
+          logger.info("Masterkey configuration file not found at '" + getConfigFilePath() + " (lookup triggered by mapping file name " + domainMappingFileName + ")");
+          throw new IOException("Configuration file '" + cfb.getFileName() + "' was not found in '" + getConfigDir());
+        } else {
+          troubleshootMissingConfig();
         }
+      }
+    }
+
+    /**
+     * @throws IOException
+     */
+    private void troubleshootMissingConfig() throws IOException {
+      logger.fatal("Masterkey configuration file not found at: '" + getConfigFilePath() + "'. Will troubleshoot. See the following log statements.");
+      File rootDirFile = new File(cfb.getMasterkeyRootConfigDir());
+      if (!rootDirFile.exists()) {
+          logger.error("Masterkey root config directory not found: '" + cfb.getMasterkeyRootConfigDir() + "'");
+          throw new IOException("Masterkey root config directory not found: " + cfb.getMasterkeyRootConfigDir());
+      } else {
+          logger.info("Masterkey root config directory was found: '" + cfb.getMasterkeyRootConfigDir() + "'");
+      }
+      File componentDirFile = new File(cfb.getComponentDirPath());
+      if (!componentDirFile.exists()) {
+          logger.error("Masterkey component config directory '" + cfb.getComponentDir() + "' not found in '" + cfb.getMasterkeyRootConfigDir() + "'. Please check web.xml and compare with file system.");
+          throw new IOException("Masterkey component config directory '" + cfb.getComponentDir() + "' not found in '" + cfb.getMasterkeyRootConfigDir() + "'");
+      } else {
+          logger.info("Masterkey component config directory was found: '" + cfb.getComponentDirPath() + "'");
+      }
+      File confdDirFile = new File(cfb.getComponentConfDDirPath());
+      if (!confdDirFile.exists()) {
+          logger.error("The component directory '" + cfb.getComponentDir() + "' must contain a directory named 'conf.d'");
+          throw new IOException("Directory 'conf.d' was not found in masterkey component config directory '" + cfb.getComponentDir() + "'");
+      } else {
+          logger.info("Masterkey component 'conf.d' directory was found: '" + cfb.getComponentConfDDirPath() + "'");
+      }
+      File configDirFile = new File(getConfigDir());
+      if (!configDirFile.exists()) {
+          if (configDirForServerName != null || configDirForServerName.length() > 0) {
+              logger.error("The directory '" + configDirForServerName
+                + "' was not found in '" + cfb.getComponentConfDDirPath()
+                + " '" + configDirForServerName + "' is configured for '"
+                + serverName + "' in '" + cfb.getComponentDirPath() + "/"
+                + serverName + "'" + " Please check the file '"
+                + serverName + "' and compare with the file system.");
+              throw new IOException("Directory '" + configDirForServerName
+                + "' was not found in '" + cfb.getComponentConfDDirPath());
+          } else {
+              logger.warn("Configuration directory not resolved for host name "
+                + serverName);
+          }
+      } else {
+          logger.info("Masterkey config directory was found: '"
+            + getConfigDir() + "'");
+      }
+      logger.error("Configuration file '" + cfb.getFileName()
+        + "' was not found in '" + getConfigDir() + ". Please check web.xml and the filesystem.");
+      throw new IOException("Configuration file '"
+        + cfb.getFileName() + "' was not found in '" + getConfigDir());
     }
 
     /**
@@ -150,16 +161,18 @@ public class ConfigFileLocation implements Serializable {
         if (domainConfigMappingProperties == null) {
             domainConfigMappingProperties = new Properties();
             try {
-            	FileInputStream fis = new FileInputStream(cfb.getMasterkeyRootConfigDir() + componentConfigDirectory + "/" + domainMappingFileName);
+              FileInputStream fis = new FileInputStream(cfb.getMasterkeyRootConfigDir() + componentConfigDirectory + "/" + domainMappingFileName);
                 domainConfigMappingProperties.load(fis);
                 fis.close();
             } catch (IOException ioe) {
-            	domainConfigMappingProperties = null;
+              domainConfigMappingProperties = null;
+              if (serverName.equals(ConfigFileBase.DUMMY_HOSTNAME)) {
+                logger.debug(ioe + "Could not load domain-to-config mapping file " + cfb.getMasterkeyRootConfigDir() + componentConfigDirectory + "/" + domainMappingFileName + ".");
+              } else {
                 logger.warn(ioe + "Could not load domain-to-config mapping file " + cfb.getMasterkeyRootConfigDir() + componentConfigDirectory + "/" + domainMappingFileName + ".");
+              }
             }
         }
         return domainConfigMappingProperties;
     }
-
-
 }
