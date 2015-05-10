@@ -44,7 +44,7 @@ public class Pazpar2ClientGeneric extends AbstractPazpar2Client {
   public void init() throws Pazpar2IOException, Pazpar2ErrorException {
     if (cfg.PAZPAR2_SETTINGS_XML != null && cfg.PAZPAR2_SETTINGS_XML.length() > 0) {
       String pz2SettingsXmlFileName = cfg.XML_FILE_PATH + "/" + cfg.PAZPAR2_SETTINGS_XML;
-      logger.debug("Found pointer to pazpar2 service xml: " + pz2SettingsXmlFileName);      
+      logger.debug("Found pointer to pazpar2 settings xml: " + pz2SettingsXmlFileName);      
       try {
         Document pz2TargetSettings = loadSettingsXml(pz2SettingsXmlFileName);
         sendInit(true);
