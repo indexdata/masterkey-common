@@ -141,6 +141,10 @@ public class ClientCommand implements Serializable {
   public boolean record() {
     return (command != null && command.equals("record"));
   }
+  
+  public boolean recordWithOffset() {
+    return record() && (queryString.contains("&offset=") || queryString.contains("&checksum="));
+  }
     
   public String getRecordQuery () {    
     return recordQuery;

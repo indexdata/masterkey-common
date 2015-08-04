@@ -309,7 +309,9 @@ public abstract class AbstractPazpar2Client implements Pazpar2Client, Serializab
     HttpResponse response = request(command.getPz2queryString());
     logger.debug("Completed Pazpar2 request on session ["+ getSessionId() +"]: " + command.getPz2queryString());
     pipeStream(response.body, os);
-    cacheResults(command.getCommand(), os, response.contentType);
+    if (!command.recordWithOffset()) {
+      cacheResults(command.getCommand(), os, response.contentType);
+    }
     return response;
   }
 
