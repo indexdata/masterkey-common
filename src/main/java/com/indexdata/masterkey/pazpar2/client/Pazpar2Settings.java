@@ -284,6 +284,7 @@ public class Pazpar2Settings {
     setSetting(id, "contentConnector",l.getContentConnector(),excludeList);
     setSetting(id, "contentAuthentication",l.getContentAuthentication(),excludeList);
     setSetting(id, "contentProxy",l.getContentProxy(),excludeList);
+    setSetting(id, "noCproxy",l.getNoCproxy(),"No", excludeList);
     setSetting(id, "aceHitsThreshold", l.getAceHitsThreshold(), excludeList);
 
     /* Now set all other pz_<name> as pz:<name> */

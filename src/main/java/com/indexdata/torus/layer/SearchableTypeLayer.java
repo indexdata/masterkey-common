@@ -78,6 +78,7 @@ public class SearchableTypeLayer extends Layer {
   private String openAccess;
   private String aceHitsThreshold;
   private String sortStrategy;
+  private String noCproxy;
 
   public String getLiteralTransform() {
     return literalTransform;
@@ -537,6 +538,14 @@ public class SearchableTypeLayer extends Layer {
 
   public void setSortStrategy(String sortStrategy) {
     this.sortStrategy = sortStrategy;
+  }
+  
+  public String getNoCproxy() {
+    return noCproxy;
+  }
+  
+  public void setNoCproxy(String noCproxy) {
+    this.noCproxy = noCproxy;
   }
 
 }
