@@ -205,8 +205,8 @@
     </repository>
   </distributionManagement>
   <scm>
-    <connection>scm:git:ssh://git.indexdata.com:222/home/git/private/masterkey-common</connection>
-    <url>http://gitid.indexdata.com/?p=masterkey-common.git</url>
+    <connection>ssh://git@github.com/indexdata/masterkey-common</connection>
+    <url>https://github.com/indexdata/masterkey-common</url>
     <tag>HEAD</tag>
   </scm>
   <repositories>
